@@ -10,6 +10,8 @@ public interface UserDao extends GenericDao<User> {
 
     void update(User entity, String password) throws SQLException;
 
+    void updateData(User entity) throws SQLException;
+
     Optional<User> getByLogin(String username);
 
     Optional<User> getByEmail(String email);
@@ -22,17 +24,5 @@ public interface UserDao extends GenericDao<User> {
 
     void disable(Long id) throws SQLException;
 
-    void disable(String login) throws SQLException;
-
     void enable(Long id) throws SQLException;
-
-    void enable(String login) throws SQLException;
-
-    void updateEmail(String email, User user) throws SQLException;
-
-    void updatePhone(String phone, User user) throws SQLException;
-
-    void updateFirstName(String firstName, User user) throws SQLException;
-
-    void updateLastName(String lastName, User user) throws SQLException;
 }

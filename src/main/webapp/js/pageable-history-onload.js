@@ -1,7 +1,7 @@
-const urlOrderHistory = `/library/user/order-history`;
+const urlPath = `/library/user/order-history`;
 
 window.onload = () => {
-    wizard(urlOrderHistory);
+    wizard(urlPath);
 }
 
 const makeRow = (rowData) => {

@@ -17,11 +17,9 @@
         <script src="${pageContext.request.contextPath}/js/pagination.js"></script>
     </jsp:attribute>
     <jsp:body>
-
-
         <div class="container main-content">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item active"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
+            <ol class="breadcrumb list-group-item-dark rounded">
+                <li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
                 <li class="breadcrumb-item active"><a href="/library/admin/books"><fmt:message
                         key="bookList.pageTitle"/></a></li>
             </ol>
@@ -100,11 +98,22 @@
                     </button>
                 </div>
                 <div class="form-group">
-                    <label class="btn btn-danger" onclick="location.href='/library/admin/books'">
+                    <a class="btn btn-danger" href='/library/admin/books'>
                         <fmt:message key="newRequest.label.close"/>
-                    </label>
+                    </a>
                 </div>
             </form>
+            <script>
+                $(document).ready(function () {
+                    $('#add-book-form').submit(function (e) {
+                        var authors = $('#authors-list').children();
+                        if (authors.length === 0) {
+                            alert("<fmt:message key="newBook.alert.authors"/>");
+                            e.preventDefault();
+                        }
+                    });
+                });
+            </script>
 
         </div>
 

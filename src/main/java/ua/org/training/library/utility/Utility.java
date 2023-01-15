@@ -5,13 +5,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.sql.DataSource;
+import javax.net.ssl.HttpsURLConnection;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
 import java.util.*;
 
 import static ua.org.training.library.utility.Constants.APP_DEFAULT_LANGUAGE;
@@ -34,11 +34,21 @@ public class Utility {
     }
 
 
-    public static int tryParseInteger(String applicationProperty, int defaultValue) {
+    public static double tryParseDouble(String applicationProperty, int defaultValue) {
+        try {
+            return Double.parseDouble(applicationProperty);
+        } catch (NumberFormatException e) {
+            LOGGER.error( String.format("Number format exception %s", applicationProperty));
+            LOGGER.info( String.format("Setting default value %s", defaultValue));
+        }
+        return defaultValue;
+    }
+
+    public static int tryParseInt(String applicationProperty, int defaultValue) {
         try {
             return Integer.parseInt(applicationProperty);
         } catch (NumberFormatException e) {
-            LOGGER.error( String.format("Number format exception %s", applicationProperty), e);
+            LOGGER.error( String.format("Number format exception %s", applicationProperty));
             LOGGER.info( String.format("Setting default value %s", defaultValue));
         }
         return defaultValue;
@@ -48,7 +58,7 @@ public class Utility {
         try {
             return Long.parseLong(applicationProperty);
         } catch (NumberFormatException e) {
-            LOGGER.error( String.format("Number format exception %s", applicationProperty), e);
+            LOGGER.error( String.format("Number format exception %s", applicationProperty));
             LOGGER.info( String.format("Setting default value %s", defaultValue));
         }
         return defaultValue;
@@ -67,7 +77,7 @@ public class Utility {
     }
 
     public static String getLocaleFine(Locale locale, double fine) {
-        int exchangeRate = Utility.tryParseInteger(
+        double exchangeRate = Utility.tryParseDouble(
                 Utility.getBundleInterface(
                         locale,
                         Constants.BUNDLE_CURRENCY_EXCHANGE),
@@ -104,5 +114,36 @@ public class Utility {
     public static Locale getLocale(HttpServletRequest request) {
         return new Locale(parseStringOrDefault((String) request.getSession().getAttribute(Constants.RequestAttributes.APP_LANG_ATTRIBUTE),
                 APP_DEFAULT_LANGUAGE));
+    }
+
+    public static String sendRequest(String url, String requestMethod) {
+        try {
+            URL urlObj = new URL(url);
+            HttpsURLConnection connection = (HttpsURLConnection) urlObj.openConnection();
+            connection.setRequestMethod(requestMethod);
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.connect();
+            DataOutputStream dataOutputStream = new DataOutputStream(connection.getOutputStream());
+            dataOutputStream.flush();
+            dataOutputStream.close();
+            StringBuilder response = collectStringFromResponse(connection);
+            return response.toString();
+        } catch (MalformedURLException e) {
+            LOGGER.error( String.format("Malformed URL exception %s", url), e);
+        } catch (IOException e) {
+            LOGGER.error( String.format("IO exception %s", url), e);
+        }
+        return null;
+    }
+
+    private static StringBuilder collectStringFromResponse(HttpsURLConnection connection) throws IOException {
+        StringBuilder response = new StringBuilder();
+        Scanner scanner = new Scanner(connection.getInputStream());
+        while (scanner.hasNextLine()) {
+            response.append(scanner.nextLine());
+        }
+        scanner.close();
+        return response;
     }
 }

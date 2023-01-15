@@ -1,7 +1,7 @@
 package ua.org.training.library.exceptions;
 
 public class ControllerException extends RuntimeException {
-    String message;
+    private final String message;
 
     public ControllerException(String message) {
         this.message = message;
@@ -12,15 +12,14 @@ public class ControllerException extends RuntimeException {
         this.message = message;
     }
 
-    public ControllerException(Throwable cause) {
-        super(cause);
-    }
-
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    @Override
+    public String toString() {
+        return "ControllerException{" +
+                "message='" + message + '\'' +
+                '}';
     }
 }

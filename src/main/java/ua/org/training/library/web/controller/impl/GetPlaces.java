@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ua.org.training.library.context.ApplicationContext;
+import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.ServiceException;
 import ua.org.training.library.model.Order;
 import ua.org.training.library.model.Place;
@@ -19,15 +21,10 @@ import java.io.PrintWriter;
 
 public class GetPlaces implements ControllerCommand {
     private static final Logger LOGGER = LogManager.getLogger(GetPlaces.class);
-    private final PlaceService placeService = new PlaceService();
+    private final PlaceService placeService = ApplicationContext.getInstance().getPlaceService();
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
         return createJSONPlaceList(request, response);
-    }
-
-    @Override
-    public void clearRequestSessionAttributes(HttpServletRequest request) {
-
     }
 
     private String createJSONPlaceList(HttpServletRequest request,
@@ -35,19 +32,14 @@ public class GetPlaces implements ControllerCommand {
         response.setContentType("application/json");
         response.setCharacterEncoding(Constants.APP_ENCODING);
         LOGGER.info("Send json page to user client!");
-        PageService<Place> pageService = new PageService<>();
-        Page<Place> page = Page.<Place>builder()
-                .setPageNumber(0)
-                .setSorting("ASC")
-                .setLimit(10)
-                .createPage();
         String jsonString = null;
         try {
-            jsonString = placeService.getPlacePage(
-                    Utility.getLocale(request),
-                    page);
+            jsonString = placeService.getPlaceList(
+                    Utility.getLocale(request));
         } catch (ServiceException e) {
             LOGGER.error("Service Exception : " + e.getMessage());
+        } catch (ConnectionDBException e) {
+            LOGGER.error("Connection DB Exception : " + e.getMessage());
         }
         try {
             PrintWriter writer = response.getWriter();

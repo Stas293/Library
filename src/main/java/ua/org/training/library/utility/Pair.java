@@ -4,13 +4,13 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Pair<K, V> implements Serializable {
-    private K key;
+    private final K key;
 
     public K getKey() {
         return key;
     }
 
-    private V value;
+    private final V value;
 
     public V getValue() {
         return value;

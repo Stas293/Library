@@ -17,8 +17,16 @@
         <script src="${pageContext.request.contextPath}/js/pagination.js"></script>
     </jsp:attribute>
     <jsp:body>
+        <div id="book_count" class="hidden"><fmt:message key="book.count"/></div>
+        <div id="book_ISBN" class="hidden"><fmt:message key="book.ISBN"/></div>
+        <div id="book_date_published" class="hidden"><fmt:message key="book.publicationDate"/></div>
+        <div id="book_fine" class="hidden"><fmt:message key="book.fine"/></div>
+        <div id="book_language" class="hidden"><fmt:message key="book.language"/></div>
+        <div id="book_authors" class="hidden"><fmt:message key="book.authors"/></div>
+        <div id="book_edit_button" class="hidden"><fmt:message key="book.edit.button"/></div>
+        <div id="book_delete_button" class="hidden"><fmt:message key="book.delete.button"/></div>
         <div class="container main-content">
-            <ol class="breadcrumb">
+            <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item active"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
             </ol>
             <c:if test="${param.created == 'true'}">
@@ -28,7 +36,7 @@
             </c:if>
             <c:if test="${param.created == 'false'}">
                 <div class="alert alert-danger" role="alert">
-                    <fmt:message key="book.notCreated"/>
+                    <fmt:message key="book.notCreated"/> ${param.message}
                 </div>
             </c:if>
             <c:if test="${param.updated == 'true'}">

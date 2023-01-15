@@ -12,7 +12,7 @@ public interface Constants {
         String ACCOUNT_LAST_NAME_ATTRIBUTE = "lastName";
         String ACCOUNT_PHONE_ATTRIBUTE = "phone";
         String APP_ERROR_ATTRIBUTE = "error";
-        String APP_LOGGED_USERS_HASH_SET_ATTRIBUTE = "loggedUsers";
+        String LOGGED_USERS_SET_CONTEXT = "loggedUsers";
         String APP_LANG_ATTRIBUTE = "lang";
         String APP_MESSAGE_ATTRIBUTE = "message";
         String APP_PASSWORD_ATTRIBUTE = "password";
@@ -26,6 +26,7 @@ public interface Constants {
         String PLACE_ID_ATTRIBUTE = "placeId";
         String APP_DISABLED = "disabled";
         String ORDER_STATUS_ATTRIBUTE = "status";
+        String APP_CAPTCHA_RESPONSE_ATTRIBUTE = "g-recaptcha-response";
     }
 
     interface BundleStrings {
@@ -48,6 +49,7 @@ public interface Constants {
         String EMAIL_LOGIN_LENGTH = "form.text.error.from.six";
         String PASSWORD_LENGTH = "form.text.error.from.eight";
         String DUPLICATE_FIELD = "error.duplicate";
+        String CAPTCHA_ERROR = "error.captcha";
     }
 
     String PARAMETER_SORT_BY = "sortBy";
@@ -70,6 +72,9 @@ public interface Constants {
     long APP_DEFAULT_ID = -1;
     long APP_DEFAULT_USER_MANIPULATION_ID = 1;
     int DEFAULT_CURRENCY_EXCHANGE = 0;
+
+    String ORDER_STATUS_ACCEPT = "ACCEPT";
+    String ORDER_PLACE_READING_ROOM = "To the reading room";
 
     String BUNDLE_NAME = "interface";
     String APP_PATH_REG_EXP = ".*/library/";

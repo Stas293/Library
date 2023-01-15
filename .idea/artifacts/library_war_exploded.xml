@@ -30,6 +30,7 @@
       </element>
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/target/library-1.0-SNAPSHOT/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$USER_HOME$/Desktop/context.xml" />
       </element>
       <element id="javaee-facet-resources" facet="library/web/Web" />
     </root>

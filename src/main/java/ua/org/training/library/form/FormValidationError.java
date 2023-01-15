@@ -7,6 +7,7 @@ public class FormValidationError {
     private String email;
     private String phone;
     private String password;
+    private String captcha;
     private boolean containsErrors = false;
 
     public String getLogin() {
@@ -60,6 +61,15 @@ public class FormValidationError {
 
     public void setPassword(String password) {
         this.password = password;
+        this.containsErrors = true;
+    }
+
+    public String getCaptcha() {
+        return captcha;
+    }
+
+    public void setCaptcha(String captchaError) {
+        this.captcha = captchaError;
         this.containsErrors = true;
     }
 

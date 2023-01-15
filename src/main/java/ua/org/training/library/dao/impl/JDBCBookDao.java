@@ -57,7 +57,10 @@ public class JDBCBookDao implements BookDao {
                     "where ol.user_id = ?) ";
     //language=MySQL
     private static final String INSERT_BOOK_AUTHOR = "INSERT INTO author_book (author_id, book_id) VALUES (?, ?)";
+    //language=MySQL
+    private static final String BOOKS_COUNT_BY_LANGUAGE = "SELECT COUNT(*) FROM books_catalog WHERE `language` = ?";
     private static final Logger LOGGER = LogManager.getLogger(JDBCBookDao.class);
+
     private final Connection connection;
     public JDBCBookDao(Connection connection) {
         this.connection = connection;
@@ -71,35 +74,9 @@ public class JDBCBookDao implements BookDao {
             statement.setLong(2, page.getOffset());
             statement.setLong(3, authorId);
             getUniqueBooksSortedBy(page, books, statement);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.error(String.format("Cannot get books by author id: %s", authorId), e);
             throw new DaoException("Cannot get books by author id: " + authorId, e);
-        }
-        return page;
-    }
-
-    @Override
-    public Page<Book> getBooksByAuthorIdAndLanguage(Page<Book> page, Long authorId, String language) {
-        try (CallableStatement statement = connection.prepareCall(PAGE_GET_BOOKS_BY_AUTHOR_ID_AND_LANGUAGE)) {
-            statement.setLong(1, page.getLimit());
-            statement.setLong(2, page.getOffset());
-            statement.setLong(3, authorId);
-            statement.setString(4, language);
-            statement.setString(5, page.getSearch());
-            statement.setString(6, page.getSorting());
-            List<Book> books;
-            try (ResultSet resultSet = statement.executeQuery()) {
-                books = new ArrayList<>();
-                BookCollector bookCollector = new BookCollector();
-                while (resultSet.next()) {
-                    books.add(bookCollector.collectFromResultSet(resultSet));
-                }
-                page.setData(books);
-                page.setElementsCount(books.size());
-            }
-        } catch (SQLException e) {
-            LOGGER.error(String.format("Cannot get books by author id: %s and language: %s", authorId, language), e);
-            throw new DaoException("Cannot get books by author id: " + authorId + " and language: " + language, e);
         }
         return page;
     }
@@ -111,8 +88,23 @@ public class JDBCBookDao implements BookDao {
             statement.setLong(1, page.getLimit());
             statement.setLong(2, page.getOffset());
             statement.setString(3, language);
-            getUniqueBooksSortedBy(page, books, statement);
-        } catch (Exception e) {
+            statement.setString(4, page.getSearch());
+            statement.setString(5, page.getSorting());
+            try (ResultSet resultSet = statement.executeQuery()) {
+                BookCollector bookCollector = new BookCollector();
+                while (resultSet.next()) {
+                    books.add(bookCollector.collectFromResultSet(resultSet));
+                }
+            }
+            page.setData(books);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(BOOKS_COUNT_BY_LANGUAGE)) {
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        page.setElementsCount(resultSet.getLong(1));
+                    }
+                }
+            }
+        } catch (SQLException e) {
             LOGGER.error(String.format("Cannot get books by language: %s", language), e);
             throw new DaoException("Cannot get books by language: " + language, e);
         }
@@ -144,7 +136,7 @@ public class JDBCBookDao implements BookDao {
                     return Optional.ofNullable(bookCollector.collectFromResultSet(resultSet));
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.error(String.format("Cannot get book by order id: %s", orderId), e);
             throw new DaoException("Cannot get book by order id: " + orderId, e);
         }
@@ -176,7 +168,7 @@ public class JDBCBookDao implements BookDao {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.error(String.format("Cannot get books which user did not order: %s", userId), e);
             throw new DaoException("Cannot get books which user did not order: " + userId, e);
         }
@@ -197,7 +189,6 @@ public class JDBCBookDao implements BookDao {
                     return bookId;
                 }
             }
-            connection.commit();
         } catch (SQLException e) {
             connection.rollback();
             LOGGER.error(String.format("Cannot create book: %s", model), e);
@@ -216,7 +207,7 @@ public class JDBCBookDao implements BookDao {
                 statement.addBatch();
             }
             statement.executeBatch();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.error(String.format("Cannot insert authors: %s", authors), e);
             throw new DaoException("Cannot insert authors: " + authors, e);
         }
@@ -232,7 +223,7 @@ public class JDBCBookDao implements BookDao {
                     return Optional.of(bookCollector.collectFromResultSet(resultSet));
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.error(String.format("Cannot get book by id: %s", id), e);
             throw new DaoException("Cannot get book by id: " + id, e);
         }
@@ -247,7 +238,7 @@ public class JDBCBookDao implements BookDao {
             statement.setLong(2, page.getOffset());
             statement.setString(3, "book_name");
             getUniqueBooksSortedBy(page, books, statement);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.error("Cannot get books", e);
             throw new DaoException("Cannot get books", e);
         }
@@ -283,7 +274,7 @@ public class JDBCBookDao implements BookDao {
             deleteAuthors(entity.getId());
             insertAuthors(entity.getAuthors(), entity.getId());
             connection.commit();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             connection.rollback();
             LOGGER.error(String.format("Cannot update book: %s", entity), e);
             throw new DaoException("Cannot update book: " + entity, e);
@@ -296,7 +287,7 @@ public class JDBCBookDao implements BookDao {
         try (PreparedStatement statement = connection.prepareStatement(DELETE_BOOK_AUTHOR)) {
             statement.setLong(1, id);
             statement.executeUpdate();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.error(String.format("Cannot delete authors: %s", id), e);
             throw new DaoException("Cannot delete authors: " + id, e);
         }

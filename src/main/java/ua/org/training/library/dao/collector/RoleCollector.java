@@ -8,10 +8,10 @@ import java.sql.SQLException;
 public class RoleCollector implements ObjectCollector<Role> {
     @Override
     public Role collectFromResultSet(ResultSet rs) throws SQLException {
-        Role role = new Role();
-        role.setId(rs.getLong("id"));
-        role.setCode(rs.getString("code"));
-        role.setName(rs.getString("name"));
-        return role;
+        return Role.builder()
+                .setId(rs.getLong("id"))
+                .setCode(rs.getString("code"))
+                .setName(rs.getString("name"))
+                .createRole();
     }
 }

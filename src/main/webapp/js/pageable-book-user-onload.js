@@ -1,4 +1,5 @@
-const urlPath = `/library/books-to-order`;
+let urlPath = "";
+let urlMakeOrders = `/library/user/books-to-order`;
 const createOrderPath = `/library/user/new-order`;
 let places;
 const urlGetPlaces = `/library/get-places`;
@@ -7,22 +8,25 @@ const urlAcceptedOrders = `/library/user/order?statusCode=ACCEPT`;
 
 window.onload = () => {
     ajaxJS(urlGetPlaces, (data) => {
-        places = data.content;
+        places = data;
     });
+    urlPath = urlMakeOrders;
     setBookListeners(urlPath);
-    wizard(urlPath, addFormOrder);
+    wizard(urlPath);
 }
 
 const listOrderToChoose = () => {
     setSize();
     clearTextFields();
+    urlPath = urlMakeOrders;
     setBookListeners(urlPath);
-    wizard(urlPath, addFormOrder);
+    wizard(urlPath);
 }
 
 const listRegisteredOrders = () => {
     setSize();
     clearTextFields();
+    urlPath = urlRegisteredOrders;
     setBookListeners(urlRegisteredOrders);
     wizard(urlRegisteredOrders);
 }
@@ -30,6 +34,7 @@ const listRegisteredOrders = () => {
 const listAcceptedOrder = () => {
     setSize();
     clearTextFields();
+    urlPath = urlAcceptedOrders;
     setBookListeners(urlAcceptedOrders);
     wizard(urlAcceptedOrders);
 }
@@ -45,7 +50,7 @@ const addFormOrder = (hiddenDesk, rowData, hiddenId) => {
     let button = document.createElement('button');
     button.type = 'submit';
     button.className = 'btn btn-primary';
-    button.innerHTML = 'Order';
+    button.innerHTML = document.getElementById('make_order').innerHTML;
 
     var radioInput = document.createElement('input');
     radioInput.type = 'radio';

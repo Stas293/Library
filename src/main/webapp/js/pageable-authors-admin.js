@@ -78,13 +78,13 @@ const createHiddenBookDiv = (hiddenId, rowData) => {
     fieldHeading.appendChild(document.createTextNode("Id: " + rowData.id));
     hiddenDesk.appendChild(fieldHeading);
 
-    fieldHeading = document.createElement('h2');
+    fieldHeading = document.createElement('h3');
     let field = document.createElement('span');
     field.appendChild(document.createTextNode(rowData.firstName));
     fieldHeading.appendChild(field);
     hiddenDesk.appendChild(fieldHeading);
 
-    fieldHeading = document.createElement('h2');
+    fieldHeading = document.createElement('h3');
     field = document.createElement('span');
     field.appendChild(document.createTextNode(rowData.lastName));
     fieldHeading.appendChild(field);
@@ -92,18 +92,20 @@ const createHiddenBookDiv = (hiddenId, rowData) => {
 
     field = document.createElement('button');
     field.className = 'btn btn-primary';
-    field.appendChild(document.createTextNode('Edit'));
+    field.appendChild(document.createTextNode(document.getElementById('edit_author_button').innerText));
     field.onclick = () => {
         let div = document.getElementById(hiddenId);
         div.style.display = 'none';
         window.location.href = `/library/admin/author/edit/${rowData.id}`;
     }
+    fieldHeading.appendChild(document.createElement('br'));
+    hiddenDesk.appendChild(fieldHeading);
     fieldHeading.appendChild(field);
     hiddenDesk.appendChild(fieldHeading);
 
     field = document.createElement('button');
     field.className = 'btn btn-danger';
-    field.appendChild(document.createTextNode('Delete'));
+    field.appendChild(document.createTextNode(document.getElementById("delete_author_button").innerText));
     field.onclick = () => {
         let div = document.getElementById(hiddenId);
         div.style.display = 'none';

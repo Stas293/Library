@@ -1,7 +1,7 @@
 package ua.org.training.library.exceptions;
 
 public class JDBCException extends Exception {
-    private String message;
+    private final String message;
 
     public JDBCException(String message) {
         this.message = message;
@@ -12,10 +12,6 @@ public class JDBCException extends Exception {
         this.message = message;
     }
 
-    public JDBCException(Throwable cause) {
-        super(cause);
-    }
-
     @Override
     public String getMessage() {
         return message;
@@ -23,6 +19,8 @@ public class JDBCException extends Exception {
 
     @Override
     public String toString() {
-        return message;
+        return "JDBCException{" +
+                "message='" + message + '\'' +
+                '}';
     }
 }

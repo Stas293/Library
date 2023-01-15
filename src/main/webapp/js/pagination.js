@@ -84,11 +84,11 @@ const setSize = () => {
 const addListeners = (url) => {
     sorting_desc.onclick = () => {
         sorting = sorting_desc.value;
-        func(url);
+        showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`);
     }
     sorting_asc.onclick = () => {
         sorting = sorting_asc.value;
-        func(url);
+        showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`);
     }
     size.onclick = () => {
         if (size.value < 2) {

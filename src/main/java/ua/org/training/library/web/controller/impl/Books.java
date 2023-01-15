@@ -10,9 +10,4 @@ public class Books implements ControllerCommand {
     public String execute(HttpServletRequest request, HttpServletResponse response) {
         return Links.BOOK_PAGE;
     }
-
-    @Override
-    public void clearRequestSessionAttributes(HttpServletRequest request) {
-
-    }
 }

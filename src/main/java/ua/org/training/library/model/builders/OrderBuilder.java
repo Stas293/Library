@@ -1,9 +1,6 @@
 package ua.org.training.library.model.builders;
 
-import ua.org.training.library.model.Book;
-import ua.org.training.library.model.Order;
-import ua.org.training.library.model.Place;
-import ua.org.training.library.model.User;
+import ua.org.training.library.model.*;
 
 import java.util.Date;
 
@@ -14,6 +11,7 @@ public class OrderBuilder {
     private Book book;
     private User user;
     private Place place;
+    private Status status;
 
     public OrderBuilder setId(Long id) {
         this.id = id;
@@ -45,7 +43,12 @@ public class OrderBuilder {
         return this;
     }
 
+    public OrderBuilder setStatus(Status status) {
+        this.status = status;
+        return this;
+    }
+
     public Order createOrder() {
-        return new Order(id, dateCreated, dateExpire, book, user, place);
+        return new Order(id, dateCreated, dateExpire, book, user, place, status);
     }
 }

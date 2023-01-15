@@ -1,5 +1,7 @@
 package ua.org.training.library.dto;
 
+import ua.org.training.library.dto.builders.HistoryOrderDTOBuilder;
+import ua.org.training.library.dto.builders.UserDTOBuilder;
 import ua.org.training.library.model.HistoryOrder;
 
 import java.io.Serializable;
@@ -15,13 +17,17 @@ public class HistoryOrderDTO implements Serializable {
     private String dateExpire;
     private StatusDTO status;
 
-    public HistoryOrderDTO(Locale locale, HistoryOrder historyOrder) {
-        this.id = historyOrder.getId();
-        this.user = new UserDTO(historyOrder.getUser());
-        this.bookName = historyOrder.getBookName();
-        this.dateCreated = historyOrder.getDateCreated().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
-        this.dateExpire = historyOrder.getDateExpire().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
-        this.status = new StatusDTO(locale, historyOrder.getStatus());
+    public HistoryOrderDTO(long id, UserDTO user, String bookName, String dateCreated, String dateExpire, StatusDTO status) {
+        this.id = id;
+        this.user = user;
+        this.bookName = bookName;
+        this.dateCreated = dateCreated;
+        this.dateExpire = dateExpire;
+        this.status = status;
+    }
+
+    public static HistoryOrderDTOBuilder builder() {
+        return new HistoryOrderDTOBuilder();
     }
 
     public long getId() {

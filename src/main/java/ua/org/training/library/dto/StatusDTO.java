@@ -1,5 +1,6 @@
 package ua.org.training.library.dto;
 
+import ua.org.training.library.dto.builders.StatusDTOBuilder;
 import ua.org.training.library.model.Status;
 import ua.org.training.library.utility.Constants;
 import ua.org.training.library.utility.Pair;
@@ -16,21 +17,15 @@ public class StatusDTO implements Serializable {
     private String value;
     private List<Pair<String, String>> nextStatuses;
 
-    public StatusDTO(Locale locale, Status status) {
-        this.code = status.getCode();
-        this.name = status.getName();
-        this.value = Utility.getBundleInterface(locale, Constants.BUNDLE_ORDER_STATUS_PREFIX
-                + code.toLowerCase());
-        this.nextStatuses = status
-                .getNextStatuses()
-                .stream()
-                .map(nextStatus -> new Pair<>(
-                        nextStatus.getCode(),
-                        Utility.getBundleInterface(locale,
-                                Constants.BUNDLE_ORDER_STATUS_PREFIX
-                                        + nextStatus.getCode().toLowerCase()))
-                )
-                .toList();
+    public StatusDTO(String code, String name, String value, List<Pair<String, String>> nextStatuses) {
+        this.code = code;
+        this.name = name;
+        this.value = value;
+        this.nextStatuses = nextStatuses;
+    }
+
+    public static StatusDTOBuilder builder() {
+        return new StatusDTOBuilder();
     }
 
     public String getCode() {

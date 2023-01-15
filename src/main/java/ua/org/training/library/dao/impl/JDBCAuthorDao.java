@@ -6,7 +6,6 @@ import ua.org.training.library.dao.AuthorDao;
 import ua.org.training.library.dao.collector.AuthorCollector;
 import ua.org.training.library.exceptions.DaoException;
 import ua.org.training.library.model.Author;
-import ua.org.training.library.model.Book;
 import ua.org.training.library.utility.page.Page;
 
 import java.sql.*;
@@ -40,8 +39,6 @@ public class JDBCAuthorDao implements AuthorDao {
     private static final String DELETE_AUTHOR = "DELETE FROM author_list WHERE id = ?";
     //language=MySQL
     private static final String DELETE_AUTHOR_BOOK = "DELETE FROM author_book WHERE author_id = ?";
-    //language=MySQL
-    private static final String SET_BOOK_AUTHOR = "INSERT INTO author_book (author_id, book_id) VALUES (?, ?)";
     private static final Logger LOGGER = LogManager.getLogger(JDBCAuthorDao.class);
     private final Connection connection;
 
@@ -77,7 +74,7 @@ public class JDBCAuthorDao implements AuthorDao {
         try (PreparedStatement statement = connection.prepareStatement(GET_AUTHORS_BY_BOOK_ISBN)) {
             statement.setString(1, isbn);
             return getAuthors(statement);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.error(String.format("Cannot get authors by book isbn: %s", isbn), e);
             throw new DaoException("Cannot get authors by book isbn: " + isbn, e);
         }
@@ -97,7 +94,7 @@ public class JDBCAuthorDao implements AuthorDao {
                     return id;
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             connection.rollback();
             LOGGER.error(String.format("Cannot create author: %s", model), e);
             throw new DaoException("Cannot create author: " + model, e);
@@ -117,7 +114,7 @@ public class JDBCAuthorDao implements AuthorDao {
                     return Optional.of(authorCollector.collectFromResultSet(resultSet));
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.error(String.format("Cannot get author by id: %s", id), e);
             throw new DaoException("Cannot get author by id: " + id, e);
         }
@@ -139,15 +136,14 @@ public class JDBCAuthorDao implements AuthorDao {
                     authors.add(authorCollector.collectFromResultSet(resultSet));
                 }
                 page.setData(authors);
-                try (Statement countStatement = connection.createStatement()) {
-                    try (ResultSet countResultSet = countStatement.executeQuery(GET_COUNT_OF_AUTHORS)) {
-                        if (countResultSet.next()) {
-                            page.setElementsCount(countResultSet.getLong(1));
-                        }
+                try (PreparedStatement countPreparedStatement = connection.prepareStatement(GET_COUNT_OF_AUTHORS);
+                     ResultSet countResultSet = countPreparedStatement.executeQuery()) {
+                    if (countResultSet.next()) {
+                        page.setElementsCount(countResultSet.getLong(1));
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.error(String.format("Cannot get authors page: %s", page), e);
             throw new DaoException("Cannot get authors page: " + page, e);
         }
@@ -163,7 +159,7 @@ public class JDBCAuthorDao implements AuthorDao {
             statement.setLong(3, entity.getId());
             statement.executeUpdate();
             connection.commit();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             connection.rollback();
             LOGGER.error(String.format("Cannot update author: %s", entity), e);
             throw new DaoException("Cannot update author: " + entity, e);
@@ -183,7 +179,7 @@ public class JDBCAuthorDao implements AuthorDao {
             }
             statement.executeUpdate();
             connection.commit();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             connection.rollback();
             LOGGER.error(String.format("Cannot delete author by id: %s", id), e);
             throw new DaoException("Cannot delete author by id: " + id, e);

@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Date;
 
 public class UserBuilder {
-    private Long id;
+    private long id;
     private String login;
     private String firstName;
     private String lastName;
@@ -19,7 +19,7 @@ public class UserBuilder {
     private Date dateUpdated;
     private Collection<Role> roles;
 
-    public UserBuilder setId(Long id) {
+    public UserBuilder setId(long id) {
         this.id = id;
         return this;
     }

@@ -17,11 +17,9 @@
         <script src="${pageContext.request.contextPath}/js/pagination.js"></script>
     </jsp:attribute>
     <jsp:body>
-
-
         <div class="container main-content">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item active"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
+            <ol class="breadcrumb list-group-item-dark rounded">
+                <li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
                 <li class="breadcrumb-item active"><a href="/library/admin/books"><fmt:message
                         key="bookList.pageTitle"/></a></li>
             </ol>
@@ -48,7 +46,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label"><fmt:message key="newBook.label.fine"/></label>
-                    <input class="col-2 rounded border" type="number" min="0" required name="fine" value="${book.fine}">
+                    <input class="col-2 rounded border" type="number" step="0.01" min="0" required name="fine" value="${book.fine}">
                 </div>
                 <div class="form-group">
                     <label class="control-label"><fmt:message key="newBook.label.language"/></label>
@@ -110,6 +108,17 @@
                     </label>
                 </div>
             </form>
+            <script>
+                $(document).ready(function () {
+                    $('#add-book-form').submit(function (e) {
+                        var authors = $('#authors-list').children();
+                        if (authors.length === 0) {
+                            alert("<fmt:message key="newBook.alert.authors"/>");
+                            e.preventDefault();
+                        }
+                    });
+                });
+            </script>
 
         </div>
 

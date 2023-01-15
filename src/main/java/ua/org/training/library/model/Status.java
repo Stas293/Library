@@ -1,5 +1,7 @@
 package ua.org.training.library.model;
 
+import ua.org.training.library.model.builders.StatusBuilder;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
@@ -10,6 +12,20 @@ public class Status implements Serializable {
     private String name;
     private boolean closed;
     private Collection<Status> nextStatuses = new HashSet<>();
+
+    public Status() {
+    }
+
+    public Status (long id, String code, String name, boolean closed) {
+        this.id = id;
+        this.code = code;
+        this.name = name;
+        this.closed = closed;
+    }
+
+    public static StatusBuilder builder() {
+        return new StatusBuilder();
+    }
 
     public long getId() {
         return id;

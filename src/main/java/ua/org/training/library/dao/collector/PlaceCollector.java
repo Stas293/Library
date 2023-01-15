@@ -8,9 +8,9 @@ import java.sql.SQLException;
 public class PlaceCollector implements ObjectCollector<Place> {
     @Override
     public Place collectFromResultSet(ResultSet rs) throws SQLException {
-        Place place = new Place();
-        place.setId(rs.getLong("id"));
-        place.setName(rs.getString("name"));
-        return place;
+        return Place.builder()
+                .setId(rs.getLong("id"))
+                .setName(rs.getString("name"))
+                .createPlace();
     }
 }

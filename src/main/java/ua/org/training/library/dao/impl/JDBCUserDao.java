@@ -70,6 +70,11 @@ public class JDBCUserDao implements UserDao {
     //language=MySQL
     private static final String UPDATE_LAST_NAME = "update user_list set last_name = ? where id = ?;";
     private static final Logger LOGGER = LogManager.getLogger(JDBCUserDao.class);
+    //language=MySQL
+    private static final String UPDATE_USER_DATA = "UPDATE user_list SET first_name = ?, last_name = ?, " +
+            "email = ?, phone = ?, login = ? WHERE id = ?;";
+    //language=MySQL
+    private static final String GET_USER_COUNT = "select count(*) from user_list;";
     private final Connection connection;
 
     public JDBCUserDao(Connection connection) {
@@ -92,7 +97,7 @@ public class JDBCUserDao implements UserDao {
             }
         } catch (SQLException e) {
             LOGGER.error("Error while getting user by id", e);
-            throw new DaoException(e);
+            throw new DaoException("Error while getting user by id", e);
         }
         return Optional.empty();
     }
@@ -112,10 +117,16 @@ public class JDBCUserDao implements UserDao {
                 }
             }
             page.setData(users);
-            page.setElementsCount(users.size());
+            try (PreparedStatement statement1 = connection.prepareStatement(GET_USER_COUNT)) {
+                try (ResultSet resultSet = statement1.executeQuery()) {
+                    if (resultSet.next()) {
+                        page.setElementsCount(resultSet.getLong(1));
+                    }
+                }
+            }
         } catch (SQLException e) {
             LOGGER.error("Error while getting user page", e);
-            throw new DaoException(e);
+            throw new DaoException("Error while getting user page", e);
         }
         return page;
     }
@@ -130,7 +141,7 @@ public class JDBCUserDao implements UserDao {
         } catch (SQLException e) {
             connection.rollback();
             LOGGER.error("Error while updating user", e);
-            throw new DaoException(e);
+            throw new DaoException("Error while updating user", e);
         } finally {
             connection.setAutoCommit(true);
         }
@@ -171,7 +182,7 @@ public class JDBCUserDao implements UserDao {
         } catch (SQLException e) {
             connection.rollback();
             LOGGER.error(String.format("Can't delete user with id: %d", id), e);
-            throw new DaoException(e);
+            throw new DaoException(String.format("Can't delete user with id: %d", id), e);
         } finally {
             connection.setAutoCommit(true);
         }
@@ -183,7 +194,7 @@ public class JDBCUserDao implements UserDao {
             connection.close();
         } catch (SQLException e) {
             LOGGER.error("Error while closing connection", e);
-            throw new DaoException(e);
+            throw new DaoException("Error while closing connection", e);
         }
     }
 
@@ -198,7 +209,7 @@ public class JDBCUserDao implements UserDao {
         } catch (SQLException e) {
             LOGGER.error("Error while creating user", e);
             connection.rollback();
-            throw new DaoException(e);
+            throw new DaoException("Error while creating user", e);
         } finally {
             connection.setAutoCommit(true);
         }
@@ -244,9 +255,36 @@ public class JDBCUserDao implements UserDao {
         } catch (SQLException e) {
             connection.rollback();
             LOGGER.error("Error while updating user", e);
-            throw new DaoException(e);
+            throw new DaoException("Error while updating user", e);
         } finally {
             connection.setAutoCommit(true);
+        }
+    }
+
+    @Override
+    public void updateData(User entity) throws SQLException {
+        connection.setAutoCommit(false);
+        try {
+            updateUserData(entity);
+            connection.commit();
+        } catch (SQLException e) {
+            connection.rollback();
+            LOGGER.error("Error while updating user", e);
+            throw new DaoException("Error while updating user", e);
+        } finally {
+            connection.setAutoCommit(true);
+        }
+    }
+
+    private void updateUserData(User entity) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement(UPDATE_USER_DATA)) {
+            statement.setString(1, entity.getFirstName());
+            statement.setString(2, entity.getLastName());
+            statement.setString(3, entity.getEmail());
+            statement.setString(4, entity.getPhone());
+            statement.setString(5, entity.getLogin());
+            statement.setLong(6, entity.getId());
+            statement.executeUpdate();
         }
     }
 
@@ -296,23 +334,7 @@ public class JDBCUserDao implements UserDao {
         } catch (SQLException e) {
             connection.rollback();
             LOGGER.error("Error while disabling user", e);
-            throw new DaoException(e);
-        } finally {
-            connection.setAutoCommit(true);
-        }
-    }
-
-    @Override
-    public void disable(String login) throws SQLException {
-        connection.setAutoCommit(false);
-        try (PreparedStatement statement = connection.prepareStatement(DISABLE_USER_BY_LOGIN)) {
-            statement.setString(1, login);
-            statement.executeUpdate();
-            connection.commit();
-        } catch (SQLException e) {
-            connection.rollback();
-            LOGGER.error("Error while disabling user", e);
-            throw new DaoException(e);
+            throw new DaoException("Error while disabling user", e);
         } finally {
             connection.setAutoCommit(true);
         }
@@ -328,91 +350,7 @@ public class JDBCUserDao implements UserDao {
         } catch (SQLException e) {
             connection.rollback();
             LOGGER.error("Error while enabling user", e);
-            throw new DaoException(e);
-        } finally {
-            connection.setAutoCommit(true);
-        }
-    }
-
-    @Override
-    public void enable(String login) throws SQLException {
-        connection.setAutoCommit(false);
-        try (PreparedStatement statement = connection.prepareStatement(ENABLE_USER_BY_LOGIN)) {
-            statement.setString(1, login);
-            statement.executeUpdate();
-            connection.commit();
-        } catch (SQLException e) {
-            connection.rollback();
-            LOGGER.error("Error while enabling user", e);
-            throw new DaoException(e);
-        } finally {
-            connection.setAutoCommit(true);
-        }
-    }
-
-    @Override
-    public void updateEmail(String email, User user) throws SQLException {
-        connection.setAutoCommit(false);
-        try (PreparedStatement statement = connection.prepareStatement(UPDATE_EMAIL)) {
-            statement.setString(1, email);
-            statement.setLong(2, user.getId());
-            statement.executeUpdate();
-            connection.commit();
-        } catch (SQLException e) {
-            connection.rollback();
-            LOGGER.error("Error while updating email", e);
-            throw new DaoException(e);
-        } finally {
-            connection.setAutoCommit(true);
-        }
-    }
-
-    @Override
-    public void updatePhone(String phone, User user) throws SQLException {
-        connection.setAutoCommit(false);
-        try (PreparedStatement statement = connection.prepareStatement(UPDATE_PHONE)) {
-            statement.setString(1, phone);
-            statement.setLong(2, user.getId());
-            statement.executeUpdate();
-            connection.commit();
-        } catch (SQLException e) {
-            connection.rollback();
-            LOGGER.error("Error while updating phone", e);
-            throw new DaoException(e);
-        } finally {
-            connection.setAutoCommit(true);
-        }
-    }
-
-    @Override
-    public void updateFirstName(String firstName, User user) throws SQLException {
-        connection.setAutoCommit(false);
-        try (PreparedStatement statement = connection.prepareStatement(UPDATE_FIRST_NAME)) {
-            statement.setString(1, firstName);
-            statement.setLong(2, user.getId());
-            statement.executeUpdate();
-            connection.commit();
-        } catch (SQLException e) {
-            connection.rollback();
-            LOGGER.error("Error while updating first name", e);
-            throw new DaoException(e);
-        } finally {
-            connection.setAutoCommit(true);
-        }
-    }
-
-    @Override
-    public void updateLastName(String lastName, User user) throws SQLException {
-        connection.setAutoCommit(false);
-        try (PreparedStatement statement = connection.prepareStatement(UPDATE_LAST_NAME)) {
-            statement.setString(1, lastName);
-            statement.setLong(2, user.getId());
-            statement.executeUpdate();
-            connection.commit();
-        } catch (SQLException e) {
-            connection.rollback();
-            LOGGER.error("Error while updating last name", e);
-            throw new DaoException(e);
+            throw new DaoException("Error while enabling user", e);
         } finally {
             connection.setAutoCommit(true);
         }
@@ -428,7 +366,7 @@ public class JDBCUserDao implements UserDao {
             }
         } catch (SQLException e) {
             LOGGER.error("Can't get user by unique field", e);
-            throw new DaoException(e);
+            throw new DaoException("Can't get user by unique field", e);
         }
         return Optional.empty();
     }
@@ -443,7 +381,7 @@ public class JDBCUserDao implements UserDao {
             }
         } catch (SQLException e) {
             LOGGER.error("Can't get user by unique field", e);
-            throw new DaoException(e);
+            throw new DaoException("Can't get user by unique field", e);
         }
         return Optional.empty();
     }

@@ -1,5 +1,7 @@
 package ua.org.training.library.model;
 
+import ua.org.training.library.model.builders.PlaceBuilder;
+
 import java.io.Serializable;
 
 public class Place implements Serializable {
@@ -12,6 +14,10 @@ public class Place implements Serializable {
     public Place(Long id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    public static PlaceBuilder builder() {
+        return new PlaceBuilder();
     }
 
     public Long getId() {

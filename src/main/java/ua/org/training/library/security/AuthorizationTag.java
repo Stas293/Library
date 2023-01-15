@@ -1,5 +1,6 @@
 package ua.org.training.library.security;
 
+import jakarta.servlet.jsp.PageContext;
 import jakarta.servlet.jsp.tagext.TagSupport;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +12,13 @@ import java.util.Optional;
 public class AuthorizationTag extends TagSupport {
     private static final Logger LOGGER = LogManager.getLogger(AuthorizationTag.class);
     private String role;
+
+    public AuthorizationTag() {
+    }
+
+    public AuthorizationTag(PageContext pageContext) {
+        this.pageContext = pageContext;
+    }
 
     public String getRole() {
         return role;

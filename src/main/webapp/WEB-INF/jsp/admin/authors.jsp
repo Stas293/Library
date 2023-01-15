@@ -17,10 +17,42 @@
         <script src="${pageContext.request.contextPath}/js/pagination.js"></script>
     </jsp:attribute>
     <jsp:body>
+        <div id="edit_author_button" hidden="hidden"><fmt:message key="admin.edit.author.button"/></div>
+        <div id="delete_author_button" hidden="hidden"><fmt:message key="admin.delete.author.button"/></div>
         <div class="container main-content">
-            <ol class="breadcrumb">
+            <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item active"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
             </ol>
+            <c:if test="${param.created == 'true'}">
+                <div class="alert alert-success" role="alert">
+                    <fmt:message key="author.created"/>
+                </div>
+            </c:if>
+            <c:if test="${param.created == 'false'}">
+                <div class="alert alert-danger" role="alert">
+                    <fmt:message key="author.notCreated"/>
+                </div>
+            </c:if>
+            <c:if test="${param.updated == 'true'}">
+                <div class="alert alert-success" role="alert">
+                    <fmt:message key="author.updated"/>
+                </div>
+            </c:if>
+            <c:if test="${param.updated == 'false'}">
+                <div class="alert alert-danger" role="alert">
+                    <fmt:message key="author.notUpdated"/>
+                </div>
+            </c:if>
+            <c:if test="${param.deleted == 'true'}">
+                <div class="alert alert-success" role="alert">
+                    <fmt:message key="author.deleted"/>
+                </div>
+            </c:if>
+            <c:if test="${param.deleted == 'false'}">
+                <div class="alert alert-danger" role="alert">
+                    <fmt:message key="author.notDeleted"/>
+                </div>
+            </c:if>
             <input type="checkbox" class="input-modal-window" id="new-book-window">
             <div class="modal hidden-new-book-window">
                 <div class="center">

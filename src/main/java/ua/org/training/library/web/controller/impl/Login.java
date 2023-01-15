@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
+import ua.org.training.library.context.ApplicationContext;
+import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.ServiceException;
 import ua.org.training.library.security.AuthorityUser;
 import ua.org.training.library.security.SecurityService;
@@ -18,7 +20,7 @@ import java.io.IOException;
 
 public class Login implements ControllerCommand {
     private static final Logger LOGGER = LogManager.getLogger(Login.class);
-    private final UserService userService = new UserService();
+    private final UserService userService = ApplicationContext.getInstance().getUserService();
 
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
@@ -55,6 +57,9 @@ public class Login implements ControllerCommand {
         } catch (ServiceException e) {
             LOGGER.error(e.getMessage(), e);
             authorityUser = AuthorityUser.ANONYMOUS;
+        } catch (ConnectionDBException e) {
+            LOGGER.error(e.getMessage(), e);
+            return Links.ERROR_PAGE + "?message=" + e.getMessage();
         }
 
         if (!authorityUser.isEnabled()) {
@@ -75,15 +80,12 @@ public class Login implements ControllerCommand {
             }
         } catch (ServiceException e) {
             LOGGER.error(e.getMessage(), e);
+        } catch (ConnectionDBException e) {
+            LOGGER.error(e.getMessage(), e);
+            return Links.ERROR_PAGE + "?message=" + e.getMessage();
         }
-        clearRequestSessionAttributes(request);
+
         request.getSession().setAttribute(Constants.RequestAttributes.APP_ERROR_ATTRIBUTE, "true");
         return Links.LOGIN_PAGE;
-    }
-
-    @Override
-    public void clearRequestSessionAttributes(HttpServletRequest request) {
-        request.getSession().removeAttribute(Constants.RequestAttributes.APP_LOGIN_ATTRIBUTE);
-        request.getSession().removeAttribute(Constants.RequestAttributes.APP_PASSWORD_ATTRIBUTE);
     }
 }

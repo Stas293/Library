@@ -18,9 +18,4 @@ public class Logout implements ControllerCommand {
         LOGGER.info("User {} was logged out", authorityUser.getLogin());
         return Links.MAIN_PAGE;
     }
-
-    @Override
-    public void clearRequestSessionAttributes(HttpServletRequest request) {
-
-    }
 }

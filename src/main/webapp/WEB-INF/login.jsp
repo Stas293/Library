@@ -19,6 +19,9 @@
         <c:if test="${error}">
           <div class="alert alert-danger"><fmt:message key="login.warning.alert"/></div>
         </c:if>
+        <c:if test="${param.disabled}">
+          <div class="alert alert-danger"><fmt:message key="login.disabled.alert"/></div>
+        </c:if>
         <div class="mb-3">
           <label for="login" class="form-label"><fmt:message key="login.login"/></label>
           <input type="text" class="form-control" id="login" name="login" aria-describedby="loginHelp"

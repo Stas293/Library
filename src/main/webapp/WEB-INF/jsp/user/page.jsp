@@ -18,8 +18,17 @@
         <script src="${pageContext.request.contextPath}/js/pagination.js"></script>
     </jsp:attribute>
     <jsp:body>
+        <div id="label_ISBN" hidden="hidden"><fmt:message key="order.label.ISBN"/></div>
+        <div id="date_order" hidden="hidden"><fmt:message key="order.label.date_created"/></div>
+        <div id="authors" hidden="hidden"><fmt:message key="order.label.authors"/></div>
+        <div id="publication_date" hidden="hidden"><fmt:message key="order.label.publication_date"/></div>
+        <div id="fine" hidden="hidden"><fmt:message key="order.label.fine"/></div>
+        <div id="place" hidden="hidden" ><fmt:message key="order.label.place"/></div>
+        <div id="make_order" hidden="hidden"><fmt:message key="order.label.make_order"/></div>
+        <div id="status" hidden="hidden"><fmt:message key="order.label.status"/></div>
+        <div id="date_expire" hidden="hidden"><fmt:message key="order.label.date_expire"/></div>
         <div class="container main-content">
-            <ol class="breadcrumb">
+            <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item active"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
             </ol>
             <c:if test="${param.created == true}">

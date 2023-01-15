@@ -5,6 +5,9 @@ window.onload = () => {
 }
 
 const addAuthors = () => {
+    if (document.getElementById("authors-list").children.length === 0) {
+        return;
+    }
     let authorsList = document.getElementById("authors-list");
     let authors = [];
     for (let i = 0; i < authorsList.children.length; i++) {
@@ -39,6 +42,9 @@ const makeRow = (rowData, index) => {
     }
     anchor.onclick = () => {
         let authorsList = document.getElementById("authors-list");
+        if (authorsList.contains(document.getElementById(rowData.id))) {
+            return;
+        }
         let author = document.createElement("li");
         author.setAttribute("id", rowData.id);
         author.appendChild(document.createTextNode(rowData.firstName + " " + rowData.lastName));

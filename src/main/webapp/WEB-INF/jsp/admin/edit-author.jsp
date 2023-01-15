@@ -14,9 +14,9 @@
     </jsp:attribute>
     <jsp:body>
         <div class="container main-content">
-            <ol class="breadcrumb">
+            <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
-                <li class="breadcrumb-item"><a href="/library/admin/authors"><fmt:message key="authorList.pageTitle"/></a></li>
+                <li class="breadcrumb-item active"><a href="/library/admin/authors"><fmt:message key="authorList.pageTitle"/></a></li>
             </ol>
             <h1><fmt:message key="editAuthor.pageTitle"/></h1>
 

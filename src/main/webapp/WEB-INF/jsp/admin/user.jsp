@@ -23,7 +23,7 @@
     </jsp:attribute>
     <jsp:body>
     <div class="container main-content">
-        <ol class="breadcrumb">
+		<ol class="breadcrumb list-group-item-dark rounded">
         	<li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle" /></a></li>
         	<li class="breadcrumb-item active"><a href="/library/admin/page"><fmt:message key="usersList.pageTitle" /></a></li>
         </ol>
@@ -91,13 +91,13 @@
 					<div class="col-sm-2"><fmt:message key="user.roles" /></div>
 					<div class="col-sm-6">
 						<c:forEach var="role" items="${account.roles}">
-							<c:out value="${role.name}" /><br />
+							<c:out value="${role}" /><br />
 						</c:forEach>
 					</div>
 				</div>
 			</div>
 		</div>
-		<a href="${editUserUrl}" class="btn btn-primary" title="${editUser}"><fmt:message key="user.edit" /></a>
+		<a href="${editUserUrl}" class="btn btn-primary"><fmt:message key="user.edit" /></a>
     </div>
     </jsp:body>
 </tag:authorization>

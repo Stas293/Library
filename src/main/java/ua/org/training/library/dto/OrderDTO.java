@@ -1,13 +1,8 @@
 package ua.org.training.library.dto;
 
-import ua.org.training.library.model.Order;
+import ua.org.training.library.dto.builders.OrderDTOBuilder;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Objects;
 
 public class OrderDTO implements Serializable {
@@ -19,20 +14,22 @@ public class OrderDTO implements Serializable {
     private PlaceDTO place;
     private StatusDTO status;
     private double priceOverdue;
+    private boolean chooseDateExpire;
 
-    public OrderDTO(Locale locale, Order order) {
-        this.id = order.getId();
-        this.dateCreated = order.getDateCreated().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
-        if (order.getDateExpire() != null) this.dateExpire = order.getDateExpire().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
-        else this.dateExpire = "Not set";
-        this.book = new BookDTO(locale, order.getBook());
-        this.user = new UserDTO(order.getUser());
-        this.place = new PlaceDTO(locale, order.getPlace());
-        this.status = new StatusDTO(locale, order.getStatus());
-        if (order.getDateExpire() != null) this.priceOverdue = order.getBook().getFine() *
-                (new Date().toInstant().atOffset(ZoneOffset.UTC).toLocalDate().toEpochDay() -
-                        order.getDateExpire().toInstant().atOffset(ZoneOffset.UTC).toLocalDate().toEpochDay());
-        else this.priceOverdue = 0;
+    public OrderDTO(long id, String dateCreated, String dateExpire, BookDTO book, UserDTO user, PlaceDTO place, StatusDTO status, double priceOverdue, boolean chooseDateExpire) {
+        this.id = id;
+        this.dateCreated = dateCreated;
+        this.dateExpire = dateExpire;
+        this.book = book;
+        this.user = user;
+        this.place = place;
+        this.status = status;
+        this.priceOverdue = priceOverdue;
+        this.chooseDateExpire = chooseDateExpire;
+    }
+
+    public static OrderDTOBuilder builder() {
+        return new OrderDTOBuilder();
     }
 
     public long getId() {
@@ -97,6 +94,14 @@ public class OrderDTO implements Serializable {
 
     public void setStatus(StatusDTO status) {
         this.status = status;
+    }
+
+    public boolean isChooseDateExpire() {
+        return chooseDateExpire;
+    }
+
+    public void setChooseDateExpire(boolean chooseDateExpire) {
+        this.chooseDateExpire = chooseDateExpire;
     }
 
     @Override

@@ -89,41 +89,41 @@ const createHiddenBookDiv = (hiddenId, rowData) => {
 
     fieldHeading = document.createElement('h2');
     let field = document.createElement('span');
-    field.appendChild(document.createTextNode(rowData.name));
+    field.appendChild(document.createTextNode(document.getElementById("book_name").innerText + ": " + rowData.name));
     fieldHeading.appendChild(field);
     hiddenDesk.appendChild(fieldHeading);
 
     fieldHeading = document.createElement('h2');
     field = document.createElement('span');
-    field.appendChild(document.createTextNode(rowData.count));
+    field.appendChild(document.createTextNode(document.getElementById("book_count").innerText + ": " + rowData.count));
     fieldHeading.appendChild(field);
     hiddenDesk.appendChild(fieldHeading);
 
     fieldHeading = document.createElement('h2');
     field = document.createElement('span');
-    field.appendChild(document.createTextNode(rowData.isbn));
+    field.appendChild(document.createTextNode(document.getElementById("book_ISBN").innerText + ": " + rowData.isbn));
     fieldHeading.appendChild(field);
     hiddenDesk.appendChild(fieldHeading);
 
     field = document.createElement('h2');
-    field.appendChild(document.createTextNode(rowData.publicationDate));
+    field.appendChild(document.createTextNode(document.getElementById("book_date_published").innerText + ": " + rowData.publicationDate));
     fieldHeading.appendChild(field);
 
     field = document.createElement('h2');
-    field.appendChild(document.createTextNode(rowData.fine));
+    field.appendChild(document.createTextNode(document.getElementById("book_fine").innerText + ": " + rowData.fine));
     fieldHeading.appendChild(field);
 
     field = document.createElement('h2');
-    field.appendChild(document.createTextNode(rowData.language));
+    field.appendChild(document.createTextNode(document.getElementById("book_language").innerText + ": " + rowData.language));
     fieldHeading.appendChild(field);
 
     field = document.createElement('h2');
-    field.appendChild(document.createTextNode(rowData.authors.map(author => `${author.firstName} ${author.lastName}`).join(', ')));
+    field.appendChild(document.createTextNode(document.getElementById("book_authors").innerText + ": " + rowData.authors.map(author => `${author.firstName} ${author.lastName}`).join(', ')));
     fieldHeading.appendChild(field);
 
     field = document.createElement('button');
     field.className = 'btn btn-primary';
-    field.appendChild(document.createTextNode('Edit'));
+    field.appendChild(document.createTextNode(document.getElementById("book_edit_button").innerText));
     field.onclick = () => {
         let div = document.getElementById(hiddenId);
         div.style.display = 'none';
@@ -133,7 +133,7 @@ const createHiddenBookDiv = (hiddenId, rowData) => {
 
     field = document.createElement('button');
     field.className = 'btn btn-danger';
-    field.appendChild(document.createTextNode('Delete'));
+    field.appendChild(document.createTextNode(document.getElementById("book_delete_button").innerText));
     field.onclick = () => {
         let div = document.getElementById(hiddenId);
         div.style.display = 'none';

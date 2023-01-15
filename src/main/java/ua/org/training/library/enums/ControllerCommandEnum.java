@@ -2,6 +2,12 @@ package ua.org.training.library.enums;
 
 import ua.org.training.library.web.controller.ControllerCommand;
 import ua.org.training.library.web.controller.impl.*;
+import ua.org.training.library.web.controller.impl.Error;
+import ua.org.training.library.web.controller.impl.admin.*;
+import ua.org.training.library.web.controller.impl.librarian.LibrarianEditOrder;
+import ua.org.training.library.web.controller.impl.librarian.LibrarianOrder;
+import ua.org.training.library.web.controller.impl.librarian.LibrarianPage;
+import ua.org.training.library.web.controller.impl.user.*;
 
 public enum ControllerCommandEnum {
     LOGIN("login", new Login()),
@@ -22,8 +28,9 @@ public enum ControllerCommandEnum {
     ADMIN_BOOK("adminBook", new AdminManipulateBook()),
     ADMIN_ADD_BOOK("adminAddBook", new AdminAddBook()),
     ADMIN_NEW_AUTHOR("adminNewAuthor", new AdminNewAuthor()),
-    EXCEPTION("exception", new ThrowException()),
     LIBRARIAN_EDIT_ORDER("librarianEditOrder", new LibrarianEditOrder()),
+    PERSONAL_DATA_EDIT("editPersonalData", new EditPersonalData()),
+    PERSONAL_DATA_EDITPASSWORD("editPassword", new EditPassword()),
     LIBRARIAN_PAGE("librarianPage", new LibrarianPage()),
     LIBRARIAN_ORDER("librarianOrder", new LibrarianOrder()),
     USER_NEW_ORDER("userNewOrder", new NewOrder()),
@@ -32,9 +39,10 @@ public enum ControllerCommandEnum {
     USER_ORDER_HISTORY("userOrderHistory", new UserOrderHistory()),
     USER_PAGE("userPage", new UserPage()),
     USER_ORDER("userOrders", new UserMakeOrder()),
-    BOOKS_TO_ORDER("booksToOrder", new BooksToOrder()),
+    USER_BOOKS_TO_ORDER("booksToOrder", new BooksToOrder()),
     GET_PLACES("getPlaces", new GetPlaces()),
-    PERSONAL_DATA("personalData", new PersonalData()),;
+    PERSONAL_DATA("personalData", new PersonalData()),
+    ERROR("error", new Error()),;
 
     private final String command;
     private final ControllerCommand controllerCommand;

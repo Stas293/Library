@@ -6,6 +6,4 @@ import ua.org.training.library.exceptions.ControllerException;
 
 public interface ControllerCommand {
     String execute(HttpServletRequest request, HttpServletResponse response);
-
-    void clearRequestSessionAttributes(HttpServletRequest request);
 }

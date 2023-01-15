@@ -21,9 +21,9 @@ public class SessionListener implements HttpSessionListener {
     public void sessionDestroyed(HttpSessionEvent se) {
         LOGGER.info(String.format("Session %s destroyed", se.getSession().getId()));
         try {
-            SecurityService.removeLoggedUserFromContext(se.getSession());
+            SecurityService.removeLoggedUserFromContextAndSession(se.getSession());
         } catch (ServiceException e) {
-            LOGGER.info(e.getMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 }

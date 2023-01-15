@@ -1,6 +1,7 @@
 package ua.org.training.library.dao.collector;
 
 import ua.org.training.library.model.Status;
+import ua.org.training.library.model.builders.StatusBuilder;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,11 +9,11 @@ import java.sql.SQLException;
 public class StatusCollector implements ObjectCollector<Status>{
     @Override
     public Status collectFromResultSet(ResultSet rs) throws SQLException {
-        Status status = new Status();
-        status.setId(rs.getLong("id"));
-        status.setCode(rs.getString("code"));
-        status.setName(rs.getString("name"));
-        status.setClosed(rs.getBoolean("closed"));
-        return status;
+        return Status.builder()
+                .setId(rs.getLong("id"))
+                .setCode(rs.getString("code"))
+                .setName(rs.getString("name"))
+                .setClosed(rs.getBoolean("closed"))
+                .createStatus();
     }
 }

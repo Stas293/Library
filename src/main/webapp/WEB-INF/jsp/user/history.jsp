@@ -18,7 +18,7 @@
     </jsp:attribute>
     <jsp:body>
         <div class="container main-content">
-            <ol class="breadcrumb" >
+            <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item active"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
             </ol>
             <h1>
@@ -48,7 +48,6 @@
                 <tbody id="pageable-list">
                 </tbody>
             </table>
-
         </div>
     </jsp:body>
 </tag:authorization>

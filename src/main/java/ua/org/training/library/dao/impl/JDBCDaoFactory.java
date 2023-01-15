@@ -18,7 +18,7 @@ public class JDBCDaoFactory extends DaoFactory {
             return new JDBCAuthorDao(getConnection());
         } catch (SQLException e) {
             LOGGER.error("Cannot create AuthorDao", e);
-            throw new JDBCException(e);
+            throw new JDBCException("Cannot create AuthorDao", e);
         }
     }
 
@@ -28,7 +28,7 @@ public class JDBCDaoFactory extends DaoFactory {
             return new JDBCBookDao(getConnection());
         } catch (SQLException e) {
             LOGGER.error("Cannot create BookDao", e);
-            throw new JDBCException(e);
+            throw new JDBCException("Cannot create BookDao", e);
         }
     }
 
@@ -38,7 +38,7 @@ public class JDBCDaoFactory extends DaoFactory {
             return new JDBCHistoryOrderDao(getConnection());
         } catch (SQLException e) {
             LOGGER.error("Cannot create HistoryOrderDao", e);
-            throw new JDBCException(e);
+            throw new JDBCException("Cannot create HistoryOrderDao", e);
         }
     }
 
@@ -48,7 +48,7 @@ public class JDBCDaoFactory extends DaoFactory {
             return new JDBCOrderDao(getConnection());
         } catch (SQLException e) {
             LOGGER.error("Cannot create OrderDao", e);
-            throw new JDBCException(e);
+            throw new JDBCException("Cannot create OrderDao", e);
         }
     }
 
@@ -58,7 +58,7 @@ public class JDBCDaoFactory extends DaoFactory {
             return new JDBCPlaceDao(getConnection());
         } catch (SQLException e) {
             LOGGER.error("Cannot create PlaceDao", e);
-            throw new JDBCException(e);
+            throw new JDBCException("Cannot create PlaceDao", e);
         }
     }
 
@@ -68,7 +68,7 @@ public class JDBCDaoFactory extends DaoFactory {
             return new JDBCRoleDao(getConnection());
         } catch (SQLException e) {
             LOGGER.error("Cannot create RoleDao", e);
-            throw new JDBCException(e);
+            throw new JDBCException("Cannot create RoleDao", e);
         }
     }
 
@@ -78,7 +78,7 @@ public class JDBCDaoFactory extends DaoFactory {
             return new JDBCUserDao(getConnection());
         } catch (Exception e) {
             LOGGER.error("Cannot create user dao", e);
-            throw new JDBCException(e);
+            throw new JDBCException("Cannot create user dao", e);
         }
     }
 
@@ -88,7 +88,7 @@ public class JDBCDaoFactory extends DaoFactory {
             return new JDBCSecurityDao(getConnection());
         } catch (Exception e) {
             LOGGER.error("Cannot create security dao", e);
-            throw new JDBCException(e);
+            throw new JDBCException("Cannot create security dao", e);
         }
     }
 
@@ -98,7 +98,7 @@ public class JDBCDaoFactory extends DaoFactory {
             return new JDBCStatusDao(getConnection());
         } catch (Exception e) {
             LOGGER.error("Cannot create status dao", e);
-            throw new JDBCException(e);
+            throw new JDBCException("Cannot create status dao", e);
         }
     }
 }

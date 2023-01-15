@@ -4,7 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="tag" tagdir="/WEB-INF/tags" %>
 
-<c:url var="userUrl" value="/library/admin/accounts/${sessionScope.account.id}"/>
+<c:url var="userUrl" value="library/admin/users/${account.id}"/>
 
 <fmt:requestEncoding value="UTF-8"/>
 <fmt:setLocale value="${sessionScope.lang}"/>
@@ -16,12 +16,12 @@
     </jsp:attribute>
     <jsp:body>
         <div class="container main-content">
-            <ol class="breadcrumb">
+            <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
                 <li class="breadcrumb-item"><a href="/library/admin/page"><fmt:message key="usersList.pageTitle"/></a></li>
-                <li class="breadcrumb-item active"><a href="${userUrl}">${sessionScope.account.login}</a></li>
+                <li class="breadcrumb-item active"><a href="${userUrl}">${account.login}</a></li>
             </ol>
-            <h1><fmt:message key="editUser.pageTitle"/>: ${sessionScope.account.login} </h1>
+            <h1><fmt:message key="editUser.pageTitle"/>: ${account.login} </h1>
 
             <c:if test="${param.saved == true}">
                 <div class="info alert"><fmt:message key="editUser.user.save"/><a href="${userUrl}"><fmt:message
@@ -31,18 +31,18 @@
             <form class="main" method="post">
                 <div class="form-group">
                     <label>
-                            ${sessionScope.account.firstName} ${sessionScope.account.lastName}
+                            ${account.firstName} ${account.lastName}
                     </label>
                 </div>
 
                 <div class="form-group">
                     <label>
-                        <a href="mailto:${sessionScope.account.email}">${sessionScope.account.email}</a>
+                        <a href="mailto:${account.email}">${account.email}</a>
                     </label>
                 </div>
                 <div class="form-group">
                     <label>
-                            ${sessionScope.account.phone}
+                            ${account.phone}
                     </label>
                 </div>
                 <div class="form-group">
@@ -50,9 +50,9 @@
                         <fmt:message key="editUser.label.roles"/>
                     </label>
                     <select required multiple name="role" class="form-control" id="role">
-                        <c:forEach items="${sessionScope.rolesList}" var="rolesList">
+                        <c:forEach items="${rolesList}" var="rolesList">
                             <c:set var="isPresent" value="false"/>
-                            <c:forEach items="${sessionScope.roles}" var="role">
+                            <c:forEach items="${roles}" var="role">
                                 <c:if test="${role eq rolesList.code}">
                                     <option value="${rolesList.code}" selected>${rolesList.code}</option>
                                     <c:set var="isPresent" value="true"/>

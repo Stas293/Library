@@ -1,5 +1,6 @@
 package ua.org.training.library.dto;
 
+import ua.org.training.library.dto.builders.PlaceDTOBuilder;
 import ua.org.training.library.model.Place;
 import ua.org.training.library.utility.Constants;
 import ua.org.training.library.utility.Utility;
@@ -11,11 +12,13 @@ public class PlaceDTO implements Serializable {
     private String name;
     private String data;
 
-    public PlaceDTO(Locale locale, Place place) {
-        this.name = place.getName();
-        this.data = Utility.getBundleInterface(
-                locale,
-                Constants.BUNDLE_PLACE_PREFIX + name.toLowerCase().replace(" ", "."));
+    public PlaceDTO(String name, String data) {
+        this.name = name;
+        this.data = data;
+    }
+
+    public static PlaceDTOBuilder builder() {
+        return new PlaceDTOBuilder();
     }
 
     public String getName() {

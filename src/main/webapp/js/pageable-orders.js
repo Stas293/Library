@@ -38,7 +38,7 @@ const makeRow = (rowData, index) => {
     tableData.style.width = '25%';
     tableData.appendChild(
         document
-            .createTextNode(rowData.dateCreated));
+            .createTextNode(Date.parse(rowData.dateExpire) ? rowData.dateExpire : rowData.dateCreated));
     tableRow.appendChild(tableData);
     tableData = document.createElement('td');
     tableData.style.width = '25%';
@@ -83,32 +83,36 @@ const createHiddenRequestDiv = (hiddenId, rowData) => {
 
     fieldHeading = document.createElement('h2');
     let field = document.createElement('span');
-    field.appendChild(document.createTextNode("ISBN: " + rowData.book.isbn));
+    var value = document.getElementById('label_ISBN').innerHTML;
+    field.appendChild(document.createTextNode(value + ": " + rowData.book.isbn));
     fieldHeading.appendChild(field);
     hiddenDesk.appendChild(fieldHeading);
 
     field = document.createElement('h2');
-    field.appendChild(document.createTextNode("Date of order: " + rowData.dateCreated));
+    value = document.getElementById('date_created').innerHTML;
+    field.appendChild(document.createTextNode(value + ": " + rowData.dateCreated));
     fieldHeading.appendChild(field);
 
     field = document.createElement('h2');
-    field.appendChild(document.createTextNode("Name of place: " + rowData.place.data));
+    value = document.getElementById('place').innerHTML;
+    field.appendChild(document.createTextNode(value + ": " + rowData.place.data));
     fieldHeading.appendChild(field);
 
     field = document.createElement('h2');
-    field.appendChild(document.createTextNode("Status: " + rowData.status.value));
+    value = document.getElementById('status').innerHTML;
+    field.appendChild(document.createTextNode(value + ": " + rowData.status.value));
     fieldHeading.appendChild(field);
 
-    if (rowData.dateExpire !== "Not set") {
+    field = document.createElement('h2');
+    value = document.getElementById('date_expires').innerHTML;
+    field.appendChild(document.createTextNode(value + ": " + rowData.dateExpire));
+    fieldHeading.appendChild(field);
+
+    if (rowData.priceOverdue > 0) {
         field = document.createElement('h2');
-        field.appendChild(document.createTextNode("Date expire: " + rowData.dateExpire));
+        value = document.getElementById('fine').innerHTML;
+        field.appendChild(document.createTextNode(value + ": " + rowData.priceOverdue));
         fieldHeading.appendChild(field);
-
-        if (rowData.priceOverdue > 0) {
-            field = document.createElement('h2');
-            field.appendChild(document.createTextNode("Fine: " + rowData.priceOverdue));
-            fieldHeading.appendChild(field);
-        }
     }
 
     updateOrder(hiddenDesk, rowData, hiddenId);

@@ -1,5 +1,6 @@
 package ua.org.training.library.dto;
 
+import ua.org.training.library.dto.builders.AuthorDTOBuilder;
 import ua.org.training.library.model.Author;
 
 import java.io.Serializable;
@@ -9,10 +10,14 @@ public class AuthorDTO implements Serializable {
     private String firstName;
     private String lastName;
 
-    public AuthorDTO(Author author) {
-        this.id = author.getId();
-        this.firstName = author.getFirstName();
-        this.lastName = author.getLastName();
+    public AuthorDTO(long id, String firstName, String lastName) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    public static AuthorDTOBuilder builder() {
+        return new AuthorDTOBuilder();
     }
 
     public long getId() {

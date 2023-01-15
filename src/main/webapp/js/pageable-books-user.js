@@ -91,23 +91,27 @@ const createHiddenOrderRegisterDiv = (hiddenId, rowData) => {
 
     fieldHeading = document.createElement('h2');
     let field = document.createElement('span');
-    field.appendChild(document.createTextNode("ISBN: " + rowData.isbn));
+    let value = document.getElementById("label_ISBN").innerText;
+    field.appendChild(document.createTextNode(value + ": " + rowData.isbn));
     fieldHeading.appendChild(field);
     hiddenDesk.appendChild(fieldHeading);
 
     field = document.createElement('h2');
     const authorsString = rowData.authors.map(author => `${author.firstName} ${author.lastName}`).join(', ');
-    field.appendChild(document.createTextNode("Authors: " + authorsString));
+    value = document.getElementById("authors").innerText;
+    field.appendChild(document.createTextNode(value + ": " + authorsString));
     hiddenDesk.appendChild(field);
 
     field = document.createElement('h5');
     field.setAttribute('title','publication date');
-    field.appendChild(document.createTextNode("Publication date: " + `${rowData.publicationDate}`));
+    value = document.getElementById("publication_date").innerText;
+    field.appendChild(document.createTextNode(value + ": " + `${rowData.publicationDate}`));
     hiddenDesk.appendChild(field);
 
     field = document.createElement('h5');
     field.setAttribute('title','fine per day');
-    field.appendChild(document.createTextNode("Fine: " + `${rowData.fine}`));
+    value = document.getElementById("fine").innerText;
+    field.appendChild(document.createTextNode(value + ": " + `${rowData.fine}`));
     hiddenDesk.appendChild(field);
 
     addFormOrder(hiddenDesk, rowData, hiddenId);
@@ -125,33 +129,38 @@ const createHiddenRequestDiv = (hiddenId, rowData) => {
 
     fieldHeading = document.createElement('h2');
     let field = document.createElement('span');
-    field.appendChild(document.createTextNode("ISBN: " + rowData.book.isbn));
+    let value = document.getElementById("label_ISBN").innerText;
+    field.appendChild(document.createTextNode(value + ": " + rowData.book.isbn));
     fieldHeading.appendChild(field);
     hiddenDesk.appendChild(fieldHeading);
 
     field = document.createElement('h2');
-    field.appendChild(document.createTextNode("Date of order: " + rowData.dateCreated));
+    value = document.getElementById("date_order").innerText;
+    field.appendChild(document.createTextNode(value + ": " + rowData.dateCreated));
     fieldHeading.appendChild(field);
 
     field = document.createElement('h2');
-    field.appendChild(document.createTextNode("Name of place: " + rowData.place.data));
+    value = document.getElementById("place").innerText;
+    field.appendChild(document.createTextNode(value + ": " + rowData.place.data));
     fieldHeading.appendChild(field);
 
     field = document.createElement('h2');
-    field.appendChild(document.createTextNode("Status: " + rowData.status.value));
+    value = document.getElementById("status").innerText;
+    field.appendChild(document.createTextNode(value + ": " + rowData.status.value));
     fieldHeading.appendChild(field);
 
-    if (rowData.dateExpire !== "Not set") {
+    field = document.createElement('h2');
+    value = document.getElementById("date_expire").innerText;
+    field.appendChild(document.createTextNode(value + ": " + rowData.dateExpire));
+    fieldHeading.appendChild(field);
+
+    if (rowData.priceOverdue > 0) {
         field = document.createElement('h2');
-        field.appendChild(document.createTextNode("Date expire: " + rowData.dateExpire));
+        value = document.getElementById("fine").innerText;
+        field.appendChild(document.createTextNode(value + ": " + rowData.priceOverdue));
         fieldHeading.appendChild(field);
-
-        if (rowData.priceOverdue > 0) {
-            field = document.createElement('h2');
-            field.appendChild(document.createTextNode("Fine: " + rowData.priceOverdue));
-            fieldHeading.appendChild(field);
-        }
     }
+
 
     hiddenRequestDiv.appendChild(hiddenDesk);
 

@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ua.org.training.library.context.ApplicationContext;
+import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.ServiceException;
 import ua.org.training.library.model.Book;
 import ua.org.training.library.service.BookService;
@@ -18,7 +20,7 @@ import java.io.PrintWriter;
 
 public class BooksPagination implements ControllerCommand {
     private static final Logger LOGGER = LogManager.getLogger(BooksPagination.class);
-    private final BookService bookService = new BookService();
+    private final BookService bookService = ApplicationContext.getInstance().getBookService();
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
         return createJSONBookList(request, response);
@@ -47,6 +49,8 @@ public class BooksPagination implements ControllerCommand {
             }
         } catch (ServiceException e) {
             LOGGER.error("Service Exception : " + e.getMessage());
+        } catch (ConnectionDBException e) {
+            LOGGER.error("Connection DB Exception : " + e.getMessage());
         }
         try {
             PrintWriter writer = response.getWriter();
@@ -56,10 +60,5 @@ public class BooksPagination implements ControllerCommand {
             LOGGER.error("IO Exception : " + e.getMessage());
         }
         return Constants.APP_STRING_DEFAULT_VALUE;
-    }
-
-    @Override
-    public void clearRequestSessionAttributes(HttpServletRequest request) {
-
     }
 }

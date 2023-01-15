@@ -21,8 +21,15 @@
         <script src="${pageContext.request.contextPath}/js/pageable-orders.js"></script>
     </jsp:attribute>
     <jsp:body>
+        <div id="label_ISBN" hidden="hidden"><fmt:message key="order.label.ISBN"/></div>
+        <div id="date_order" hidden="hidden"><fmt:message key="order.label.date_created"/></div>
+        <div id="place" hidden="hidden"><fmt:message key="order.label.place"/></div>
+        <div id="status" hidden="hidden"><fmt:message key="order.label.status"/></div>
+        <div id="date_expires" hidden="hidden"><fmt:message key="order.label.date_expire"/></div>
+        <div id="fine" hidden="hidden"><fmt:message key="order.label.fine"/></div>
+        <div id="edit_order" hidden="hidden"><fmt:message key="order.label.edit"/></div>
         <div class="container main-content">
-            <ol class="breadcrumb">
+            <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item active"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
             </ol>
             <h1>

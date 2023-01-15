@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Objects;
 
 public class User implements Serializable {
-    private Long id;
+    private long id;
     private String login;
     private String firstName;
     private String lastName;
@@ -151,27 +151,29 @@ public class User implements Serializable {
         if (this == o) return true;
         if (!(o instanceof User user)) return false;
 
+        if (id != user.id) return false;
         if (enabled != user.enabled) return false;
-        if (!id.equals(user.id)) return false;
-        if (!login.equals(user.login)) return false;
-        if (!firstName.equals(user.firstName)) return false;
-        if (!lastName.equals(user.lastName)) return false;
-        if (!email.equals(user.email)) return false;
-        if (!phone.equals(user.phone)) return false;
-        if (!dateCreated.equals(user.dateCreated)) return false;
+        if (!Objects.equals(login, user.login)) return false;
+        if (!Objects.equals(firstName, user.firstName)) return false;
+        if (!Objects.equals(lastName, user.lastName)) return false;
+        if (!Objects.equals(email, user.email)) return false;
+        if (!Objects.equals(phone, user.phone)) return false;
+        if (!Objects.equals(dateCreated, user.dateCreated)) return false;
+        if (!Objects.equals(dateUpdated, user.dateUpdated)) return false;
         return Objects.equals(roles, user.roles);
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + login.hashCode();
-        result = 31 * result + firstName.hashCode();
-        result = 31 * result + lastName.hashCode();
-        result = 31 * result + email.hashCode();
-        result = 31 * result + phone.hashCode();
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (login != null ? login.hashCode() : 0);
+        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
+        result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
+        result = 31 * result + (email != null ? email.hashCode() : 0);
+        result = 31 * result + (phone != null ? phone.hashCode() : 0);
         result = 31 * result + (enabled ? 1 : 0);
-        result = 31 * result + dateCreated.hashCode();
+        result = 31 * result + (dateCreated != null ? dateCreated.hashCode() : 0);
+        result = 31 * result + (dateUpdated != null ? dateUpdated.hashCode() : 0);
         result = 31 * result + (roles != null ? roles.hashCode() : 0);
         return result;
     }

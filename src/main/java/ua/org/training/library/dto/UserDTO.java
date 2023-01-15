@@ -1,6 +1,6 @@
 package ua.org.training.library.dto;
 
-import ua.org.training.library.model.User;
+import ua.org.training.library.dto.builders.UserDTOBuilder;
 
 import java.io.Serializable;
 
@@ -22,12 +22,8 @@ public class UserDTO implements Serializable {
         this.phone = phone;
     }
 
-    public UserDTO(User user) {
-        this.login = user.getLogin();
-        this.firstName = user.getFirstName();
-        this.lastName = user.getLastName();
-        this.email = user.getEmail();
-        this.phone = user.getPhone();
+    public static UserDTOBuilder builder() {
+        return new UserDTOBuilder();
     }
 
     public String getLogin() {

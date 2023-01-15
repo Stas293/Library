@@ -31,6 +31,8 @@ public class JDBCPlaceDao implements PlaceDao {
                     "where order_list.id = ?";
     //language=MySQL
     private static final String GET_PLACE_BY_NAME = "SELECT * FROM place_list WHERE `name` = ?";
+    //language=MySQL
+    private static final String GET_ALL_PLACES = "SELECT * FROM place_list";
     private static final Logger LOGGER = LogManager.getLogger(JDBCPlaceDao.class);
     private final Connection connection;
     public JDBCPlaceDao(Connection connection) {
@@ -38,7 +40,7 @@ public class JDBCPlaceDao implements PlaceDao {
     }
     public long create(Place model) throws SQLException {
         connection.setAutoCommit(false);
-        try (PreparedStatement preparedStatement = connection.prepareStatement(CREATE_PLACE, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(CREATE_PLACE, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, model.getName());
             preparedStatement.executeUpdate();
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
@@ -168,5 +170,21 @@ public class JDBCPlaceDao implements PlaceDao {
             throw new DaoException("Can't get place by name", e);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public List<Place> getAll() {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL_PLACES)) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                List<Place> places = new ArrayList<>();
+                while (resultSet.next()) {
+                    places.add(new PlaceCollector().collectFromResultSet(resultSet));
+                }
+                return places;
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Can't get all places", e);
+            throw new DaoException("Can't get all places", e);
+        }
     }
 }

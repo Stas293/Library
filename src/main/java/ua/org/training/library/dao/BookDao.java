@@ -10,11 +10,6 @@ public interface BookDao extends GenericDao<Book> {
             Page<Book> page,
             Long authorId);
 
-    Page<Book> getBooksByAuthorIdAndLanguage(
-            Page<Book> page,
-            Long authorId,
-            String language);
-
     Page<Book> getBooksByLanguage(
             Page<Book> page,
             String language);

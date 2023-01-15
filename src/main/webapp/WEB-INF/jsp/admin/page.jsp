@@ -18,10 +18,11 @@
     </jsp:attribute>
     <jsp:body>
         <div class="container main-content">
-            <ol class="breadcrumb">
+            <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item active"><a href="/"><fmt:message key="home.pageTitle" /></a></li>
             </ol>
             <h1><fmt:message key="usersList.pageTitle" /></h1>
+
             <input id="search" class="col-4 rounded border" type="text" placeholder="<fmt:message key="table.search" />">
             <input id="size" class="col-2 rounded border" type="number" min="2" max="6" value="5">
             <input name="sorting" class="hidden" type="radio" id="asc" value="asc" checked><label class="col-2" for="asc"><fmt:message key="table.asc" /></label>

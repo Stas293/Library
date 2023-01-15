@@ -21,15 +21,15 @@ public class AuthorityUser extends User {
     }
     
     public boolean isNonAuthorized() {
-        return getRoles().isEmpty();
+        return getGrantedAuthorities().isEmpty();
     }
     
     public boolean isAuthorized() {
-        return !getRoles().isEmpty();
+        return !getGrantedAuthorities().isEmpty();
     }
     
     public boolean hasRole(String role) {
-        return getRoles().stream().anyMatch(r -> r.getCode().equals(role));
+        return getGrantedAuthorities().stream().anyMatch(r -> r.getAuthority().equals(role));
     }
     
     public Collection<GrantedAuthority> getGrantedAuthorities() {
@@ -39,10 +39,8 @@ public class AuthorityUser extends User {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof AuthorityUser)) return false;
+        if (!(o instanceof AuthorityUser that)) return false;
         if (!super.equals(o)) return false;
-
-        AuthorityUser that = (AuthorityUser) o;
 
         return getLogin().equals(that.getLogin());
     }

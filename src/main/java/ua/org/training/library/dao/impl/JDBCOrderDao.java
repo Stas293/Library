@@ -54,14 +54,19 @@ public class JDBCOrderDao implements OrderDao {
     //language=MySQL
     private static final String GET_ORDERS_PAGE_BY_STATUS_ID_AND_PLACE_ID =
             "CALL GET_ORDERS_PAGE_BY_STATUS_AND_PLACE_ID(?, ?, ?, ?, ?, ?, ?);";
-    private static final Logger LOGGER = LogManager.getLogger(JDBCOrderDao.class);
     //language=MySQL
     private static final String GET_ORDERS_COUNT_BY_STATUS_ID_AND_PLACE_ID =
             "SELECT COUNT(*) FROM order_list WHERE status_id = ? AND place_id = ?";
+    //language=MySQL
+    private static final String GET_ORDERS_COUNT_BY_BOOK_ID = "SELECT COUNT(*) FROM order_list WHERE book_id = ?";
+    //language=MySQL
+    private static final String GET_ORDERS_COUNT_BY_STATUS_AND_USER_ID = "SELECT COUNT(*) FROM order_list WHERE status_id = ? AND user_id = ?";
+    private static final Logger LOGGER = LogManager.getLogger(JDBCOrderDao.class);
     private final Connection connection;
     public JDBCOrderDao(Connection connection) {
         this.connection = connection;
     }
+
     @Override
     public long create(Order model) throws SQLException {
         connection.setAutoCommit(false);
@@ -101,10 +106,6 @@ public class JDBCOrderDao implements OrderDao {
             connection.rollback();
             LOGGER.error("Can't create order", e);
             throw new DaoException("Can't create order", e);
-        } catch (Exception e1) {
-            connection.rollback();
-            LOGGER.error("Book count is less than 0", e1);
-            throw new DaoException("Book count is less than 0", e1);
         } finally {
             connection.setAutoCommit(true);
         }
@@ -200,56 +201,29 @@ public class JDBCOrderDao implements OrderDao {
     }
 
     @Override
-    public Page<Order> getPageByUserId(Page<Order> page, Long userId) {
-        try (CallableStatement statement = connection.prepareCall(GET_ORDERS_PAGE_BY_USER_ID)) {
-            setFieldsPrepareCall(page, userId, statement);
-        } catch (SQLException e) {
-            LOGGER.error("Can't get orders page by user id", e);
-            throw new DaoException("Can't get orders page by user id", e);
-        }
-        return page;
-    }
-
-    @Override
-    public Page<Order> getPageByPlaceId(Page<Order> page, Long placeId) {
-        try (CallableStatement statement = connection.prepareCall(GET_ORDERS_PAGE_BY_PLACE_ID)) {
-            setFieldsPrepareCall(page, placeId, statement);
-        } catch (SQLException e) {
-            LOGGER.error("Can't get orders page by place id", e);
-            throw new DaoException("Can't get orders page by place id", e);
-        }
-        return page;
-    }
-
-    @Override
-    public Page<Order> getPageByUserIdAndPlaceId(Page<Order> page, Long userId, Long placeId) {
-        try (CallableStatement statement = connection.prepareCall(GET_ORDERS_PAGE_BY_USER_ID_AND_PLACE_ID)) {
-            fillCallableStatementPage(page, placeId, userId, statement);
-        } catch (SQLException e) {
-            LOGGER.error("Can't get orders page by user id and place id", e);
-            throw new DaoException("Can't get orders page by user id and place id", e);
-        }
-        return page;
-    }
-
-    @Override
-    public Page<Order> getPageByPlaceName(Page<Order> page, String placeName) {
-        try (CallableStatement statement = connection.prepareCall(GET_ORDERS_PAGE_BY_PLACE_NAME)) {
-            statement.setLong(1, page.getLimit());
-            statement.setLong(2, page.getOffset());
-            statement.setString(3, placeName);
-            searchSortSetContent(page, statement);
-        } catch (SQLException e) {
-            LOGGER.error("Can't get orders page by place name", e);
-            throw new DaoException("Can't get orders page by place name", e);
-        }
-        return page;
-    }
-
-    @Override
     public Page<Order> getPageByBookId(Page<Order> page, Long bookId) {
         try (CallableStatement statement = connection.prepareCall(GET_ORDERS_PAGE_BY_BOOK_ID)) {
-            setFieldsPrepareCall(page, bookId, statement);
+            statement.setLong(1, page.getLimit());
+            statement.setLong(2, page.getOffset());
+            statement.setLong(3, bookId);
+            statement.setString(4, page.getSearch());
+            statement.setString(5, page.getSorting());
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List<Order> orders = new ArrayList<>();
+                OrderCollector orderCollector = new OrderCollector();
+                while (resultSet.next()) {
+                    orders.add(orderCollector.collectFromResultSet(resultSet));
+                }
+                page.setData(orders);
+                try (PreparedStatement statement1 = connection.prepareStatement(GET_ORDERS_COUNT_BY_BOOK_ID)) {
+                    statement1.setLong(1, bookId);
+                    try (ResultSet resultSet1 = statement1.executeQuery()) {
+                        if (resultSet1.next()) {
+                            page.setElementsCount(resultSet1.getInt(1));
+                        }
+                    }
+                }
+            }
         } catch (SQLException e) {
             LOGGER.error("Can't get orders page by book id", e);
             throw new DaoException("Can't get orders page by book id", e);
@@ -260,7 +234,29 @@ public class JDBCOrderDao implements OrderDao {
     @Override
     public Page<Order> getPageByStatusAndUserId(Page<Order> page, Long statusId, Long userId) {
         try (CallableStatement statement = connection.prepareCall(GET_ORDERS_PAGE_BY_STATUS_AND_USER_ID)) {
-            fillCallableStatementPage(page, statusId, userId, statement);
+            statement.setLong(1, page.getLimit());
+            statement.setLong(2, page.getOffset());
+            statement.setLong(3, userId);
+            statement.setLong(4, statusId);
+            statement.setString(5, page.getSearch());
+            statement.setString(6, page.getSorting());
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List<Order> orders = new ArrayList<>();
+                OrderCollector orderCollector = new OrderCollector();
+                while (resultSet.next()) {
+                    orders.add(orderCollector.collectFromResultSet(resultSet));
+                }
+                page.setData(orders);
+                try (PreparedStatement statement1 = connection.prepareStatement(GET_ORDERS_COUNT_BY_STATUS_AND_USER_ID)) {
+                    statement1.setLong(1, statusId);
+                    statement1.setLong(2, userId);
+                    try (ResultSet resultSet1 = statement1.executeQuery()) {
+                        if (resultSet1.next()) {
+                            page.setElementsCount(resultSet1.getInt(1));
+                        }
+                    }
+                }
+            }
         } catch (SQLException e) {
             LOGGER.error("Can't get orders page by status and user id", e);
             throw new DaoException("Can't get orders page by status and user id", e);
@@ -302,7 +298,7 @@ public class JDBCOrderDao implements OrderDao {
 
     @Override
     public Page<Order> getPageByStatusIdAndPlaceId(Page<Order> page, Long statusId, Long placeId, String sortBy) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(GET_ORDERS_PAGE_BY_STATUS_ID_AND_PLACE_ID)) {
+        try (PreparedStatement preparedStatement = connection.prepareCall(GET_ORDERS_PAGE_BY_STATUS_ID_AND_PLACE_ID)) {
             preparedStatement.setLong(1, page.getLimit());
             preparedStatement.setLong(2, page.getOffset());
             preparedStatement.setLong(3, placeId);
@@ -334,38 +330,4 @@ public class JDBCOrderDao implements OrderDao {
         return page;
     }
 
-    private void fillCallableStatementPage(Page<Order> page, Long statusId, Long userId, CallableStatement statement) throws SQLException {
-        statement.setLong(1, page.getLimit());
-        statement.setLong(2, page.getOffset());
-        statement.setLong(3, userId);
-        statement.setLong(4, statusId);
-        statement.setString(5, page.getSearch());
-        statement.setString(6, page.getSorting());
-        collectSetContent(page, statement);
-    }
-
-    private void setFieldsPrepareCall(Page<Order> page, Long bookId, CallableStatement statement) throws SQLException {
-        statement.setLong(1, page.getLimit());
-        statement.setLong(2, page.getOffset());
-        statement.setLong(3, bookId);
-        searchSortSetContent(page, statement);
-    }
-
-    private void searchSortSetContent(Page<Order> page, CallableStatement statement) throws SQLException {
-        statement.setString(4, page.getSearch());
-        statement.setString(5, page.getSorting());
-        collectSetContent(page, statement);
-    }
-
-    private void collectSetContent(Page<Order> page, CallableStatement statement) throws SQLException {
-        try (ResultSet resultSet = statement.executeQuery()) {
-            List<Order> orders = new ArrayList<>();
-            OrderCollector orderCollector = new OrderCollector();
-            while (resultSet.next()) {
-                orders.add(orderCollector.collectFromResultSet(resultSet));
-            }
-            page.setData(orders);
-            page.setElementsCount(orders.size());
-        }
-    }
 }

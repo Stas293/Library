@@ -1,5 +1,6 @@
 package ua.org.training.library.model;
 
+import ua.org.training.library.model.builders.RoleBuilder;
 import ua.org.training.library.security.GrantedAuthority;
 
 import java.util.Objects;
@@ -16,6 +17,10 @@ public class Role implements GrantedAuthority {
         this.id = id;
         this.code = code;
         this.name = name;
+    }
+
+    public static RoleBuilder builder() {
+        return new RoleBuilder();
     }
 
     public Long getId() {

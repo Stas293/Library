@@ -10,9 +10,4 @@ public class AccessDenied implements ControllerCommand {
     public String execute(HttpServletRequest request, HttpServletResponse response) {
         return Links.ACCESS_DENIED_PAGE;
     }
-
-    @Override
-    public void clearRequestSessionAttributes(HttpServletRequest request) {
-
-    }
 }

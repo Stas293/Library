@@ -43,7 +43,7 @@ public class JDBCStatusDao implements StatusDao {
 
     @Override
     public long create(Status model) throws SQLException {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -63,7 +63,7 @@ public class JDBCStatusDao implements StatusDao {
 
     @Override
     public Page<Status> getPage(Page<Status> page) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override

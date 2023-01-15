@@ -2,8 +2,13 @@ package ua.org.training.library.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ua.org.training.library.context.ApplicationContext;
+import ua.org.training.library.exceptions.CaptchaException;
+import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.ServiceException;
+import ua.org.training.library.exceptions.UnexpectedValidationException;
 import ua.org.training.library.model.User;
+import ua.org.training.library.utility.CaptchaValidator;
 import ua.org.training.library.utility.Constants;
 import ua.org.training.library.form.FormValidationError;
 
@@ -24,7 +29,7 @@ public class UserValidation {
     private static final int MIN_EIGHT = 8;
     private static final int MAX_255 = 255;
 
-    public void validation(Locale locale, User user, FormValidationError errors) {
+    public void validation(Locale locale, User user, FormValidationError errors) throws UnexpectedValidationException {
         ResourceBundle bundle = ResourceBundle.getBundle(
                 Constants.BUNDLE_NAME,
                 locale);
@@ -34,7 +39,7 @@ public class UserValidation {
                 user.getLogin(),
                 bundle.getString(Constants.BundleStrings.APP_LOGIN_PATTERN),
                 errors);
-        validateLogin(user.getLogin(), errors);
+        validateLogin(user.getLogin(), errors, user.getId());
 
         validateFirstNameLength(user.getFirstName(), errors);
         String pattenFirstName = locale.getLanguage().equals(Constants.APP_DEFAULT_LANGUAGE) ?
@@ -59,13 +64,13 @@ public class UserValidation {
                 bundle.getString(Constants.BundleStrings.APP_EMAIL_PATTERN),
                 errors);
         validateEmailLength(user.getEmail(), errors);
-        validateEmail(user.getEmail(), errors);
+        validateEmail(user.getEmail(), errors, user.getId());
 
         validatePhonePattern(
                 user.getPhone(),
                 bundle.getString(Constants.BundleStrings.APP_PHONE_PATTERN),
                 errors);
-        validatePhone(user.getPhone(), errors);
+        validatePhone(user.getPhone(), errors, user.getId());
     }
 
     private void validateLastNamePattern(String lastName, String pattern, FormValidationError errors) {
@@ -133,36 +138,57 @@ public class UserValidation {
         return field.length() < min || field.length() > max;
     }
 
-    private void validateLogin(String login, FormValidationError errors) {
+    private void validateLogin(String login, FormValidationError errors, long userId) throws UnexpectedValidationException {
         try {
-            userService.getUserByLogin(login);
+            if (userService.getUserByLogin(login).getId() == userId)
+                return;
         } catch (ServiceException e) {
             LOGGER.error(e.getMessage());
             return;
+        } catch (ConnectionDBException e) {
+            LOGGER.error("error: " + e.getMessage());
+            throw new UnexpectedValidationException(e.getMessage(), e);
         }
         errors.setLogin(Constants.Validation.DUPLICATE_FIELD);
         LOGGER.info("Validation failed: duplicate login -> " + login);
     }
 
-    private void validateEmail(String email, FormValidationError errors) {
+    private void validateEmail(String email, FormValidationError errors, long userId) throws UnexpectedValidationException {
         try {
-            userService.getUserByEmail(email);
+            if (userService.getUserByEmail(email).getId() == userId)
+                return;
         } catch (ServiceException e) {
             LOGGER.error("error: " + e.getMessage());
             return;
+        } catch (ConnectionDBException e) {
+            LOGGER.error("error: " + e.getMessage());
+            throw new UnexpectedValidationException(e.getMessage(), e);
         }
         LOGGER.debug("Validation failed: duplicate email -> " + email);
         errors.setEmail(Constants.Validation.DUPLICATE_FIELD);
     }
 
-    private void validatePhone(String phone, FormValidationError errors) {
+    private void validatePhone(String phone, FormValidationError errors, long userId) throws UnexpectedValidationException {
         try {
-            userService.getUserByPhone(phone);
+            if (userService.getUserByPhone(phone).getId() == userId)
+                return;
         } catch (ServiceException e) {
             LOGGER.error("error: " + e.getMessage());
             return;
+        } catch (ConnectionDBException e) {
+            LOGGER.error("error: " + e.getMessage());
+            throw new UnexpectedValidationException(e.getMessage(), e);
         }
         LOGGER.debug("Validation failed: duplicate phone -> " + phone);
         errors.setPhone(Constants.Validation.DUPLICATE_FIELD);
+    }
+
+    public void validateCaptcha(String captchaResponse, FormValidationError formErrors) {
+        try {
+            ApplicationContext.getInstance().getCaptchaValidator().checkCaptcha(captchaResponse);
+        } catch (CaptchaException e) {
+            LOGGER.error("error: " + e.getMessage());
+            formErrors.setCaptcha(Constants.Validation.CAPTCHA_ERROR);
+        }
     }
 }

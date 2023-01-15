@@ -1,5 +1,6 @@
 package ua.org.training.library.dto;
 
+import ua.org.training.library.dto.builders.BookDTOBuilder;
 import ua.org.training.library.model.Book;
 import ua.org.training.library.utility.Utility;
 
@@ -19,17 +20,19 @@ public class BookDTO implements Serializable {
     private String language;
     private List<AuthorDTO> authors;
 
-    public BookDTO(Locale locale, Book book) {
-        this.id = book.getId();
-        this.name = book.getName();
-        this.count = book.getCount();
-        this.ISBN = book.getISBN();
-        this.publicationDate = book.getPublicationDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString();
-        this.fine = Utility.getLocaleFine(locale, book.getFine());
-        this.language = book.getLanguage();
-        this.authors = book.getAuthors().stream()
-                .map(AuthorDTO::new)
-                .toList();
+    public BookDTO(long id, String name, int count, String ISBN, String publicationDate, String fine, String language, List<AuthorDTO> authors) {
+        this.id = id;
+        this.name = name;
+        this.count = count;
+        this.ISBN = ISBN;
+        this.publicationDate = publicationDate;
+        this.fine = fine;
+        this.language = language;
+        this.authors = authors;
+    }
+
+    public static BookDTOBuilder builder() {
+        return new BookDTOBuilder();
     }
 
     public long getId() {

@@ -12,11 +12,6 @@ public class DaoException extends RuntimeException {
         this.message = message;
     }
 
-    public DaoException(Throwable cause) {
-        super(cause);
-        this.message = cause.getMessage();
-    }
-
     @Override
     public String getMessage() {
         return message;
@@ -24,7 +19,9 @@ public class DaoException extends RuntimeException {
 
     @Override
     public String toString() {
-        return message;
+        return "DaoException{" +
+                "message='" + message + '\'' +
+                '}';
     }
 }
 

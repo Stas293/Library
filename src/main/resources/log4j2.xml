@@ -4,10 +4,14 @@
         <File name="MyFile" fileName="logs/library.log" immediateFlush="true" append="false">
             <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
+        <Console name="MyConsole" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
     </Appenders>
     <Loggers>
         <Root level="INFO">
             <AppenderRef ref="MyFile"/>
+            <AppenderRef ref="MyConsole"/>
         </Root>
     </Loggers>
 </Configuration>

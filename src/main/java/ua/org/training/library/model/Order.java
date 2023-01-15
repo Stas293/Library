@@ -18,13 +18,14 @@ public class Order implements Serializable {
     public Order() {
     }
 
-    public Order(Long id, Date dateCreated, Date dateExpire, Book book, User user, Place place) {
+    public Order(Long id, Date dateCreated, Date dateExpire, Book book, User user, Place place, Status status) {
         this.id = id;
         this.dateCreated = dateCreated;
         this.dateExpire = dateExpire;
         this.book = book;
         this.user = user;
         this.place = place;
+        this.status = status;
     }
 
     public static OrderBuilder builder() {

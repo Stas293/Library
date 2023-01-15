@@ -20,6 +20,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/error.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Serif+Pro:400,600,700">
+    <link rel="icon" href="${pageContext.request.contextPath}/bookshelf.ico" type="image/x-icon">
 </head>
 <body>
 <header>
