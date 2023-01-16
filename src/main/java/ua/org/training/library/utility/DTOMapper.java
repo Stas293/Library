@@ -10,6 +10,9 @@ import java.util.Date;
 import java.util.Locale;
 
 public class DTOMapper {
+    private DTOMapper() {
+    }
+
     public static AuthorDTO authorToDTO(Author author) {
         return AuthorDTO.builder()
                 .setId(author.getId())

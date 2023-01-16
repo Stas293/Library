@@ -7,7 +7,6 @@
     <display-name>Library Application</display-name>
 
 
-
     <error-page>
         <error-code>403</error-code>
         <location>/WEB-INF/access-denied.jsp</location>

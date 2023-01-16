@@ -5,7 +5,7 @@
 <%@ taglib prefix="tag" tagdir="/WEB-INF/tags" %>
 
 <fmt:requestEncoding value="UTF-8" />
-<fmt:setLocale value="${lang}" />
+<fmt:setLocale value="${sessionScope.lang}" />
 <fmt:setBundle basename="interface"/>
 
 <tag:authorization>

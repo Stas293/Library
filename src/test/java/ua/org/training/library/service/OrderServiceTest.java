@@ -222,7 +222,7 @@ class OrderServiceTest {
                         "\"user\":{\"login\":null,\"firstName\":null,\"lastName\":null,\"email\":null,\"phone\":null,\"fullName\":\"null null\"}," +
                         "\"place\":{\"name\":\"To the reading room\",\"data\":\"To the reading room\"}," +
                         "\"status\":{\"code\":\"ACCEPT\",\"name\":null,\"value\":\"Accepted\",\"nextStatuses\":[]}," +
-                        "\"priceOverdue\":0.0,\"chooseDateExpire\":false}]}",
+                        "\"priceOverdue\":\"0.0 USD\",\"chooseDateExpire\":false}]}",
                 orderService.getOrderPage(Locale.ENGLISH, orderPage));
 
         Mockito.when(bookDao.getBookByOrderId(1L)).thenReturn(Optional.empty());
@@ -399,7 +399,7 @@ class OrderServiceTest {
                         "\"user\":{\"login\":null,\"firstName\":null,\"lastName\":null,\"email\":null,\"phone\":null,\"fullName\":\"null null\"}," +
                         "\"place\":{\"name\":\"To the reading room\",\"data\":\"To the reading room\"}," +
                         "\"status\":{\"code\":\"ACCEPT\",\"name\":null,\"value\":\"Accepted\",\"nextStatuses\":[]}," +
-                        "\"priceOverdue\":0.0,\"chooseDateExpire\":false}]}",
+                        "\"priceOverdue\":\"0.0 USD\",\"chooseDateExpire\":false}]}",
                 orderService.getOrderPageByBookId(Locale.ENGLISH, orderPage, 1L));
 
         Mockito.when(orderDao.getPageByBookId(orderPage, 1L)).thenThrow(DaoException.class);
@@ -510,7 +510,7 @@ class OrderServiceTest {
                         "\"user\":{\"login\":null,\"firstName\":null,\"lastName\":null,\"email\":null,\"phone\":null,\"fullName\":\"null null\"}," +
                         "\"place\":{\"name\":\"To the reading room\",\"data\":\"To the reading room\"}," +
                         "\"status\":{\"code\":\"ACCEPT\",\"name\":null,\"value\":\"Accepted\",\"nextStatuses\":[]}," +
-                        "\"priceOverdue\":0.0,\"chooseDateExpire\":false}]}",
+                        "\"priceOverdue\":\"0.0 USD\",\"chooseDateExpire\":false}]}",
                 orderService.getOrderPageByUserIdAndStatusId(Locale.ENGLISH, orderPage, 1L, 1L));
 
         Mockito.when(orderDao.getPageByStatusAndUserId(orderPage, 1L, 1L)).thenThrow(DaoException.class);
@@ -621,7 +621,7 @@ class OrderServiceTest {
                         "\"user\":{\"login\":null,\"firstName\":null,\"lastName\":null,\"email\":null,\"phone\":null,\"fullName\":\"null null\"}," +
                         "\"place\":{\"name\":\"To the reading room\",\"data\":\"To the reading room\"}," +
                         "\"status\":{\"code\":\"ACCEPT\",\"name\":null,\"value\":\"Accepted\",\"nextStatuses\":[]}," +
-                        "\"priceOverdue\":0.0,\"chooseDateExpire\":false}]}",
+                        "\"priceOverdue\":\"0.0 USD\",\"chooseDateExpire\":false}]}",
                 orderService.getOrderPageByStatusId(Locale.ENGLISH, orderPage, 1L, "book_name"));
 
         Mockito.when(orderDao.getPageByStatusId(orderPage, 1L, "book_name")).thenThrow(DaoException.class);
@@ -732,7 +732,7 @@ class OrderServiceTest {
                         "\"user\":{\"login\":null,\"firstName\":null,\"lastName\":null,\"email\":null,\"phone\":null,\"fullName\":\"null null\"}," +
                         "\"place\":{\"name\":\"To the reading room\",\"data\":\"To the reading room\"}," +
                         "\"status\":{\"code\":\"ACCEPT\",\"name\":null,\"value\":\"Accepted\",\"nextStatuses\":[]}," +
-                        "\"priceOverdue\":0.0,\"chooseDateExpire\":false}]}",
+                        "\"priceOverdue\":\"0.0 USD\",\"chooseDateExpire\":false}]}",
                 orderService.getOrderPageByStatusIdAndPlaceId(Locale.ENGLISH, orderPage, 1L, 1L, "book_name"));
 
         Mockito.when(orderDao.getPageByStatusIdAndPlaceId(orderPage, 1L, 1L, "book_name")).thenThrow(DaoException.class);

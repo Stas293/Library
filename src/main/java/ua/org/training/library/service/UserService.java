@@ -43,9 +43,8 @@ public class UserService {
     }
 
     public User getUserById(long id) throws ServiceException, ConnectionDBException {
-        User user;
         try (UserDao userDao = daoFactory.createUserDao()) {
-            user = userDao.getById(id).orElseThrow(() -> new ServiceException("User not found"));
+            User user = userDao.getById(id).orElseThrow(() -> new ServiceException("User not found"));
             addRolesForUser(user);
             return user;
         } catch (JDBCException e) {
@@ -58,9 +57,8 @@ public class UserService {
     }
 
     public User getUserByLogin(String login) throws ServiceException, ConnectionDBException {
-        User user;
         try (UserDao userDao = daoFactory.createUserDao()) {
-            user = userDao.getByLogin(login).orElseThrow(() -> new ServiceException("User not found"));
+            User user = userDao.getByLogin(login).orElseThrow(() -> new ServiceException("User not found"));
             return addRolesForUser(user);
         } catch (JDBCException e) {
             LOGGER.error("Error while getting UserDao", e);
@@ -72,9 +70,8 @@ public class UserService {
     }
 
     public User getUserByEmail(String email) throws ServiceException, ConnectionDBException {
-        User user;
         try (UserDao userDao = daoFactory.createUserDao()) {
-            user = userDao.getByEmail(email).orElseThrow(() -> new ServiceException("User not found"));
+            User user = userDao.getByEmail(email).orElseThrow(() -> new ServiceException("User not found"));
             return addRolesForUser(user);
         } catch (JDBCException e) {
             LOGGER.error("Error while getting UserDao", e);

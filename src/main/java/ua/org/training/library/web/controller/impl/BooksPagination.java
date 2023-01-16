@@ -36,17 +36,13 @@ public class BooksPagination implements ControllerCommand {
         try {
             String sortBy = Utility.getStringParameter(
                     request.getParameter(Constants.PARAMETER_SORT_BY),
-                    Constants.APP_STRING_DEFAULT_VALUE);
-            if (sortBy.equals(Constants.APP_STRING_DEFAULT_VALUE)) {
-                jsonString = bookService.getBookPage(
-                        Utility.getLocale(request),
-                        page);
-            } else {
+                    Constants.APP_STRINT_DEFAULT_SORTING);
+
                 jsonString = bookService.getBooksSortedBy(
                                 Utility.getLocale(request),
                                 page,
                                 sortBy);
-            }
+
         } catch (ServiceException e) {
             LOGGER.error("Service Exception : " + e.getMessage());
         } catch (ConnectionDBException e) {

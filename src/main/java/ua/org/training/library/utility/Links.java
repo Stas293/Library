@@ -1,6 +1,8 @@
 package ua.org.training.library.utility;
 
 public class Links {
+    private Links() {
+    }
     public static final String ADMIN_CONTROL_PAGE = "/WEB-INF/jsp/admin/page.jsp";
     public static final String LIBRARIAN_ORDER_UPDATE_SUCCESS = "redirect:library/librarian/page?updated=true";
     public static final String LIBRARIAN_PAGE = "/WEB-INF/jsp/librarian/page.jsp";
@@ -51,7 +53,4 @@ public class Links {
     public static final String PASSWORD_EDIT_PAGE = "/WEB-INF/jsp/edit-password.jsp";
     public static final String PASSWORD_EDIT_PAGE_FAIL = "redirect:library/personal-data?password=false";
     public static final String ADMIN_USER_PAGE_REDIRECT = "redirect:library/admin/page";
-
-    private Links() {
-    }
 }

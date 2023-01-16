@@ -117,4 +117,35 @@ public class OrderDTO implements Serializable {
                 ", priceOverdue=" + priceOverdue +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OrderDTO orderDTO)) return false;
+
+        if (id != orderDTO.id) return false;
+        if (chooseDateExpire != orderDTO.chooseDateExpire) return false;
+        if (!Objects.equals(dateCreated, orderDTO.dateCreated))
+            return false;
+        if (!Objects.equals(dateExpire, orderDTO.dateExpire)) return false;
+        if (!Objects.equals(book, orderDTO.book)) return false;
+        if (!Objects.equals(user, orderDTO.user)) return false;
+        if (!Objects.equals(place, orderDTO.place)) return false;
+        if (!Objects.equals(status, orderDTO.status)) return false;
+        return Objects.equals(priceOverdue, orderDTO.priceOverdue);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (dateCreated != null ? dateCreated.hashCode() : 0);
+        result = 31 * result + (dateExpire != null ? dateExpire.hashCode() : 0);
+        result = 31 * result + (book != null ? book.hashCode() : 0);
+        result = 31 * result + (user != null ? user.hashCode() : 0);
+        result = 31 * result + (place != null ? place.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (priceOverdue != null ? priceOverdue.hashCode() : 0);
+        result = 31 * result + (chooseDateExpire ? 1 : 0);
+        return result;
+    }
 }

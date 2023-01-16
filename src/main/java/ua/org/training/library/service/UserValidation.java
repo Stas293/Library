@@ -8,7 +8,6 @@ import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.ServiceException;
 import ua.org.training.library.exceptions.UnexpectedValidationException;
 import ua.org.training.library.model.User;
-import ua.org.training.library.utility.CaptchaValidator;
 import ua.org.training.library.utility.Constants;
 import ua.org.training.library.form.FormValidationError;
 

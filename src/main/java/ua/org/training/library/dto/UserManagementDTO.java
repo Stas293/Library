@@ -1,8 +1,6 @@
 package ua.org.training.library.dto;
 
 import ua.org.training.library.dto.builders.UserManagementDTOBuilder;
-import ua.org.training.library.model.Role;
-import ua.org.training.library.model.builders.UserBuilder;
 
 import java.io.Serializable;
 import java.util.*;

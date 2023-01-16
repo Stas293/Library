@@ -37,8 +37,6 @@ public class Register implements ControllerCommand {
     public String execute(HttpServletRequest request,
                           HttpServletResponse response) {
 
-        HttpSession session = request.getSession();
-
         AuthorityUser securityAccount = SecurityService.getAuthorityUser(request);
 
         if (!securityAccount.getLogin().equals(Constants.APP_UNAUTHORIZED_USER)) {
@@ -113,14 +111,12 @@ public class Register implements ControllerCommand {
                     LOGGER.error("Error while creating user", e);
                     return Links.ERROR_PAGE + "?message=" + e.getMessage();
                 }
-            session.setAttribute("user_reg", user);
-            session.setAttribute("errors", formErrors);
+            request.setAttribute("user_reg", user);
+            request.setAttribute("errors", formErrors);
 
             if (formErrors.isContainsErrors()) {
                 return Links.REGISTRATION_PAGE;
             }
-            session.removeAttribute("user_reg");
-            session.removeAttribute("errors");
             return Links.REGISTRATION_FORM_SUCCESS;
         }
     }
