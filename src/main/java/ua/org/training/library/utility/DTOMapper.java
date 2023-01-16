@@ -52,9 +52,9 @@ public class DTOMapper {
         String dateExpire = order.getDateExpire() != null ?
                 order.getDateExpire().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString() :
                 Utility.getBundleInterface(locale, Constants.BUNDLE_ORDER_STATUS_PREFIX + "not_set");
-        double priceOverdue = order.getDateExpire() != null ?
-                order.getBook().getFine() * (new Date().toInstant().atOffset(ZoneOffset.UTC).toLocalDate().toEpochDay() -
-                        order.getDateExpire().toInstant().atOffset(ZoneOffset.UTC).toLocalDate().toEpochDay()) : 0;
+        long overdue = order.getDateExpire() != null ? (new Date().toInstant().atOffset(ZoneOffset.UTC).toLocalDate().toEpochDay() -
+                order.getDateExpire().toInstant().atOffset(ZoneOffset.UTC).toLocalDate().toEpochDay()) : 0;
+        String priceOverdue = Utility.getLocaleFine(locale, order.getBook().getFine() * overdue);
         return OrderDTO.builder()
                 .setId(order.getId())
                 .setDateCreated(order.getDateCreated().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().toString())
@@ -65,7 +65,7 @@ public class DTOMapper {
                 .setStatus(statusToDTO(locale, order.getStatus()))
                 .setChooseDateExpire(!order.getStatus().getCode().equals(Constants.ORDER_STATUS_ACCEPT) &&
                         !order.getPlace().getName().equals(Constants.ORDER_PLACE_READING_ROOM))
-                .setPriceOverdue(priceOverdue > 0 ? priceOverdue : 0)
+                .setPriceOverdue(overdue > 0 ? priceOverdue : "0")
                 .createOrderDTO();
     }
 

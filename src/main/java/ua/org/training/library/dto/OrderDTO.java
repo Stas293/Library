@@ -13,10 +13,10 @@ public class OrderDTO implements Serializable {
     private UserDTO user;
     private PlaceDTO place;
     private StatusDTO status;
-    private double priceOverdue;
+    private String priceOverdue;
     private boolean chooseDateExpire;
 
-    public OrderDTO(long id, String dateCreated, String dateExpire, BookDTO book, UserDTO user, PlaceDTO place, StatusDTO status, double priceOverdue, boolean chooseDateExpire) {
+    public OrderDTO(long id, String dateCreated, String dateExpire, BookDTO book, UserDTO user, PlaceDTO place, StatusDTO status, String priceOverdue, boolean chooseDateExpire) {
         this.id = id;
         this.dateCreated = dateCreated;
         this.dateExpire = dateExpire;
@@ -80,11 +80,11 @@ public class OrderDTO implements Serializable {
         this.place = place;
     }
 
-    public double getPriceOverdue() {
+    public String  getPriceOverdue() {
         return priceOverdue;
     }
 
-    public void setPriceOverdue(double priceOverdue) {
+    public void setPriceOverdue(String priceOverdue) {
         this.priceOverdue = priceOverdue;
     }
 
@@ -116,37 +116,5 @@ public class OrderDTO implements Serializable {
                 ", status=" + status +
                 ", priceOverdue=" + priceOverdue +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof OrderDTO orderDTO)) return false;
-
-        if (id != orderDTO.id) return false;
-        if (Double.compare(orderDTO.priceOverdue, priceOverdue) != 0) return false;
-        if (!Objects.equals(dateCreated, orderDTO.dateCreated))
-            return false;
-        if (!Objects.equals(dateExpire, orderDTO.dateExpire)) return false;
-        if (!Objects.equals(book, orderDTO.book)) return false;
-        if (!Objects.equals(user, orderDTO.user)) return false;
-        if (!Objects.equals(place, orderDTO.place)) return false;
-        return Objects.equals(status, orderDTO.status);
-    }
-
-    @Override
-    public int hashCode() {
-        int result;
-        long temp;
-        result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (dateCreated != null ? dateCreated.hashCode() : 0);
-        result = 31 * result + (dateExpire != null ? dateExpire.hashCode() : 0);
-        result = 31 * result + (book != null ? book.hashCode() : 0);
-        result = 31 * result + (user != null ? user.hashCode() : 0);
-        result = 31 * result + (place != null ? place.hashCode() : 0);
-        result = 31 * result + (status != null ? status.hashCode() : 0);
-        temp = Double.doubleToLongBits(priceOverdue);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        return result;
     }
 }

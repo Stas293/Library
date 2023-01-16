@@ -108,7 +108,7 @@ const createHiddenRequestDiv = (hiddenId, rowData) => {
     field.appendChild(document.createTextNode(value + ": " + rowData.dateExpire));
     fieldHeading.appendChild(field);
 
-    if (rowData.priceOverdue > 0) {
+    if (rowData.priceOverdue !== "0") {
         field = document.createElement('h2');
         value = document.getElementById('fine').innerHTML;
         field.appendChild(document.createTextNode(value + ": " + rowData.priceOverdue));

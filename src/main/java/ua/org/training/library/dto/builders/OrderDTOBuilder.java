@@ -10,7 +10,7 @@ public class OrderDTOBuilder {
     private UserDTO user;
     private PlaceDTO place;
     private StatusDTO status;
-    private double priceOverdue;
+    private String priceOverdue;
     private boolean chooseDateExpire;
 
     public OrderDTOBuilder setId(long id) {
@@ -48,7 +48,7 @@ public class OrderDTOBuilder {
         return this;
     }
 
-    public OrderDTOBuilder setPriceOverdue(double priceOverdue) {
+    public OrderDTOBuilder setPriceOverdue(String priceOverdue) {
         this.priceOverdue = priceOverdue;
         return this;
     }
