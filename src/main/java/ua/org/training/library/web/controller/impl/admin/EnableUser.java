@@ -20,7 +20,8 @@ public class EnableUser implements ControllerCommand {
     private final UserService userService = ApplicationContext.getInstance().getUserService();
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
-        long  id = Utility.parseLongOrDefault(request.getParameter(Constants.RequestAttributes.ACCOUNT_ID_ATTRIBUTE),
+        long  id = Utility.parseLongOrDefault(
+                request.getParameter(Constants.RequestAttributes.ACCOUNT_ID_ATTRIBUTE),
                 Constants.APP_DEFAULT_ID);
         try {
             User userToDisable = userService.getUserById(id);

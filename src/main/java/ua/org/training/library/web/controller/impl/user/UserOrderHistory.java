@@ -33,10 +33,26 @@ public class UserOrderHistory implements ControllerCommand {
     private String createJSONHistoryOrder(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("application/json");
         response.setCharacterEncoding(Constants.APP_ENCODING);
-        LOGGER.info("Send json page to user client!");
+        LOGGER.info("Sending json page");
         PageService<HistoryOrder> pageService = new PageService<>();
         Page<HistoryOrder> page = pageService.getPage(request);
         String jsonString = "";
+        jsonString = getJSONPage(request, page, jsonString);
+        printJSON(response, jsonString);
+        return Constants.APP_STRING_DEFAULT_VALUE;
+    }
+
+    private static void printJSON(HttpServletResponse response, String jsonString) {
+        try {
+            PrintWriter writer = response.getWriter();
+            writer.print(jsonString);
+            LOGGER.info(jsonString);
+        } catch (IOException e) {
+            LOGGER.error(String.format("IO Exception : %s", e.getMessage()));
+        }
+    }
+
+    private String getJSONPage(HttpServletRequest request, Page<HistoryOrder> page, String jsonString) {
         try {
             jsonString = historyOrderService.getHistoryOrderPageByUserId(
                     Utility.getLocale(request),
@@ -48,13 +64,6 @@ public class UserOrderHistory implements ControllerCommand {
         } catch (ConnectionDBException e) {
             LOGGER.error(String.format("Connection DB Exception : %s", e.getMessage()));
         }
-        try {
-            PrintWriter writer = response.getWriter();
-            writer.print(jsonString);
-            LOGGER.info(jsonString);
-        } catch (IOException e) {
-            LOGGER.error(String.format("IO Exception : %s", e.getMessage()));
-        }
-        return Constants.APP_STRING_DEFAULT_VALUE;
+        return jsonString;
     }
 }

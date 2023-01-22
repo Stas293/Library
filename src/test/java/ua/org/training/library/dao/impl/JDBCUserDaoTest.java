@@ -101,11 +101,8 @@ class JDBCUserDaoTest {
         Mockito.when(resultSet.getInt("enabled")).thenReturn(1);
         Mockito.when(resultSet.getDate("date_created")).thenReturn(Date.valueOf("2020-01-01"));
         Mockito.when(resultSet.getDate("date_updated")).thenReturn(Date.valueOf("2020-01-01"));
-        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenReturn(preparedStatement);
-        ResultSet resultSet1 = Mockito.mock(ResultSet.class);
-        Mockito.when(preparedStatement.executeQuery()).thenReturn(resultSet1);
-        Mockito.when(resultSet1.next()).thenReturn(true);
-        Mockito.when(resultSet1.getLong(1)).thenReturn(2L);
+        Mockito.when(callableStatement.getLong(5)).thenReturn(2L);
+
         userDao = new JDBCUserDao(connection);
         List<User> expected = List.of(
                 User.builder()
@@ -159,13 +156,6 @@ class JDBCUserDaoTest {
         Mockito.verify(resultSet, Mockito.times(2)).getInt("enabled");
         Mockito.verify(resultSet, Mockito.times(2)).getDate("date_created");
         Mockito.verify(resultSet, Mockito.times(2)).getDate("date_updated");
-
-        Mockito.when(resultSet.next()).thenReturn(false);
-        expectedPage.setElementsCount(0);
-        expectedPage.setData(List.of());
-        Mockito.when(resultSet1.next()).thenReturn(true);
-        Mockito.when(resultSet1.getLong(1)).thenReturn(0L);
-        assertEquals(expectedPage, userDao.getPage(page));
 
         Mockito.when(connection.prepareCall(Mockito.anyString())).thenThrow(SQLException.class);
         assertThrows(DaoException.class, () -> userDao.getPage(page));

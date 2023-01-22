@@ -2,13 +2,11 @@ package ua.org.training.library.web.controller.impl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
 import ua.org.training.library.context.ApplicationContext;
 import ua.org.training.library.exceptions.ConnectionDBException;
-import ua.org.training.library.exceptions.ControllerException;
 import ua.org.training.library.exceptions.ServiceException;
 import ua.org.training.library.exceptions.UnexpectedValidationException;
 import ua.org.training.library.model.User;
@@ -16,8 +14,7 @@ import ua.org.training.library.security.AuthorityUser;
 import ua.org.training.library.security.SecurityService;
 import ua.org.training.library.service.RoleService;
 import ua.org.training.library.service.UserService;
-import ua.org.training.library.service.UserValidation;
-import ua.org.training.library.utility.CaptchaValidator;
+import ua.org.training.library.utility.validation.UserValidation;
 import ua.org.training.library.utility.Constants;
 import ua.org.training.library.utility.Links;
 import ua.org.training.library.utility.Utility;
@@ -31,7 +28,7 @@ public class Register implements ControllerCommand {
 
     private final UserService userService = ApplicationContext.getInstance().getUserService();
     private final RoleService roleService = ApplicationContext.getInstance().getRoleService();
-    private final UserValidation userValidation = new UserValidation(userService);
+    private final UserValidation userValidation = ApplicationContext.getInstance().getUserValidation();
 
     @Override
     public String execute(HttpServletRequest request,
@@ -70,47 +67,18 @@ public class Register implements ControllerCommand {
                     user, password, confirmPassword));
             try {
                 user.setRoles(Collections.singletonList(roleService.getRoleByCode(Constants.DEFAULT_USER_ROLE)));
-            } catch (ServiceException e) {
-                LOGGER.error("Error while getting role by code", e);
-                return Links.REGISTRATION_PAGE;
-            } catch (ConnectionDBException e) {
+            } catch (ServiceException | ConnectionDBException e) {
                 LOGGER.error("Error while getting role by code", e);
                 return Links.REGISTRATION_PAGE;
             }
 
-            userValidation.validatePasswordLength(password, formErrors);
-            userValidation.validatePasswordLength(confirmPassword, formErrors);
-            userValidation.validateConfirmPassword(
-                    password,
-                    confirmPassword,
-                    formErrors);
+            String errorPage = validateUserData(request, formErrors, user, password, confirmPassword, captchaResponse);
+            if (errorPage != null) return errorPage;
 
-            userValidation.validateCaptcha(captchaResponse, formErrors);
-
-            LOGGER.debug("error has formErrors = " + formErrors.isContainsErrors());
-
-            try {
-                userValidation.validation(Utility.getLocale(request),
-                        user,
-                        formErrors);
-            } catch (UnexpectedValidationException e) {
-                LOGGER.error("Unexpected validation error", e);
-                return Links.ERROR_PAGE + "?message=" + e.getMessage();
+            if (!formErrors.isContainsErrors()) {
+                String registrationPage = registerUser(user, password);
+                if (registrationPage != null) return registrationPage;
             }
-            LOGGER.debug("error has formErrors = " + formErrors.isContainsErrors());
-
-            if (!formErrors.isContainsErrors())
-                try {
-                    String bcryptPassword = BCrypt.hashpw(
-                            password, BCrypt.gensalt(Constants.APP_BCRYPT_SALT));
-                    userService.createUser(user, bcryptPassword);
-                } catch (ServiceException e) {
-                    LOGGER.error("Error while creating user", e);
-                    return Links.REGISTRATION_PAGE;
-                } catch (ConnectionDBException e) {
-                    LOGGER.error("Error while creating user", e);
-                    return Links.ERROR_PAGE + "?message=" + e.getMessage();
-                }
             request.setAttribute("user_reg", user);
             request.setAttribute("errors", formErrors);
 
@@ -119,5 +87,44 @@ public class Register implements ControllerCommand {
             }
             return Links.REGISTRATION_FORM_SUCCESS;
         }
+    }
+
+    private String validateUserData(HttpServletRequest request, FormValidationError formErrors, User user, String password, String confirmPassword, String captchaResponse) {
+        userValidation.validatePasswordLength(password, formErrors);
+        userValidation.validatePasswordLength(confirmPassword, formErrors);
+        userValidation.validateConfirmPassword(
+                password,
+                confirmPassword,
+                formErrors);
+
+        userValidation.validateCaptcha(captchaResponse, formErrors);
+
+        LOGGER.debug(String.format("FormValidator: %s", formErrors));
+
+        try {
+            userValidation.validation(Utility.getLocale(request),
+                    user,
+                    formErrors);
+        } catch (UnexpectedValidationException e) {
+            LOGGER.error("Unexpected validation error", e);
+            return Links.ERROR_PAGE + "?message=" + e.getMessage();
+        }
+        LOGGER.debug(String.format("FormValidator: %s", formErrors));
+        return null;
+    }
+
+    private String registerUser(User user, String password) {
+        try {
+            String bcryptPassword = BCrypt.hashpw(
+                    password, BCrypt.gensalt(Constants.APP_BCRYPT_SALT));
+            userService.createUser(user, bcryptPassword);
+        } catch (ServiceException e) {
+            LOGGER.error("Error while creating user", e);
+            return Links.REGISTRATION_PAGE;
+        } catch (ConnectionDBException e) {
+            LOGGER.error("Error while creating user", e);
+            return Links.ERROR_PAGE + "?message=" + e.getMessage();
+        }
+        return null;
     }
 }

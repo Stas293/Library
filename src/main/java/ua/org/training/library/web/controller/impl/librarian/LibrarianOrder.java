@@ -34,10 +34,27 @@ public class LibrarianOrder implements ControllerCommand {
                                        HttpServletResponse response) {
         response.setContentType("application/json");
         response.setCharacterEncoding(Constants.APP_ENCODING);
-        LOGGER.info("Send json page to user client!");
+        LOGGER.info("Sending JSON order list");
         PageService<Order> pageService = new PageService<>();
         Page<Order> page = pageService.getPage(request);
-        String jsonString = null;
+        String jsonString = "";
+        jsonString = getJsonString(request, page, jsonString);
+        printString(response, jsonString);
+        return Constants.APP_STRING_DEFAULT_VALUE;
+    }
+
+    private static void printString(HttpServletResponse response, String jsonString) {
+        try {
+            PrintWriter writer = response.getWriter();
+            writer.print(jsonString);
+            LOGGER.info(jsonString);
+        } catch (IOException e) {
+            LOGGER.error(String.format("Error while getting order page by status id: %s",
+                    e.getMessage()));
+        }
+    }
+
+    private String getJsonString(HttpServletRequest request, Page<Order> page, String jsonString) {
         try {
             if (request.getParameter(Constants.RequestAttributes.PLACE_NAME_ATTRIBUTE) != null) {
                 jsonString = orderService
@@ -66,18 +83,10 @@ public class LibrarianOrder implements ControllerCommand {
                                         request.getParameter(Constants.PARAMETER_SORT_BY),
                                         Constants.DEFAULT_ORDER_SORT_BY));
             }
-        } catch (ServiceException e) {
-            LOGGER.error("Service Exception : " + e.getMessage());
-        } catch (ConnectionDBException e) {
-            LOGGER.error("Connection DB Exception : " + e.getMessage());
+        } catch (ServiceException | ConnectionDBException e) {
+            LOGGER.error(String.format("Error while getting order page by status id: %s",
+                    e.getMessage()));
         }
-        try {
-            PrintWriter writer = response.getWriter();
-            writer.print(jsonString);
-            LOGGER.info(jsonString);
-        } catch (IOException e) {
-            LOGGER.error("IO Exception : " + e.getMessage());
-        }
-        return Constants.APP_STRING_DEFAULT_VALUE;
+        return jsonString;
     }
 }

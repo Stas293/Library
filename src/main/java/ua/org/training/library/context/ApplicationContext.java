@@ -3,8 +3,10 @@ package ua.org.training.library.context;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.org.training.library.dao.DaoFactory;
+import ua.org.training.library.dao.impl.ConnectionPool;
 import ua.org.training.library.service.*;
-import ua.org.training.library.utility.CaptchaValidator;
+import ua.org.training.library.utility.MailSender;
+import ua.org.training.library.utility.validation.*;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -19,7 +21,12 @@ public class ApplicationContext {
     private final UserService userService;
     private final StatusService statusService;
     private final PlaceService placeService;
+    private final UserValidation userValidation;
+    private final BookValidation bookValidation;
+    private final AuthorValidation authorValidation;
+    private final ResetValidation resetValidation;
     private final CaptchaValidator captchaValidator;
+    private final MailService mailService;
 
     private ApplicationContext() {
         DaoFactory daoFactory = DaoFactory.getInstance();
@@ -32,6 +39,11 @@ public class ApplicationContext {
         statusService = new StatusService(daoFactory);
         placeService = new PlaceService(daoFactory);
         captchaValidator = new CaptchaValidator();
+        userValidation = new UserValidation(userService);
+        bookValidation = new BookValidation(bookService);
+        authorValidation = new AuthorValidation();
+        resetValidation = new ResetValidation(userService);
+        mailService = new MailService(new MailSender());
         LOGGER.info("Application context initialized");
     }
 
@@ -76,5 +88,24 @@ public class ApplicationContext {
 
     public PlaceService getPlaceService() {
         return placeService;
+    }
+    public UserValidation getUserValidation() {
+        return userValidation;
+    }
+
+    public BookValidation getBookValidation() {
+        return bookValidation;
+    }
+
+    public AuthorValidation getAuthorValidation() {
+        return authorValidation;
+    }
+
+    public ResetValidation getResetValidation() {
+        return resetValidation;
+    }
+
+    public MailService getMailService() {
+        return mailService;
     }
 }

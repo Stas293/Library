@@ -32,22 +32,31 @@ public class GetPlaces implements ControllerCommand {
         response.setContentType("application/json");
         response.setCharacterEncoding(Constants.APP_ENCODING);
         LOGGER.info("Send json page to user client!");
-        String jsonString = null;
-        try {
-            jsonString = placeService.getPlaceList(
-                    Utility.getLocale(request));
-        } catch (ServiceException e) {
-            LOGGER.error("Service Exception : " + e.getMessage());
-        } catch (ConnectionDBException e) {
-            LOGGER.error("Connection DB Exception : " + e.getMessage());
-        }
+        String jsonString = "";
+        jsonString = getJsonString(request, jsonString);
+        printJSON(response, jsonString);
+        return Constants.APP_STRING_DEFAULT_VALUE;
+    }
+
+    private static void printJSON(HttpServletResponse response, String jsonString) {
         try {
             PrintWriter writer = response.getWriter();
             writer.print(jsonString);
             LOGGER.info(jsonString);
         } catch (IOException e) {
-            LOGGER.error("IO Exception : " + e.getMessage());
+            LOGGER.error(String.format("IO Exception : %s", e.getMessage()));
         }
-        return Constants.APP_STRING_DEFAULT_VALUE;
+    }
+
+    private String getJsonString(HttpServletRequest request, String jsonString) {
+        try {
+            jsonString = placeService.getPlaceList(
+                    Utility.getLocale(request));
+        } catch (ServiceException e) {
+            LOGGER.error(String.format("Service Exception : %s", e.getMessage()));
+        } catch (ConnectionDBException e) {
+            LOGGER.error(String.format("Connection DB Exception : %s", e.getMessage()));
+        }
+        return jsonString;
     }
 }

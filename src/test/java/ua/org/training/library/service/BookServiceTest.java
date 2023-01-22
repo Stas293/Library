@@ -97,7 +97,7 @@ class BookServiceTest {
                                 .setCount(5)
                                 .setPublicationDate(dateOfCreation)
                                 .setFine(100.0)
-                                .setLanguage("en_US")
+                                .setLanguage("en_UK")
                                 .setISBN("ISBN")
                                 .createBook(),
                         Book.builder()
@@ -106,7 +106,7 @@ class BookServiceTest {
                                 .setCount(5)
                                 .setPublicationDate(dateOfCreation)
                                 .setFine(10.0)
-                                .setLanguage("en_US")
+                                .setLanguage("en_UK")
                                 .setISBN("new ISBN")
                                 .createBook(),
                         Book.builder()
@@ -115,7 +115,7 @@ class BookServiceTest {
                                 .setCount(5)
                                 .setPublicationDate(dateOfCreation)
                                 .setFine(10.0)
-                                .setLanguage("en_US")
+                                .setLanguage("en_UK")
                                 .setISBN("new ISBN1")
                                 .createBook(),
                         Book.builder()
@@ -124,11 +124,11 @@ class BookServiceTest {
                                 .setCount(5)
                                 .setPublicationDate(dateOfCreation)
                                 .setFine(10.0)
-                                .setLanguage("en_US")
+                                .setLanguage("en_UK")
                                 .setISBN("new ISBN2")
                                 .createBook()))
                 .createPage();
-        Mockito.when(bookDao.getBooksByLanguage(page, "en_US")).thenReturn(resultBookPage);
+        Mockito.when(bookDao.getBooksByLanguage(page, "en_UK")).thenReturn(resultBookPage);
         Mockito.when(daoFactory.createBookDao()).thenReturn(bookDao);
         Mockito.when(authorDao.getAuthorsByBookId(1L)).thenReturn(List.of(new Author(1L, "name", "surname")));
         Mockito.when(authorDao.getAuthorsByBookId(2L)).thenReturn(List.of(new Author(2L, "Paul", "Wells")));
@@ -141,13 +141,13 @@ class BookServiceTest {
                 "{\"elementsCount\":3," +
                         "\"limit\":5," +
                         "\"content\":[" +
-                        "{\"id\":1,\"name\":\"name\",\"count\":5,\"publicationDate\":\"2020-01-01\",\"fine\":\"100.0 USD\",\"language\":\"en_US\"," +
+                        "{\"id\":1,\"name\":\"name\",\"count\":5,\"publicationDate\":\"2020-01-01\",\"fine\":\"100.0 USD\",\"language\":\"en_UK\"," +
                         "\"authors\":[{\"id\":1,\"firstName\":\"name\",\"lastName\":\"surname\"}],\"isbn\":\"ISBN\"}," +
-                        "{\"id\":2,\"name\":\"another book\",\"count\":5,\"publicationDate\":\"2020-01-01\",\"fine\":\"10.0 USD\",\"language\":\"en_US\"," +
+                        "{\"id\":2,\"name\":\"another book\",\"count\":5,\"publicationDate\":\"2020-01-01\",\"fine\":\"10.0 USD\",\"language\":\"en_UK\"," +
                         "\"authors\":[{\"id\":2,\"firstName\":\"Paul\",\"lastName\":\"Wells\"}],\"isbn\":\"new ISBN\"}," +
-                        "{\"id\":3,\"name\":\"another book1\",\"count\":5,\"publicationDate\":\"2020-01-01\",\"fine\":\"10.0 USD\",\"language\":\"en_US\"," +
+                        "{\"id\":3,\"name\":\"another book1\",\"count\":5,\"publicationDate\":\"2020-01-01\",\"fine\":\"10.0 USD\",\"language\":\"en_UK\"," +
                         "\"authors\":[{\"id\":3,\"firstName\":\"John\",\"lastName\":\"Smith\"}],\"isbn\":\"new ISBN1\"}," +
-                        "{\"id\":4,\"name\":\"another book2\",\"count\":5,\"publicationDate\":\"2020-01-01\",\"fine\":\"10.0 USD\",\"language\":\"en_US\"," +
+                        "{\"id\":4,\"name\":\"another book2\",\"count\":5,\"publicationDate\":\"2020-01-01\",\"fine\":\"10.0 USD\",\"language\":\"en_UK\"," +
                         "\"authors\":[{\"id\":4,\"firstName\":\"Alex\",\"lastName\":\"Nikolaev\"}],\"isbn\":\"new ISBN2\"}]}",
                 result);
         Mockito.when(daoFactory.createBookDao()).thenThrow(JDBCException.class);

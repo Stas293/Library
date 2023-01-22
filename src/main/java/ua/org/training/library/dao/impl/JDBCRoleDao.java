@@ -8,10 +8,7 @@ import ua.org.training.library.exceptions.DaoException;
 import ua.org.training.library.model.Role;
 import ua.org.training.library.utility.page.Page;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +49,7 @@ public class JDBCRoleDao implements RoleDao {
     @Override
     public long create(Role model) throws SQLException {
         connection.setAutoCommit(false);
-        try (PreparedStatement statement = connection.prepareStatement(INSERT_ROLE, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement statement = connection.prepareStatement(INSERT_ROLE, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, model.getCode());
             statement.setString(2, model.getName());
             statement.executeUpdate();

@@ -14,7 +14,7 @@ import ua.org.training.library.exceptions.ServiceException;
 import ua.org.training.library.model.Role;
 import ua.org.training.library.model.User;
 import ua.org.training.library.utility.Constants;
-import ua.org.training.library.utility.DTOMapper;
+import ua.org.training.library.utility.Mapper;
 import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.PageService;
@@ -134,7 +134,7 @@ public class UserService {
                 .setLimit(page.getLimit())
                 .setPageNumber(page.getPageNumber())
                 .setData(page.getData().stream()
-                        .map(DTOMapper::userToUserManagementDTO)
+                        .map(Mapper::userToUserManagementDTO)
                         .toList())
                 .createPage();
     }

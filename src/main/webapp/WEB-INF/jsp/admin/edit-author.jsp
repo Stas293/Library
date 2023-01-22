@@ -20,9 +20,35 @@
             </ol>
             <h1><fmt:message key="editAuthor.pageTitle"/></h1>
 
-            <form class="main" method="post">
-                <textarea name="firstName" class="form-control" placeholder="<fmt:message key="editAuthor.firstName"/>">${author.firstName}</textarea>
-                <textarea name="lastName" class="form-control" placeholder="<fmt:message key="editAuthor.lastName"/>">${author.lastName}</textarea>
+            <form class="form-group" method="post">
+                <div class="mb-3">
+                    <label for="firstName">
+                        <fmt:message key="editAuthor.firstName"/>
+                    </label>
+                    <c:set var="userInfo">${author.firstName}</c:set>
+                    <c:if test="${not empty userInfo}">
+                        <c:set var="authorFirstName">${author.firstName}</c:set>
+                    </c:if>
+                    <input name="firstName" id="firstName" class="form-control" value=${authorFirstName}>
+                    <c:set var="firstNameErrors">${authorValidationError.firstName}</c:set>
+                    <c:if test="${not empty firstNameErrors}">
+                        <div class="alert alert-danger"><fmt:message key="${authorValidationError.firstName}"/></div>
+                    </c:if>
+                </div>
+                <div class="mb-3">
+                    <label for="lastName">
+                        <fmt:message key="editAuthor.lastName"/>
+                    </label>
+                    <c:set var="userInfo">${author.lastName}</c:set>
+                    <c:if test="${not empty userInfo}">
+                        <c:set var="authorLastName">${author.lastName}</c:set>
+                    </c:if>
+                    <input name="lastName" id="lastName" class="form-control" value=${authorLastName}>
+                    <c:set var="firstNameErrors">${authorValidationError.lastName}</c:set>
+                    <c:if test="${not empty firstNameErrors}">
+                        <div class="alert alert-danger"><fmt:message key="${authorValidationError.lastName}"/></div>
+                    </c:if>
+                </div>
                 <div class="form-group">
                     <input type="submit" class="btn btn-primary" value="<fmt:message key="editUser.label.submit" />"/>
                 </div>

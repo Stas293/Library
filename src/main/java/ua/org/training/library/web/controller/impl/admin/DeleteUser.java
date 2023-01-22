@@ -20,16 +20,15 @@ public class DeleteUser implements ControllerCommand {
     private final UserService userService = ApplicationContext.getInstance().getUserService();
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
-        long  id = Utility.parseLongOrDefault(request.getParameter(Constants.RequestAttributes.ACCOUNT_ID_ATTRIBUTE),
+        long  id = Utility.parseLongOrDefault(
+                request.getParameter(Constants.RequestAttributes.ACCOUNT_ID_ATTRIBUTE),
                 Constants.APP_DEFAULT_ID);
         try {
             User userToDelete = userService.getUserById(id);
-
             if (!SecurityService.getAuthorityUser(request).hasRole(Constants.APP_ADMIN_ROLE)) {
                 LOGGER.error("User can`t manipulate with other users");
                 return Links.ACCESS_DENIED_PAGE;
             }
-
             userService.deleteUser(userToDelete.getId());
         } catch (ServiceException e) {
             return Links.ADMIN_PAGE_REDIRECT_DELETE_ACCOUNT_FAILED;

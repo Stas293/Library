@@ -13,7 +13,10 @@ import java.util.stream.Collectors;
 
 public class ControllerCommandFactory {
     private static final Logger LOGGER = LogManager.getLogger(ControllerCommandFactory.class);
-    private static final Set<ControllerCommandEnum> commands = Arrays.stream(ControllerCommandEnum.values()).collect(Collectors.toSet());
+    private static final Set<ControllerCommandEnum> commands =
+            Arrays.stream(
+                    ControllerCommandEnum.values())
+                    .collect(Collectors.toSet());
 
     private ControllerCommandFactory() {
     }

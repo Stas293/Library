@@ -18,11 +18,6 @@ import java.util.Optional;
 
 public class JDBCStatusDao implements StatusDao {
     private static final Logger LOGGER = LogManager.getLogger(JDBCStatusDao.class);
-    private final Connection connection;
-    public JDBCStatusDao(Connection connection) {
-        this.connection = connection;
-    }
-
     //language=MySQL
     private static final String GET_STATUS_BY_ID = "SELECT * FROM status WHERE id = ?";
     //language=MySQL
@@ -40,6 +35,10 @@ public class JDBCStatusDao implements StatusDao {
     //language=MySQL
     private static final String GET_STATUS_BY_HISTORY_ORDER_ID =
             "SELECT s.* FROM status s inner join history_order o on o.status_id = s.id WHERE o.id = ?";
+    private final Connection connection;
+    public JDBCStatusDao(Connection connection) {
+        this.connection = connection;
+    }
 
     @Override
     public long create(Status model) throws SQLException {

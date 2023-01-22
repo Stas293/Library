@@ -29,7 +29,7 @@ public class Utility {
     public static String getApplicationProperty(String property) {
         ResourceBundle bundle = ResourceBundle.getBundle(
                 APP_PROPERTIES_NAME,
-                new Locale(APP_DEFAULT_LANGUAGE));
+                Locale.of(APP_DEFAULT_LANGUAGE));
         return bundle.getString(property);
     }
 
@@ -101,18 +101,21 @@ public class Utility {
         return path.split("/");
     }
 
-    public static Date parseDateOrDefault(String parameter, Date dateExpire) {
+    public static Date parseDateOrDefault(String parameter, Date defaultValue) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         try {
             return format.parse(parameter);
-        } catch (ParseException e) {
+        } catch (ParseException | NullPointerException e) {
             LOGGER.error( String.format("Date format exception %s", parameter), e);
         }
-        return dateExpire;
+        return defaultValue;
     }
 
     public static Locale getLocale(HttpServletRequest request) {
-        return new Locale(parseStringOrDefault((String) request.getSession().getAttribute(Constants.RequestAttributes.APP_LANG_ATTRIBUTE),
+        return Locale.of(
+                parseStringOrDefault(
+                        (String) request.getSession()
+                                .getAttribute(Constants.RequestAttributes.APP_LANG_ATTRIBUTE),
                 APP_DEFAULT_LANGUAGE));
     }
 
@@ -145,5 +148,20 @@ public class Utility {
         }
         scanner.close();
         return response;
+    }
+
+    public static String generateCode() {
+        return UUID.randomUUID().toString();
+    }
+
+    public static String getParameters(HttpServletRequest request) {
+        StringBuilder parameters = new StringBuilder();
+        Enumeration<String> parameterNames = request.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String parameterName = parameterNames.nextElement();
+            parameters.append(parameterName).append("=").append(request.getParameter(parameterName)).append("&");
+        }
+        parameters.deleteCharAt(parameters.length() - 1);
+        return parameters.toString();
     }
 }

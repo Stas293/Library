@@ -1,16 +1,22 @@
 package ua.org.training.library.utility;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ua.org.training.library.dto.*;
+import ua.org.training.library.exceptions.ConnectionDBException;
+import ua.org.training.library.exceptions.MapException;
+import ua.org.training.library.exceptions.ServiceException;
 import ua.org.training.library.model.*;
+import ua.org.training.library.service.AuthorService;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
-public class DTOMapper {
-    private DTOMapper() {
+public class Mapper {
+    private static final Logger LOGGER = LogManager.getLogger(Mapper.class);
+    private Mapper() {
     }
 
     public static AuthorDTO authorToDTO(Author author) {
@@ -31,7 +37,7 @@ public class DTOMapper {
                 .setFine(Utility.getLocaleFine(locale, book.getFine()))
                 .setLanguage(book.getLanguage())
                 .setAuthors(book.getAuthors().stream()
-                        .map(DTOMapper::authorToDTO)
+                        .map(Mapper::authorToDTO)
                         .toList())
                 .createBookDTO();
     }
@@ -127,5 +133,81 @@ public class DTOMapper {
                         .map(Role::getCode)
                         .toList() : new ArrayList<>())
                 .createUserManagementDTO();
+    }
+
+    public static HistoryOrder orderToHistoryOrder(Order order) {
+        return HistoryOrder.builder()
+                .setUser(order.getUser())
+                .setBookName(order.getBook().getName())
+                .setDateCreated(order.getDateCreated())
+                .setDateExpire(new Date())
+                .setStatus(order.getStatus())
+                .createHistoryOrder();
+    }
+
+    public static Author requestDataToAuthor(HttpServletRequest request) {
+        String firstName = Utility.getStringParameter(
+                request.getParameter(Constants.RequestAttributes.AUTHOR_FIRST_NAME),
+                Constants.APP_STRING_DEFAULT_VALUE);
+        String lastName = Utility.getStringParameter(
+                request.getParameter(Constants.RequestAttributes.AUTHOR_LAST_NAME),
+                Constants.APP_STRING_DEFAULT_VALUE);
+        return Author.builder()
+                .setFirstName(firstName)
+                .setLastName(lastName)
+                .createAuthor();
+    }
+
+    public static Book requestDataToBook(HttpServletRequest request) {
+        String name = Utility.getStringParameter(
+                request.getParameter(Constants.RequestAttributes.BOOK_NAME_ATTRIBUTE),
+                Constants.APP_STRING_DEFAULT_VALUE);
+        int count = Utility.tryParseInt(
+                request.getParameter(Constants.RequestAttributes.BOOK_COUNT_ATTRIBUTE),
+                Constants.DEFAULT_BOOK_COUNT);
+        String ISBN = Utility.getStringParameter(
+                request.getParameter(Constants.RequestAttributes.BOOK_ISBN_ATTRIBUTE),
+                Constants.APP_STRING_DEFAULT_VALUE);
+        Date publicationDate = Utility.parseDateOrDefault(
+                request.getParameter(Constants.RequestAttributes.BOOK_PUBLICATION_DATE_ATTRIBUTE),
+                Constants.DEFAULT_DATE);
+        double fine = Utility.tryParseDouble(
+                request.getParameter(Constants.RequestAttributes.BOOK_FINE_ATTRIBUTE),
+                Constants.DEFAULT_FINE);
+        String language = Utility.getLanguage(
+                Locale.of(request.getParameter(Constants.RequestAttributes.LOCALE_ATTRIBUTE)));
+        return Book.builder()
+                .setName(name)
+                .setCount(count)
+                .setISBN(ISBN)
+                .setPublicationDate(publicationDate)
+                .setFine(fine)
+                .setLanguage(language)
+                .createBook();
+    }
+
+    public static List<String> requestDataToAuthorIds(HttpServletRequest request) {
+        return Arrays.stream(Utility.getStringParameter(
+                                request.getParameter(Constants.RequestAttributes.AUTHOR_IDS_ATTRIBUTE),
+                                Constants.APP_STRING_DEFAULT_VALUE)
+                        .split(","))
+                .toList();
+    }
+
+    public static List<Author> authorIdsToAuthors(List<String> authorIds, AuthorService authorService) {
+        return authorIds
+                .stream()
+                .map(Long::parseLong)
+                .map((Long id) -> {
+                    try {
+                        return authorService.getAuthorById(id);
+                    } catch (ServiceException e) {
+                        LOGGER.error(String.format("Can't get author by id: %d", id), e);
+                        throw new MapException(e.getMessage(), e);
+                    } catch (ConnectionDBException e) {
+                        LOGGER.error(e.getMessage(), e);
+                        throw new MapException(e.getMessage(), e);
+                    }
+                }).toList();
     }
 }

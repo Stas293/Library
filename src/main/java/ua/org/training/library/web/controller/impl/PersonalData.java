@@ -5,11 +5,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.org.training.library.context.ApplicationContext;
+import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.ServiceException;
 import ua.org.training.library.model.User;
 import ua.org.training.library.security.SecurityService;
 import ua.org.training.library.service.UserService;
-import ua.org.training.library.utility.DTOMapper;
+import ua.org.training.library.utility.Mapper;
 import ua.org.training.library.utility.Links;
 import ua.org.training.library.web.controller.ControllerCommand;
 
@@ -21,11 +22,13 @@ public class PersonalData implements ControllerCommand {
         try {
             User user = userService.getUserByLogin(
                     SecurityService.getAuthorityUser(request).getLogin());
-            request.setAttribute("authority", DTOMapper.userToUserManagementDTO(user));
+            request.setAttribute("authority", Mapper.userToUserManagementDTO(user));
         } catch (ServiceException e) {
             LOGGER.error("Error while getting user by login", e);
-        } catch (Exception e) {
+            return Links.LOGIN_PAGE;
+        } catch (ConnectionDBException e) {
             LOGGER.error("Error while getting user by login", e);
+            return Links.ERROR_PAGE + "?message=" + e.getMessage();
         }
         return Links.PERSONAL_DATA;
     }

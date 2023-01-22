@@ -69,6 +69,7 @@ const updateOrder = (hiddenDesk, rowData, hiddenId) => {
     button.setAttribute('style', 'margin: 10px 0;');
     button.appendChild(document.createTextNode(document.getElementById('edit_order').innerHTML));
     form.setAttribute('action',urlEditRequest);
+    form.setAttribute('method','POST');
     form.appendChild(select);
     form.appendChild(button);
     hiddenDesk.appendChild(form);

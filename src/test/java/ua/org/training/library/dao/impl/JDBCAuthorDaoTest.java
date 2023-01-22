@@ -171,11 +171,8 @@ class JDBCAuthorDaoTest {
         Mockito.when(resultSet.getString("last_name")).thenReturn("lastName");
         Mockito.doNothing().when(resultSet).close();
         Mockito.doNothing().when(callableStatement).close();
-        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenReturn(preparedStatement);
-        ResultSet resultSet1 = Mockito.mock(ResultSet.class);
-        Mockito.when(preparedStatement.executeQuery()).thenReturn(resultSet1);
-        Mockito.when(resultSet1.next()).thenReturn(true);
-        Mockito.when(resultSet1.getLong(Mockito.anyInt())).thenReturn(1L);
+        Mockito.when(callableStatement.getLong(Mockito.anyInt())).thenReturn(1L);
+
         authorDao = new JDBCAuthorDao(connection);
         Author author = Author.builder()
                 .setId(1L)
@@ -197,12 +194,6 @@ class JDBCAuthorDaoTest {
                 .setData(List.of(author))
                 .createPage();
         assertEquals(resultingPage, authorDao.getPage(page));
-        Mockito.verify(connection, Mockito.times(1)).prepareStatement(Mockito.anyString());
-        Mockito.verify(preparedStatement, Mockito.times(1)).executeQuery();
-        Mockito.verify(resultSet1, Mockito.times(1)).next();
-        Mockito.verify(resultSet1, Mockito.times(1)).getLong(Mockito.anyInt());
-        Mockito.verify(resultSet1, Mockito.times(1)).close();
-        Mockito.verify(preparedStatement, Mockito.times(1)).close();
         Mockito.verify(connection, Mockito.times(1)).prepareCall(Mockito.anyString());
         Mockito.verify(callableStatement, Mockito.times(2)).setString(Mockito.anyInt(), Mockito.anyString());
         Mockito.verify(callableStatement, Mockito.times(2)).setLong(Mockito.anyInt(), Mockito.anyLong());
@@ -212,12 +203,6 @@ class JDBCAuthorDaoTest {
         Mockito.verify(resultSet, Mockito.times(2)).getString(Mockito.anyString());
         Mockito.verify(resultSet, Mockito.times(1)).close();
         Mockito.verify(callableStatement, Mockito.times(1)).close();
-
-        Mockito.when(preparedStatement.executeQuery()).thenThrow(SQLException.class);
-        assertThrows(DaoException.class, () -> authorDao.getPage(page));
-
-        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenThrow(SQLException.class);
-        assertThrows(DaoException.class, () -> authorDao.getPage(page));
 
         Mockito.when(callableStatement.executeQuery()).thenThrow(SQLException.class);
         assertThrows(DaoException.class, () -> authorDao.getPage(page));

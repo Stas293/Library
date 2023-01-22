@@ -27,28 +27,19 @@
         	<li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle" /></a></li>
         	<li class="breadcrumb-item active"><a href="/library/admin/page"><fmt:message key="usersList.pageTitle" /></a></li>
         </ol>
-        <c:if test="${param.saved == true}">
-            <div class="info alert"><fmt:message key="user.save" /></div>
-        </c:if>
-        <c:if test="${param.deleted == true}">
-            <div class="info alert"><fmt:message key="user.delete.true" /></div>
-        </c:if>
-        <c:if test="${param.deleted == false}">
-            <div class="info alert-danger"><fmt:message key="user.delete.false" /></div>
-        </c:if>
         <h1><c:out value="${account.fullName}" /></h1>
-        <form action="${deleteUserUrl}">
+        <form action="${deleteUserUrl}" method="post">
 		    <input type="text" name=id class="hidden" value=${account.id}>
 		    <input type="submit" class="btn btn-danger" value=<fmt:message key="user.delete" /> >
 		</form>
 		<c:if test="${account.enabled == true}">
-		    <form action="${disableUserUrl}">
+		    <form action="${disableUserUrl}" method="post">
 			    <input type="text" name=id class="hidden" value=${account.id}>
 			    <input type="submit" class="btn btn-warning" value=<fmt:message key="user.disable" /> >
 			</form>
 		</c:if>
 		<c:if test="${account.enabled == false}">
-		    <form action="${enableUserUrl}">
+		    <form action="${enableUserUrl}" method="post">
 			    <input type="text" name=id class="hidden" value=${account.id}>
 			    <input type="submit" class="btn btn-success" value=<fmt:message key="user.enable" /> >
 			</form>

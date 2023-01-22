@@ -18,17 +18,19 @@ public class FrontController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        LOGGER.info(String.format("GET request URI: %s", req.getRequestURI()));
         process(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        LOGGER.info(String.format("POST request URI: %s", req.getRequestURI()));
         process(req, resp);
     }
 
     private void process(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         ControllerCommand command = ControllerCommandFactory.getCommand(req.getRequestURI());
-        LOGGER.info(command.getClass().getSimpleName());
+        LOGGER.info(String.format("Command: %s", command.getClass().getSimpleName()));
         try {
             String page = command.execute(req, resp);
             LOGGER.info(page);

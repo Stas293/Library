@@ -15,6 +15,8 @@ import ua.org.training.library.utility.page.Page;
 
 import java.lang.reflect.Field;
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -46,11 +48,8 @@ class JDBCBookDaoTest {
         Mockito.when(resultSet.getTimestamp("book_date_publication")).thenReturn(new Timestamp(1));
         Mockito.when(resultSet.getDouble("fine_per_day")).thenReturn(1.0);
         Mockito.when(resultSet.getString("language")).thenReturn("language");
-        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenReturn(preparedStatement);
-        ResultSet resultSet1 = Mockito.mock(ResultSet.class);
-        Mockito.when(preparedStatement.executeQuery()).thenReturn(resultSet1);
-        Mockito.when(resultSet1.next()).thenReturn(true);
-        Mockito.when(resultSet1.getLong(1)).thenReturn(1L);
+        Mockito.when(callableStatement.getLong(6)).thenReturn(1L);
+
         Page<Book> page = Page.<Book>builder()
                 .setPageNumber(0)
                 .setLimit(5)
@@ -91,17 +90,6 @@ class JDBCBookDaoTest {
         Mockito.verify(resultSet, Mockito.times(1)).getTimestamp("book_date_publication");
         Mockito.verify(resultSet, Mockito.times(1)).getDouble("fine_per_day");
         Mockito.verify(resultSet, Mockito.times(1)).getString("language");
-        Mockito.verify(connection, Mockito.times(1)).prepareStatement(Mockito.anyString());
-        Mockito.verify(preparedStatement, Mockito.times(1)).executeQuery();
-        Mockito.verify(resultSet1, Mockito.times(1)).next();
-        Mockito.verify(resultSet1, Mockito.times(1)).getLong(1);
-
-        Mockito.when(resultSet.next()).thenReturn(false);
-        Mockito.when(resultSet1.next()).thenReturn(false);
-        assertEquals(page, bookDao.getBooksByAuthorId(page, 1L));
-
-        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenThrow(SQLException.class);
-        assertThrows(DaoException.class, () -> bookDao.getBooksByAuthorId(page, 1L));
 
         Mockito.when(connection.prepareCall(Mockito.anyString())).thenThrow(SQLException.class);
         assertThrows(DaoException.class, () -> bookDao.getBooksByAuthorId(page, 1L));
@@ -120,11 +108,8 @@ class JDBCBookDaoTest {
         Mockito.when(resultSet.getTimestamp("book_date_publication")).thenReturn(new Timestamp(1));
         Mockito.when(resultSet.getDouble("fine_per_day")).thenReturn(1.0);
         Mockito.when(resultSet.getString("language")).thenReturn("language");
-        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenReturn(preparedStatement);
-        ResultSet resultSet1 = Mockito.mock(ResultSet.class);
-        Mockito.when(preparedStatement.executeQuery()).thenReturn(resultSet1);
-        Mockito.when(resultSet1.next()).thenReturn(true);
-        Mockito.when(resultSet1.getLong(1)).thenReturn(1L);
+        Mockito.when(callableStatement.getLong(6)).thenReturn(1L);
+
         Page<Book> page = Page.<Book>builder()
                 .setPageNumber(0)
                 .setLimit(5)
@@ -163,17 +148,6 @@ class JDBCBookDaoTest {
         Mockito.verify(resultSet, Mockito.times(1)).getTimestamp("book_date_publication");
         Mockito.verify(resultSet, Mockito.times(1)).getDouble("fine_per_day");
         Mockito.verify(resultSet, Mockito.times(1)).getString("language");
-        Mockito.verify(connection, Mockito.times(1)).prepareStatement(Mockito.anyString());
-        Mockito.verify(preparedStatement, Mockito.times(1)).executeQuery();
-        Mockito.verify(resultSet1, Mockito.times(1)).next();
-        Mockito.verify(resultSet1, Mockito.times(1)).getLong(1);
-
-        Mockito.when(resultSet.next()).thenReturn(false);
-        Mockito.when(resultSet1.next()).thenReturn(false);
-        assertEquals(0, bookDao.getBooksByLanguage(page, "language").getData().size());
-
-        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenThrow(SQLException.class);
-        assertThrows(DaoException.class, () -> bookDao.getBooksByLanguage(page, "language"));
 
         Mockito.when(connection.prepareCall(Mockito.anyString())).thenThrow(SQLException.class);
         assertThrows(DaoException.class, () -> bookDao.getBooksByLanguage(page, "language"));
@@ -315,7 +289,7 @@ class JDBCBookDaoTest {
         ResultSet resultSet1 = Mockito.mock(ResultSet.class);
         Mockito.when(preparedStatement.executeQuery()).thenReturn(resultSet1);
         Mockito.when(resultSet1.next()).thenReturn(true);
-        Mockito.when(resultSet1.getInt(1)).thenReturn(2);
+        Mockito.when(resultSet1.getLong(1)).thenReturn(2L);
         bookDao = new JDBCBookDao(connection);
         Page<Book> page = Page.<Book>builder()
                 .setPageNumber(0)
@@ -366,7 +340,7 @@ class JDBCBookDaoTest {
         Mockito.verify(connection, Mockito.times(1)).prepareStatement(Mockito.anyString());
         Mockito.verify(preparedStatement, Mockito.times(1)).executeQuery();
         Mockito.verify(resultSet1, Mockito.times(1)).next();
-        Mockito.verify(resultSet1, Mockito.times(1)).getInt(1);
+        Mockito.verify(resultSet1, Mockito.times(1)).getLong(1);
 
         Mockito.when(resultSet.next()).thenReturn(false);
         assertTrue(bookDao.getBooksWhichUserDidNotOrder(page, 1L, "book_name").getData().isEmpty());
@@ -687,5 +661,51 @@ class JDBCBookDaoTest {
 
         Mockito.doThrow(SQLException.class).when(connection).close();
         assertThrows(DaoException.class, () -> bookDao.close());
+    }
+
+    @Test
+    void getBookByISBN() throws SQLException {
+        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenReturn(preparedStatement);
+        Mockito.when(preparedStatement.executeQuery()).thenReturn(resultSet);
+        Mockito.when(resultSet.next()).thenReturn(true);
+        Mockito.when(resultSet.getLong(Mockito.anyString())).thenReturn(1L);
+        Mockito.when(resultSet.getString(Mockito.anyString())).thenReturn("test");
+        Mockito.when(resultSet.getTimestamp(Mockito.anyString())).thenReturn(Timestamp.valueOf(LocalDateTime.of(2020, 1, 1, 1, 1)));
+        Mockito.when(resultSet.getInt(Mockito.anyString())).thenReturn(1);
+        Mockito.when(resultSet.getDouble(Mockito.anyString())).thenReturn(1.0);
+
+        bookDao = new JDBCBookDao(connection);
+        Optional<Book> book = bookDao.getBookByISBN("test");
+        Book expected = Book.builder()
+                .setId(1L)
+                .setName("test")
+                .setISBN("test")
+                .setPublicationDate(Timestamp.valueOf(LocalDateTime.of(2020, 1, 1, 1, 1)))
+                .setCount(1)
+                .setFine(1)
+                .setLanguage("test")
+                .setAuthors(null)
+                .createBook();
+        assertEquals(Optional.of(expected), book);
+
+        Mockito.verify(connection, Mockito.times(1)).prepareStatement(Mockito.anyString());
+        Mockito.verify(preparedStatement, Mockito.times(1)).setString(Mockito.anyInt(), Mockito.anyString());
+        Mockito.verify(preparedStatement, Mockito.times(1)).executeQuery();
+        Mockito.verify(resultSet, Mockito.times(1)).next();
+        Mockito.verify(resultSet, Mockito.times(1)).getLong(Mockito.anyString());
+        Mockito.verify(resultSet, Mockito.times(3)).getString(Mockito.anyString());
+        Mockito.verify(resultSet, Mockito.times(1)).getTimestamp(Mockito.anyString());
+        Mockito.verify(resultSet, Mockito.times(1)).getInt(Mockito.anyString());
+        Mockito.verify(resultSet, Mockito.times(1)).getDouble(Mockito.anyString());
+
+        Mockito.when(resultSet.next()).thenReturn(false);
+        book = bookDao.getBookByISBN("test");
+        assertEquals(Optional.empty(), book);
+
+        Mockito.when(preparedStatement.executeQuery()).thenThrow(SQLException.class);
+        assertThrows(DaoException.class, () -> bookDao.getBookByISBN("test"));
+
+        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenThrow(SQLException.class);
+        assertThrows(DaoException.class, () -> bookDao.getBookByISBN("test"));
     }
 }

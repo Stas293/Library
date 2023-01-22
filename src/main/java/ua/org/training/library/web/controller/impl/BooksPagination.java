@@ -32,7 +32,23 @@ public class BooksPagination implements ControllerCommand {
         LOGGER.info("Send json page to user client!");
         PageService<Book> pageService = new PageService<>();
         Page<Book> page = pageService.getPage(request);
-        String jsonString = null;
+        String jsonString = "";
+        jsonString = getJSONPage(request, page, jsonString);
+        printJSON(response, jsonString);
+        return Constants.APP_STRING_DEFAULT_VALUE;
+    }
+
+    private static void printJSON(HttpServletResponse response, String jsonString) {
+        try {
+            PrintWriter writer = response.getWriter();
+            writer.print(jsonString);
+            LOGGER.info(jsonString);
+        } catch (IOException e) {
+            LOGGER.error(String.format("Error while writing json to response: %s", e.getMessage()), e);
+        }
+    }
+
+    private String getJSONPage(HttpServletRequest request, Page<Book> page, String jsonString) {
         try {
             String sortBy = Utility.getStringParameter(
                     request.getParameter(Constants.PARAMETER_SORT_BY),
@@ -40,21 +56,14 @@ public class BooksPagination implements ControllerCommand {
 
                 jsonString = bookService.getBooksSortedBy(
                                 Utility.getLocale(request),
-                                page,
+                        page,
                                 sortBy);
 
         } catch (ServiceException e) {
-            LOGGER.error("Service Exception : " + e.getMessage());
+            LOGGER.error(String.format("Service Exception : %s", e.getMessage()), e);
         } catch (ConnectionDBException e) {
-            LOGGER.error("Connection DB Exception : " + e.getMessage());
+            LOGGER.error(String.format("Connection DB Exception : %s", e.getMessage()), e);
         }
-        try {
-            PrintWriter writer = response.getWriter();
-            writer.print(jsonString);
-            LOGGER.info(jsonString);
-        } catch (IOException e) {
-            LOGGER.error("IO Exception : " + e.getMessage());
-        }
-        return Constants.APP_STRING_DEFAULT_VALUE;
+        return jsonString;
     }
 }

@@ -36,6 +36,10 @@
         </div>
         <button type="submit" class="ui-button btn btn-primary"><fmt:message key="login.in"/></button>
       </form>
+
+      <div class="mt-3">
+        <a href="library/forgot-password"><fmt:message key="login.forgot.password"/></a>
+      </div>
     </div>
   </jsp:body>
 </tag:authorization>

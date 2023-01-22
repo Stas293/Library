@@ -24,12 +24,10 @@
                     <div id="home" class="first-section">
                         <div class="dtab">
                             <div class="container">
-                                <div class="col-md-12 col-sm-12 text-right">
-                                    <div class="big-tagline">
-                                        <h2><strong><fmt:message key="app.title"/></strong> <fmt:message
-                                                key="app.page.header.company"/></h2>
-                                        <p class="lead"><fmt:message key="app.slogan"/></p>
-                                    </div>
+                                <div class="col-md-12 col-sm-12">
+                                    <h2><strong><fmt:message key="app.title"/></strong> <fmt:message
+                                            key="app.page.header.company"/></h2>
+                                    <p class="lead"><fmt:message key="app.slogan"/></p>
                                 </div>
                             </div>
                         </div>

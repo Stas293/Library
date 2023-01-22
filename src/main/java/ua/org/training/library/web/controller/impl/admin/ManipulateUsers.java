@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.org.training.library.context.ApplicationContext;
-import ua.org.training.library.dto.UserDTO;
 import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.ServiceException;
 import ua.org.training.library.model.Role;
@@ -13,7 +12,7 @@ import ua.org.training.library.model.User;
 import ua.org.training.library.service.RoleService;
 import ua.org.training.library.service.UserService;
 import ua.org.training.library.utility.Constants;
-import ua.org.training.library.utility.DTOMapper;
+import ua.org.training.library.utility.Mapper;
 import ua.org.training.library.utility.Links;
 import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.page.Page;
@@ -39,11 +38,13 @@ public class ManipulateUsers implements ControllerCommand {
         if (uriDivided.length == 2) {
             return returnJSONUsers(request, response);
         }
-        id = Utility.parseLongOrDefault(uriDivided[2], Constants.APP_DEFAULT_USER_MANIPULATION_ID);
+        id = Utility.parseLongOrDefault(
+                uriDivided[2],
+                Constants.APP_DEFAULT_USER_MANIPULATION_ID);
         User user;
         try {
             user = userService.getUserById(id);
-            request.setAttribute("account", DTOMapper.userToUserManagementDTO(user));
+            request.setAttribute("account", Mapper.userToUserManagementDTO(user));
         } catch (ServiceException e) {
             LOGGER.error("Error while getting user by id", e);
             return Links.USER_INFO_PAGE;
@@ -52,53 +53,78 @@ public class ManipulateUsers implements ControllerCommand {
             return Links.ERROR_PAGE + "?message=" + e.getMessage();
         }
         if (uriDivided.length == 4 && uriDivided[3].equals("edit")) {
-            String[] roles = user.getRoles()
-                    .stream()
-                    .map(Role::getCode)
-                    .toArray(String[]::new);
-            LOGGER.info(String.format("Role array : %s", Arrays.toString(roles)));
-            request.setAttribute("roles", roles);
+            parseRolesToArrayAndShow(request, user);
+            String userInfoPage = showRolesList(request);
+            if (userInfoPage != null) return userInfoPage;
+            if (request.getMethod().equals("GET")) {
+                return Links.USER_EDIT_PAGE;
+            } else {
+                return updateUserRoles(request, user);
+            }
+        }
+        return Links.USER_INFO_PAGE;
+    }
+
+    private String updateUserRoles(HttpServletRequest request, User user) {
+        LOGGER.debug(request.getParameterValues("role"));
+        String adminUserPageRedirect = setRolesForUser(request, user);
+        if (adminUserPageRedirect != null) return adminUserPageRedirect;
+        String adminUserPageRedirect1 = updateRolesForUser(user);
+        if (adminUserPageRedirect1 != null) return adminUserPageRedirect1;
+        return Links.ADMIN_USER_PAGE_REDIRECT;
+    }
+
+    private static void parseRolesToArrayAndShow(HttpServletRequest request, User user) {
+        String[] roles = user.getRoles()
+                .stream()
+                .map(Role::getCode)
+                .toArray(String[]::new);
+        LOGGER.info(String.format("Role array : %s", Arrays.toString(roles)));
+        request.setAttribute("roles", roles);
+    }
+
+    private String updateRolesForUser(User user) {
+        try {
+            userService.updateUserRoles(user);
+        } catch (ServiceException e) {
+            LOGGER.error("Error while updating user roles", e);
+            return Links.ADMIN_USER_PAGE_REDIRECT;
+        } catch (ConnectionDBException e) {
+            LOGGER.error(e.getMessage(), e);
+            return Links.ERROR_PAGE + "?message=" + e.getMessage();
+        }
+        return null;
+    }
+
+    private String setRolesForUser(HttpServletRequest request, User user) {
+        Set<Role> newRoles = new HashSet<>();
+        for (String role : request.getParameterValues("role")) {
             try {
-                request.setAttribute("rolesList", roleService.getAllRoles());
+                newRoles.add(roleService.getRoleByCode(role));
             } catch (ServiceException e) {
-                LOGGER.error("Error while getting roles list", e);
-                return Links.USER_INFO_PAGE;
+                LOGGER.error("Error while getting role by code", e);
+                return Links.ADMIN_USER_PAGE_REDIRECT;
             } catch (ConnectionDBException e) {
                 LOGGER.error(e.getMessage(), e);
                 return Links.ERROR_PAGE + "?message=" + e.getMessage();
             }
-            if (request.getMethod().equals("GET")) {
-                return Links.USER_EDIT_PAGE;
-            } else {
-                LOGGER.debug(request.getParameterValues("role"));
-                LOGGER.debug("Try to post my changed users roles!");
-                Set<Role> newRoles = new HashSet<>();
-                for (String role : request.getParameterValues("role")) {
-                    try {
-                        newRoles.add(roleService.getRoleByCode(role));
-                    } catch (ServiceException e) {
-                        LOGGER.error("Error while getting role by code", e);
-                        return Links.ADMIN_USER_PAGE_REDIRECT;
-                    } catch (ConnectionDBException e) {
-                        LOGGER.error(e.getMessage(), e);
-                        return Links.ERROR_PAGE + "?message=" + e.getMessage();
-                    }
-                    LOGGER.info(String.format("New roles : %s", newRoles));
-                }
-                user.setRoles(newRoles);
-                try {
-                    userService.updateUserRoles(user);
-                } catch (ServiceException e) {
-                    LOGGER.error("Error while updating user roles", e);
-                    return Links.ADMIN_USER_PAGE_REDIRECT;
-                } catch (ConnectionDBException e) {
-                    LOGGER.error(e.getMessage(), e);
-                    return Links.ERROR_PAGE + "?message=" + e.getMessage();
-                }
-                return Links.ADMIN_USER_PAGE_REDIRECT;
-            }
+            LOGGER.info(String.format("New roles : %s", newRoles));
         }
-        return Links.USER_INFO_PAGE;
+        user.setRoles(newRoles);
+        return null;
+    }
+
+    private String showRolesList(HttpServletRequest request) {
+        try {
+            request.setAttribute("rolesList", roleService.getAllRoles());
+        } catch (ServiceException e) {
+            LOGGER.error("Error while getting roles list", e);
+            return Links.USER_INFO_PAGE;
+        } catch (ConnectionDBException e) {
+            LOGGER.error(e.getMessage(), e);
+            return Links.ERROR_PAGE + "?message=" + e.getMessage();
+        }
+        return null;
     }
 
     private String returnJSONUsers(HttpServletRequest request, HttpServletResponse response){
@@ -108,6 +134,22 @@ public class ManipulateUsers implements ControllerCommand {
         PageService<User> pageService = new PageService<>();
         Page<User> page = pageService.getPage(request);
 
+        String jsonString = getUserPage(page);
+        printPage(response, jsonString);
+        return "";
+    }
+
+    private static void printPage(HttpServletResponse response, String jsonString) {
+        try {
+            PrintWriter writer = response.getWriter();
+            writer.print(jsonString);
+            LOGGER.info(jsonString);
+        } catch (IOException e) {
+            LOGGER.error("Error while getting writer from response", e);
+        }
+    }
+
+    private String getUserPage(Page<User> page) {
         String jsonString = null;
         try {
             jsonString = userService.getUserPage(page);
@@ -116,13 +158,6 @@ public class ManipulateUsers implements ControllerCommand {
         } catch (ConnectionDBException e) {
             LOGGER.error(e.getMessage(), e);
         }
-        try {
-            PrintWriter writer = response.getWriter();
-            writer.print(jsonString);
-            LOGGER.info(jsonString);
-        } catch (IOException e) {
-            LOGGER.error("Error while getting writer from response", e);
-        }
-        return "";
+        return jsonString;
     }
 }

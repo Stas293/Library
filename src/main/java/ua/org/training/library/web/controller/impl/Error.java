@@ -8,6 +8,6 @@ import ua.org.training.library.web.controller.ControllerCommand;
 public class Error implements ControllerCommand {
     @Override
     public String execute(HttpServletRequest request, HttpServletResponse response) {
-        return Links.ERROR_PAGE;
+        return Links.ERROR;
     }
 }

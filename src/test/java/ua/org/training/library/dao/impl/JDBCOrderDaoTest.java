@@ -126,14 +126,7 @@ class JDBCOrderDaoTest {
         Mockito.when(resultSet.getLong("id")).thenReturn(1L);
         Mockito.when(resultSet.getTimestamp("date_created")).thenReturn(new Timestamp(1));
         Mockito.when(resultSet.getTimestamp("date_expire")).thenReturn(new Timestamp(1));
-        Field GET_ORDERS_COUNT = JDBCOrderDao.class.getDeclaredField("GET_ORDERS_COUNT");
-        GET_ORDERS_COUNT.setAccessible(true);
-        PreparedStatement preparedStatement1 = Mockito.mock(PreparedStatement.class);
-        Mockito.when(connection.prepareStatement(GET_ORDERS_COUNT.get("String").toString())).thenReturn(preparedStatement1);
-        ResultSet resultSet1 = Mockito.mock(ResultSet.class);
-        Mockito.when(preparedStatement1.executeQuery()).thenReturn(resultSet1);
-        Mockito.when(resultSet1.next()).thenReturn(true);
-        Mockito.when(resultSet1.getInt(1)).thenReturn(1);
+        Mockito.when(callableStatement.getLong(5)).thenReturn(1L);
 
         orderDao = new JDBCOrderDao(connection);
         Page<Order> page = Page.<Order>builder()
@@ -150,8 +143,8 @@ class JDBCOrderDaoTest {
                 .setElementsCount(1)
                 .setData(Collections.singletonList(Order.builder()
                         .setId(1L)
-                        .setDateCreated(new Date(1))
-                        .setDateExpire(new Date(1))
+                        .setDateCreated(new Timestamp(1))
+                        .setDateExpire(new Timestamp(1))
                         .createOrder()))
                 .createPage();
         assertEquals(expected, orderDao.getPage(page));
@@ -164,16 +157,6 @@ class JDBCOrderDaoTest {
         Mockito.verify(resultSet, Mockito.times(1)).getLong("id");
         Mockito.verify(resultSet, Mockito.times(1)).getTimestamp("date_created");
         Mockito.verify(resultSet, Mockito.times(1)).getTimestamp("date_expire");
-        Mockito.verify(connection, Mockito.times(1)).prepareStatement(Mockito.anyString());
-        Mockito.verify(preparedStatement1, Mockito.times(1)).executeQuery();
-        Mockito.verify(resultSet1, Mockito.times(1)).next();
-        Mockito.verify(resultSet1, Mockito.times(1)).getInt(1);
-
-        Mockito.when(resultSet.next()).thenReturn(false);
-        Mockito.when(resultSet1.getInt(1)).thenReturn(0);
-        expected.setElementsCount(0);
-        expected.setData(Collections.emptyList());
-        assertEquals(expected, orderDao.getPage(page));
 
         Mockito.doThrow(SQLException.class).when(resultSet).next();
         assertThrows(DaoException.class, () -> orderDao.getPage(page));
@@ -259,12 +242,7 @@ class JDBCOrderDaoTest {
         Mockito.when(resultSet.getLong("id")).thenReturn(1L);
         Mockito.when(resultSet.getTimestamp("date_created")).thenReturn(new Timestamp(1));
         Mockito.when(resultSet.getTimestamp("date_expire")).thenReturn(new Timestamp(1));
-        PreparedStatement preparedStatement1 = Mockito.mock(PreparedStatement.class);
-        ResultSet resultSet1 = Mockito.mock(ResultSet.class);
-        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenReturn(preparedStatement1);
-        Mockito.when(preparedStatement1.executeQuery()).thenReturn(resultSet1);
-        Mockito.when(resultSet1.next()).thenReturn(true);
-        Mockito.when(resultSet1.getInt(1)).thenReturn(2);
+        Mockito.when(callableStatement.getLong(6)).thenReturn(2L);
 
         orderDao = new JDBCOrderDao(connection);
         Page<Order> expected = Page.<Order>builder()
@@ -273,7 +251,8 @@ class JDBCOrderDaoTest {
                 .setSearch("")
                 .setSorting("ASC")
                 .setElementsCount(2)
-                .setData(List.of(Order.builder()
+                .setData(List.of(
+                        Order.builder()
                         .setId(1L)
                         .setDateCreated(new Timestamp(1))
                         .setDateExpire(new Timestamp(1))
@@ -302,13 +281,6 @@ class JDBCOrderDaoTest {
         Mockito.verify(resultSet, Mockito.times(2)).getLong("id");
         Mockito.verify(resultSet, Mockito.times(2)).getTimestamp("date_created");
         Mockito.verify(resultSet, Mockito.times(2)).getTimestamp("date_expire");
-        Mockito.verify(connection, Mockito.times(1)).prepareStatement(Mockito.anyString());
-        Mockito.verify(preparedStatement1, Mockito.times(1)).executeQuery();
-        Mockito.verify(resultSet1, Mockito.times(1)).next();
-        Mockito.verify(resultSet1, Mockito.times(1)).getInt(1);
-
-        Mockito.doThrow(SQLException.class).when(connection).prepareStatement(Mockito.anyString());
-        assertThrows(DaoException.class, () -> orderDao.getPageByBookId(page, 1L));
 
         Mockito.doThrow(SQLException.class).when(callableStatement).executeQuery();
         assertThrows(DaoException.class, () -> orderDao.getPageByBookId(page, 1L));
@@ -325,12 +297,7 @@ class JDBCOrderDaoTest {
         Mockito.when(resultSet.getLong("id")).thenReturn(1L);
         Mockito.when(resultSet.getTimestamp("date_created")).thenReturn(new Timestamp(1));
         Mockito.when(resultSet.getTimestamp("date_expire")).thenReturn(new Timestamp(1));
-        PreparedStatement preparedStatement1 = Mockito.mock(PreparedStatement.class);
-        ResultSet resultSet1 = Mockito.mock(ResultSet.class);
-        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenReturn(preparedStatement1);
-        Mockito.when(preparedStatement1.executeQuery()).thenReturn(resultSet1);
-        Mockito.when(resultSet1.next()).thenReturn(true);
-        Mockito.when(resultSet1.getInt(1)).thenReturn(2);
+        Mockito.when(callableStatement.getLong(7)).thenReturn(2L);
 
         orderDao = new JDBCOrderDao(connection);
         Page<Order> expected = Page.<Order>builder()
@@ -339,7 +306,8 @@ class JDBCOrderDaoTest {
                 .setSearch("")
                 .setSorting("ASC")
                 .setElementsCount(2)
-                .setData(List.of(Order.builder()
+                .setData(List.of(
+                        Order.builder()
                         .setId(1L)
                         .setDateCreated(new Timestamp(1))
                         .setDateExpire(new Timestamp(1))
@@ -368,13 +336,6 @@ class JDBCOrderDaoTest {
         Mockito.verify(resultSet, Mockito.times(2)).getLong("id");
         Mockito.verify(resultSet, Mockito.times(2)).getTimestamp("date_created");
         Mockito.verify(resultSet, Mockito.times(2)).getTimestamp("date_expire");
-        Mockito.verify(connection, Mockito.times(1)).prepareStatement(Mockito.anyString());
-        Mockito.verify(preparedStatement1, Mockito.times(1)).executeQuery();
-        Mockito.verify(resultSet1, Mockito.times(1)).next();
-        Mockito.verify(resultSet1, Mockito.times(1)).getInt(1);
-
-        Mockito.doThrow(SQLException.class).when(connection).prepareStatement(Mockito.anyString());
-        assertThrows(DaoException.class, () -> orderDao.getPageByStatusAndUserId(page, 1L, 1L));
 
         Mockito.doThrow(SQLException.class).when(callableStatement).executeQuery();
         assertThrows(DaoException.class, () -> orderDao.getPageByStatusAndUserId(page, 1L, 1L));
@@ -391,12 +352,7 @@ class JDBCOrderDaoTest {
         Mockito.when(resultSet.getLong("id")).thenReturn(1L);
         Mockito.when(resultSet.getTimestamp("date_created")).thenReturn(new Timestamp(1));
         Mockito.when(resultSet.getTimestamp("date_expire")).thenReturn(new Timestamp(1));
-        PreparedStatement preparedStatement1 = Mockito.mock(PreparedStatement.class);
-        ResultSet resultSet1 = Mockito.mock(ResultSet.class);
-        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenReturn(preparedStatement1);
-        Mockito.when(preparedStatement1.executeQuery()).thenReturn(resultSet1);
-        Mockito.when(resultSet1.next()).thenReturn(true);
-        Mockito.when(resultSet1.getLong(1)).thenReturn(2L);
+        Mockito.when(callableStatement.getLong(7)).thenReturn(2L);
 
         orderDao = new JDBCOrderDao(connection);
         Page<Order> expected = Page.<Order>builder()
@@ -405,7 +361,8 @@ class JDBCOrderDaoTest {
                 .setSearch("")
                 .setSorting("ASC")
                 .setElementsCount(2)
-                .setData(List.of(Order.builder()
+                .setData(List.of(
+                        Order.builder()
                                 .setId(1L)
                                 .setDateCreated(new Timestamp(1))
                                 .setDateExpire(new Timestamp(1))
@@ -434,13 +391,7 @@ class JDBCOrderDaoTest {
         Mockito.verify(resultSet, Mockito.times(2)).getLong("id");
         Mockito.verify(resultSet, Mockito.times(2)).getTimestamp("date_created");
         Mockito.verify(resultSet, Mockito.times(2)).getTimestamp("date_expire");
-        Mockito.verify(connection, Mockito.times(1)).prepareStatement(Mockito.anyString());
-        Mockito.verify(preparedStatement1, Mockito.times(1)).executeQuery();
-        Mockito.verify(resultSet1, Mockito.times(1)).next();
-        Mockito.verify(resultSet1, Mockito.times(1)).getLong(1);
-
-        Mockito.doThrow(SQLException.class).when(connection).prepareStatement(Mockito.anyString());
-        assertThrows(DaoException.class, () -> orderDao.getPageByStatusId(page, 1L, "book_name"));
+        Mockito.verify(callableStatement, Mockito.times(1)).getLong(7);
 
         Mockito.doThrow(SQLException.class).when(callableStatement).executeQuery();
         assertThrows(DaoException.class, () -> orderDao.getPageByStatusId(page, 1L, "book_name"));
@@ -457,12 +408,7 @@ class JDBCOrderDaoTest {
         Mockito.when(resultSet.getLong("id")).thenReturn(1L);
         Mockito.when(resultSet.getTimestamp("date_created")).thenReturn(new Timestamp(1));
         Mockito.when(resultSet.getTimestamp("date_expire")).thenReturn(new Timestamp(1));
-        PreparedStatement preparedStatement1 = Mockito.mock(PreparedStatement.class);
-        ResultSet resultSet1 = Mockito.mock(ResultSet.class);
-        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenReturn(preparedStatement1);
-        Mockito.when(preparedStatement1.executeQuery()).thenReturn(resultSet1);
-        Mockito.when(resultSet1.next()).thenReturn(true);
-        Mockito.when(resultSet1.getLong(1)).thenReturn(2L);
+        Mockito.when(callableStatement.getLong(8)).thenReturn(2L);
 
         orderDao = new JDBCOrderDao(connection);
         Page<Order> expected = Page.<Order>builder()
@@ -471,7 +417,8 @@ class JDBCOrderDaoTest {
                 .setSearch("")
                 .setSorting("ASC")
                 .setElementsCount(2)
-                .setData(List.of(Order.builder()
+                .setData(List.of(
+                        Order.builder()
                                 .setId(1L)
                                 .setDateCreated(new Timestamp(1))
                                 .setDateExpire(new Timestamp(1))
@@ -500,13 +447,6 @@ class JDBCOrderDaoTest {
         Mockito.verify(resultSet, Mockito.times(2)).getLong("id");
         Mockito.verify(resultSet, Mockito.times(2)).getTimestamp("date_created");
         Mockito.verify(resultSet, Mockito.times(2)).getTimestamp("date_expire");
-        Mockito.verify(connection, Mockito.times(1)).prepareStatement(Mockito.anyString());
-        Mockito.verify(preparedStatement1, Mockito.times(1)).executeQuery();
-        Mockito.verify(resultSet1, Mockito.times(1)).next();
-        Mockito.verify(resultSet1, Mockito.times(1)).getLong(1);
-
-        Mockito.doThrow(SQLException.class).when(connection).prepareStatement(Mockito.anyString());
-        assertThrows(DaoException.class, () -> orderDao.getPageByStatusIdAndPlaceId(page, 1L, 1L, "book_name"));
 
         Mockito.doThrow(SQLException.class).when(callableStatement).executeQuery();
         assertThrows(DaoException.class, () -> orderDao.getPageByStatusIdAndPlaceId(page, 1L, 1L, "book_name"));

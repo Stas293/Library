@@ -28,9 +28,7 @@ public class JDBCAuthorDao implements AuthorDao {
                     "inner join books_catalog bl on ab.book_id = bl.book_id " +
                     "where bl.isbn = ?";
     //language=MySQL
-    private static final String GET_COUNT_OF_AUTHORS = "SELECT COUNT(*) FROM author_list";
-    //language=MySQL
-    private static final String GET_AUTHORS_PAGE = "CALL GET_AUTHORS_PAGE(?, ?, ?, ?);";
+    private static final String GET_AUTHORS_PAGE = "CALL GET_AUTHORS_PAGE(?, ?, ?, ?, ?);";
     //language=MySQL
     private static final String CREATE_AUTHOR = "INSERT INTO author_list (first_name, last_name) VALUES (?, ?)";
     //language=MySQL
@@ -128,20 +126,15 @@ public class JDBCAuthorDao implements AuthorDao {
             statement.setLong(2, page.getOffset());
             statement.setString(3, page.getSearch());
             statement.setString(4, page.getSorting());
-            List<Author> authors;
+            statement.registerOutParameter(5, Types.BIGINT);
             try (ResultSet resultSet = statement.executeQuery()) {
-                authors = new ArrayList<>();
+                page.setElementsCount(statement.getLong(5));
+                List<Author> authors = new ArrayList<>();
                 AuthorCollector authorCollector = new AuthorCollector();
                 while (resultSet.next()) {
                     authors.add(authorCollector.collectFromResultSet(resultSet));
                 }
                 page.setData(authors);
-                try (PreparedStatement countPreparedStatement = connection.prepareStatement(GET_COUNT_OF_AUTHORS);
-                     ResultSet countResultSet = countPreparedStatement.executeQuery()) {
-                    if (countResultSet.next()) {
-                        page.setElementsCount(countResultSet.getLong(1));
-                    }
-                }
             }
         } catch (SQLException e) {
             LOGGER.error(String.format("Cannot get authors page: %s", page), e);

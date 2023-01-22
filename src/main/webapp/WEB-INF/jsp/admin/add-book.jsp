@@ -26,34 +26,89 @@
             <h1><fmt:message key="newBook.pageTitle"/></h1>
             <form id="add-book-form" data-toggle="validator" action="/library/admin/new-book"
                   method="post">
-                <div class="form-group">
-                    <input type="text" class="form-control caps" name="name"
-                           placeholder="<fmt:message key="newBook.label.name" />" required>
+                <div class="mb-3">
+                    <label for="bookName">
+                        <fmt:message key="newBook.label.name"/>
+                    </label>
+                    <c:set var="bookName">${book.name}</c:set>
+                    <c:if test="${not empty bookName}">
+                        <c:set var="bookTitle">${book.name}</c:set>
+                    </c:if>
+                    <input name="bookName" id="bookName" class="form-control" value=${bookTitle}>
+                    <c:set var="bookNameErrors">${bookValidationError.name}</c:set>
+                    <c:if test="${not empty bookNameErrors}">
+                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.name}"/></div>
+                    </c:if>
                 </div>
-                <div class="form-group">
-                    <label class="control-label"><fmt:message key="newBook.label.count"/></label>
-                    <input class="col-2 rounded border" type="number" min="0" required name="count">
+                <div class="mb-3">
+                    <label for="bookCount">
+                        <fmt:message key="newBook.label.count"/>
+                    </label>
+                    <c:set var="bookCount">${book.count}</c:set>
+                    <c:if test="${not empty bookCount}">
+                        <c:set var="bookNumber">${book.count}</c:set>
+                    </c:if>
+                    <input class="col-2 rounded border" id="bookCount" type="number" min="0" required name="count" value=${bookNumber}>
+                    <c:set var="bookNameErrors">${bookValidationError.count}</c:set>
+                    <c:if test="${not empty bookNameErrors}">
+                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.count}"/></div>
+                    </c:if>
                 </div>
-                <div class="form-group">
-                    <label class="control-label"><fmt:message key="newBook.label.ISBN"/></label>
-                    <input class="col-2 rounded border" type="number" min="0000000000000" minlength="13"
-                           maxlength="13" placeholder="0000000000000" required name="ISBN">
+                <div class="mb-3">
+                    <label for="bookISBN">
+                        <fmt:message key="newBook.label.ISBN"/>
+                    </label>
+                    <c:set var="bookISBN">${book.ISBN}</c:set>
+                    <c:if test="${not empty bookISBN}">
+                        <c:set var="bookISBNNumber">${book.ISBN}</c:set>
+                    </c:if>
+                    <input class="col-2 rounded border" id="bookISBN" type="number" min="0000000000000" minlength="13"
+                           maxlength="13" placeholder="0000000000000" required name="ISBN" value=${bookISBNNumber}>
+                    <c:set var="bookNameErrors">${bookValidationError.ISBN}</c:set>
+                    <c:if test="${not empty bookNameErrors}">
+                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.ISBN}"/></div>
+                    </c:if>
                 </div>
-                <div class="form-group">
-                    <label class="control-label"><fmt:message key="newBook.label.publicationDate"/></label>
-                    <input class="col-2 rounded border" type="date" required name="publicationDate">
+                <div class="mb-3">
+                    <label for="publicationDate">
+                        <fmt:message key="newBook.label.publicationDate"/>
+                    </label>
+                    <c:set var="bookPublicationDate">${book.publicationDate}</c:set>
+                    <c:if test="${not empty bookPublicationDate}">
+                        <c:set var="bookPublicationDateNumber">${book.publicationDate}</c:set>
+                    </c:if>
+                    <input class="col-2 rounded border" id="publicationDate" type="date" required name="publicationDate"
+                           value=${bookPublicationDateNumber}>
+                    <c:set var="bookNameErrors">${bookValidationError.datePublication}</c:set>
+                    <c:if test="${not empty bookNameErrors}">
+                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.datePublication}"/></div>
+                    </c:if>
                 </div>
-                <div class="form-group">
-                    <label class="control-label"><fmt:message key="newBook.label.fine"/></label>
-                    <input class="col-2 rounded border" type="number" min="0" required name="fine">
+                <div class="mb-3">
+                    <label for="bookFine">
+                        <fmt:message key="newBook.label.fine"/>
+                    </label>
+                    <c:set var="bookFine">${book.fine}</c:set>
+                    <c:if test="${not empty bookFine}">
+                        <c:set var="bookFineNumber">${book.fine}</c:set>
+                    </c:if>
+                    <input class="col-2 rounded border" id="bookFine" type="number" min="0" required name="fine" value=${bookFineNumber}>
+                    <c:set var="bookNameErrors">${bookValidationError.finePerDay}</c:set>
+                    <c:if test="${not empty bookNameErrors}">
+                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.finePerDay}"/></div>
+                    </c:if>
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label class="control-label"><fmt:message key="newBook.label.language"/></label>
                     <input type="radio" name="language" value="ENGLISH" required checked><fmt:message
                         key="newBook.label.english"/>
                     <input type="radio" name="language" value="UKRAINIAN" required><fmt:message
                         key="newBook.label.ukrainian"/>
                 </div>
+                <c:set var="bookAuthorsErrors">${bookValidationError.authors}</c:set>
+                <c:if test="${not empty bookAuthorsErrors}">
+                    <div class="alert alert-danger"><fmt:message key="${bookValidationError.authors}"/></div>
+                </c:if>
                 <div class="grid-container">
                     <div class="grid-left-3">
                         <div class="form-group">
@@ -112,6 +167,9 @@
                             e.preventDefault();
                         }
                     });
+                });
+                $(document).ready(function () {
+                    document.getElementById("publicationDate").max = new Date().toISOString().split("T")[0];
                 });
             </script>
 

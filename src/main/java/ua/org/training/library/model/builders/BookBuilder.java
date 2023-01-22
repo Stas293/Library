@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class BookBuilder {
     private String name;
-    private Long id;
+    private long id;
     private int count;
     private String isbn;
     private Date publicationDate;
@@ -21,7 +21,7 @@ public class BookBuilder {
         return this;
     }
 
-    public BookBuilder setId(Long id) {
+    public BookBuilder setId(long id) {
         this.id = id;
         return this;
     }

@@ -10,12 +10,7 @@ import ua.org.training.library.model.User;
 import ua.org.training.library.utility.Constants;
 import ua.org.training.library.utility.page.Page;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +27,7 @@ public class JDBCUserDao implements UserDao {
     //language=MySQL
     private static final String GET_BY_ID = "select * from user_list where id = ?;";
     //language=MySQL
-    private static final String GET_USER_PAGE = "CALL GET_USER_PAGE (?, ?, ?, ?);";
+    private static final String GET_USER_PAGE = "CALL GET_USER_PAGE (?, ?, ?, ?, ?);";
     //language=MySQL
     private static final String DELETE_USER_BY_ID = "delete from user_list where id = ?;";
     //language=MySQL
@@ -54,27 +49,11 @@ public class JDBCUserDao implements UserDao {
     //language=MySQL
     private static final String DISABLE_USER_BY_ID = "update user_list set enabled = 0 where id = ?;";
     //language=MySQL
-    private static final String DISABLE_USER_BY_LOGIN = "update user_list set enabled = 0 where login = ?;";
-    //language=MySQL
     private static final String ENABLE_USER_BY_ID = "update user_list set enabled = 1 where id = ?;";
-    //language=MySQL
-    private static final String ENABLE_USER_BY_LOGIN = "update user_list set enabled = 1 where login = ?;";
-    //language=MySQL
-    private static final String UPDATE_EMAIL = "update user_list set email = ? where id = ?;";
-    //language=MySQL
-    private static final String UPDATE_PHONE = "update user_list set phone = ? where id = ?;";
-    //language=MySQL
-    private static final String UPDATE_PASSWORD = "update user_list set password = ? where id = ?;";
-    //language=MySQL
-    private static final String UPDATE_FIRST_NAME = "update user_list set first_name = ? where id = ?;";
-    //language=MySQL
-    private static final String UPDATE_LAST_NAME = "update user_list set last_name = ? where id = ?;";
-    private static final Logger LOGGER = LogManager.getLogger(JDBCUserDao.class);
     //language=MySQL
     private static final String UPDATE_USER_DATA = "UPDATE user_list SET first_name = ?, last_name = ?, " +
             "email = ?, phone = ?, login = ? WHERE id = ?;";
-    //language=MySQL
-    private static final String GET_USER_COUNT = "select count(*) from user_list;";
+    private static final Logger LOGGER = LogManager.getLogger(JDBCUserDao.class);
     private final Connection connection;
 
     public JDBCUserDao(Connection connection) {
@@ -110,19 +89,14 @@ public class JDBCUserDao implements UserDao {
             statement.setLong(2, page.getOffset());
             statement.setString(3, page.getSearch());
             statement.setString(4, page.getSorting());
+            statement.registerOutParameter(5, Types.BIGINT);
             try (ResultSet resultSet = statement.executeQuery()) {
+                page.setElementsCount(statement.getLong(5));
                 UserCollector userCollector = new UserCollector();
                 while (resultSet.next()) {
                     users.add(userCollector.collectFromResultSet(resultSet));
                 }
-            }
-            page.setData(users);
-            try (PreparedStatement statement1 = connection.prepareStatement(GET_USER_COUNT)) {
-                try (ResultSet resultSet = statement1.executeQuery()) {
-                    if (resultSet.next()) {
-                        page.setElementsCount(resultSet.getLong(1));
-                    }
-                }
+                page.setData(users);
             }
         } catch (SQLException e) {
             LOGGER.error("Error while getting user page", e);

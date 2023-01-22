@@ -1,4 +1,4 @@
-package ua.org.training.library.service;
+package ua.org.training.library.utility.validation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,8 +8,9 @@ import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.ServiceException;
 import ua.org.training.library.exceptions.UnexpectedValidationException;
 import ua.org.training.library.model.User;
-import ua.org.training.library.utility.Constants;
+import ua.org.training.library.service.UserService;
 import ua.org.training.library.form.FormValidationError;
+import ua.org.training.library.utility.Constants;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -101,19 +102,21 @@ public class UserValidation {
 
     private void validateLoginPattern(String login, String pattern, FormValidationError errors) {
         Pattern r = Pattern.compile(pattern);
+        LOGGER.info(String.format("Login: %s, pattern: %s", login, pattern));
         if (!r.matcher(login).matches())
             errors.setLogin(Constants.Validation.LOGIN_PATTERN_ERROR);
     }
 
     private void validateEmailPattern(String email, String pattern, FormValidationError errors) {
         Pattern r = Pattern.compile(pattern);
-        LOGGER.info(email + " : " + pattern);
+        LOGGER.info(String.format("email: %s, pattern: %s", email, pattern));
         if (!r.matcher(email).matches())
             errors.setEmail(Constants.Validation.EMAIL_PATTERN_ERROR);
     }
 
     private void validatePhonePattern(String phone, String pattern, FormValidationError errors) {
         Pattern r = Pattern.compile(pattern);
+        LOGGER.info(String.format("phone: %s, pattern: %s", phone, pattern));
         if (!r.matcher(phone).matches())
             errors.setPhone(Constants.Validation.PHONE_PATTERN_ERROR);
     }
@@ -145,11 +148,11 @@ public class UserValidation {
             LOGGER.error(e.getMessage());
             return;
         } catch (ConnectionDBException e) {
-            LOGGER.error("error: " + e.getMessage());
+            LOGGER.error(String.format("ConnectionDBException: %s", e.getMessage()));
             throw new UnexpectedValidationException(e.getMessage(), e);
         }
         errors.setLogin(Constants.Validation.DUPLICATE_FIELD);
-        LOGGER.info("Validation failed: duplicate login -> " + login);
+        LOGGER.info(String.format("Login: %s already exists", login));
     }
 
     private void validateEmail(String email, FormValidationError errors, long userId) throws UnexpectedValidationException {
@@ -157,13 +160,13 @@ public class UserValidation {
             if (userService.getUserByEmail(email).getId() == userId)
                 return;
         } catch (ServiceException e) {
-            LOGGER.error("error: " + e.getMessage());
+            LOGGER.error(String.format("ServiceException: %s", e.getMessage()));
             return;
         } catch (ConnectionDBException e) {
-            LOGGER.error("error: " + e.getMessage());
+            LOGGER.error(String.format("ConnectionDBException: %s", e.getMessage()));
             throw new UnexpectedValidationException(e.getMessage(), e);
         }
-        LOGGER.debug("Validation failed: duplicate email -> " + email);
+        LOGGER.debug(String.format("Email: %s already exists", email));
         errors.setEmail(Constants.Validation.DUPLICATE_FIELD);
     }
 
@@ -172,13 +175,13 @@ public class UserValidation {
             if (userService.getUserByPhone(phone).getId() == userId)
                 return;
         } catch (ServiceException e) {
-            LOGGER.error("error: " + e.getMessage());
+            LOGGER.error(String.format("ServiceException: %s", e.getMessage()));
             return;
         } catch (ConnectionDBException e) {
-            LOGGER.error("error: " + e.getMessage());
+            LOGGER.error(String.format("ConnectionDBException: %s", e.getMessage()));
             throw new UnexpectedValidationException(e.getMessage(), e);
         }
-        LOGGER.debug("Validation failed: duplicate phone -> " + phone);
+        LOGGER.debug(String.format("Phone: %s already exists", phone));
         errors.setPhone(Constants.Validation.DUPLICATE_FIELD);
     }
 
@@ -186,7 +189,7 @@ public class UserValidation {
         try {
             ApplicationContext.getInstance().getCaptchaValidator().checkCaptcha(captchaResponse);
         } catch (CaptchaException e) {
-            LOGGER.error("error: " + e.getMessage());
+            LOGGER.error(String.format("CaptchaException: %s", e.getMessage()));
             formErrors.setCaptcha(Constants.Validation.CAPTCHA_ERROR);
         }
     }

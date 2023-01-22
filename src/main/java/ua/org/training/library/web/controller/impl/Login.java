@@ -28,7 +28,6 @@ public class Login implements ControllerCommand {
                 Constants.APP_STRING_DEFAULT_VALUE);
         String password = Utility.getStringParameter(request.getParameter(Constants.RequestAttributes.APP_PASSWORD_ATTRIBUTE),
                 Constants.APP_STRING_DEFAULT_VALUE);
-        request.getSession().removeAttribute(Constants.RequestAttributes.APP_ERROR_ATTRIBUTE);
 
         AuthorityUser authorityUser = SecurityService.getAuthorityUser(request);
 
@@ -42,14 +41,7 @@ public class Login implements ControllerCommand {
         }
 
         if (SecurityService.checkIfUserIsLogged(request, login)) {
-            try {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN);
-                request.setAttribute(Constants.RequestAttributes.APP_MESSAGE_ATTRIBUTE, Constants.BUNDLE_ACCESS_DENIED_LOGGED_USERS);
-                return Links.LOGIN_PAGE;
-            } catch (IOException e) {
-                LOGGER.error("Error user is already logged", e);
-            }
-            return Constants.APP_STRING_DEFAULT_VALUE;
+            return sendForbidden(request, response);
         }
 
         try {
@@ -68,6 +60,14 @@ public class Login implements ControllerCommand {
         }
 
         LOGGER.info(String.format("User with full name %s and roles %s is trying to login", authorityUser.getFullName(), authorityUser.getRoles()));
+        String adminPageRedirect = checkPasswordAndLogIn(request, password, authorityUser);
+        if (adminPageRedirect != null) return adminPageRedirect;
+
+        request.setAttribute(Constants.RequestAttributes.APP_ERROR_ATTRIBUTE, "true");
+        return Links.LOGIN_PAGE;
+    }
+
+    private static String checkPasswordAndLogIn(HttpServletRequest request, String password, AuthorityUser authorityUser) {
         try {
             if (!authorityUser.getLogin().equals(Constants.APP_UNAUTHORIZED_USER) &&
                     BCrypt.checkpw(password, SecurityService.getUserPassword(authorityUser.getLogin()))) {
@@ -84,8 +84,17 @@ public class Login implements ControllerCommand {
             LOGGER.error(e.getMessage(), e);
             return Links.ERROR_PAGE + "?message=" + e.getMessage();
         }
+        return null;
+    }
 
-        request.getSession().setAttribute(Constants.RequestAttributes.APP_ERROR_ATTRIBUTE, "true");
-        return Links.LOGIN_PAGE;
+    private static String sendForbidden(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            request.setAttribute(Constants.RequestAttributes.APP_MESSAGE_ATTRIBUTE, Constants.BUNDLE_ACCESS_DENIED_LOGGED_USERS);
+            return Links.LOGIN_PAGE;
+        } catch (IOException e) {
+            LOGGER.error("Error user is already logged", e);
+        }
+        return Constants.APP_STRING_DEFAULT_VALUE;
     }
 }

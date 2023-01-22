@@ -7,10 +7,8 @@ import ua.org.training.library.dao.BookDao;
 import ua.org.training.library.dao.DaoFactory;
 import ua.org.training.library.dto.BookDTO;
 import ua.org.training.library.exceptions.*;
-import ua.org.training.library.model.Author;
 import ua.org.training.library.model.Book;
-import ua.org.training.library.utility.Constants;
-import ua.org.training.library.utility.DTOMapper;
+import ua.org.training.library.utility.Mapper;
 import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.PageService;
@@ -61,7 +59,7 @@ public class BookService {
     private List<BookDTO> formatDataBook(Locale locale, List<Book> data) {
         return data.stream().map(book -> {
             try {
-                return DTOMapper.bookToDTO(locale, loadFields(book));
+                return Mapper.bookToDTO(locale, loadFields(book));
             } catch (ConnectionDBException e) {
                 throw new LoadFieldsException(e.getMessage(), e);
             }
@@ -70,11 +68,7 @@ public class BookService {
 
     private Book loadFields(Book book) throws ConnectionDBException {
         try (AuthorDao authorDao = daoFactory.createAuthorDao()) {
-            if (book.getId() == null) {
-                book.setAuthors(authorDao.getAuthorsByBookIsbn(book.getISBN()));
-            } else {
-                book.setAuthors(authorDao.getAuthorsByBookId(book.getId()));
-            }
+            book.setAuthors(authorDao.getAuthorsByBookId(book.getId()));
         } catch (JDBCException e) {
             LOGGER.error("Can`t create authorDao", e);
             throw new ConnectionDBException(e.getMessage(), e);
@@ -185,6 +179,18 @@ public class BookService {
         } catch (DaoException e) {
             LOGGER.error("Can`t get book page", e);
             throw new ServiceException("Can`t get book page", e);
+        }
+    }
+
+    public Book getBookByISBN(String isbn) throws ConnectionDBException, ServiceException {
+        try (BookDao bookDao = daoFactory.createBookDao()) {
+            return bookDao.getBookByISBN(isbn).orElseThrow(() -> new ServiceException("Book not found"));
+        } catch (JDBCException e) {
+            LOGGER.error("Can`t create bookDao", e);
+            throw new ConnectionDBException(e.getMessage(), e);
+        } catch (DaoException e) {
+            LOGGER.error("Can`t get book by ISBN", e);
+            throw new ServiceException("Can`t get book by ISBN", e);
         }
     }
 }

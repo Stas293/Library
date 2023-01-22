@@ -32,16 +32,35 @@ public class BooksToOrder implements ControllerCommand {
     private String createJSONBookList(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("application/json");
         response.setCharacterEncoding(Constants.APP_ENCODING);
-        LOGGER.info("Send json page to user client!");
+        LOGGER.info("Sending json page");
         PageService<Book> pageService = new PageService<>();
         Page<Book> page = pageService.getPage(request);
-        String jsonString = null;
+        String jsonString = "";
         long userId = Constants.APP_DEFAULT_ID;
         try {
-             userId = userService.getUserByLogin(SecurityService.getAuthorityUser(request).getLogin()).getId();
+             userId = userService.getUserByLogin(
+                     SecurityService.getAuthorityUser(request)
+                             .getLogin())
+                     .getId();
         } catch (ServiceException | ConnectionDBException e) {
             LOGGER.error(e.getMessage(), e);
         }
+        jsonString = getJSONOrderPage(request, page, jsonString, userId);
+        printJSON(response, jsonString);
+        return Constants.APP_STRING_DEFAULT_VALUE;
+    }
+
+    private static void printJSON(HttpServletResponse response, String jsonString) {
+        try {
+            PrintWriter writer = response.getWriter();
+            writer.print(jsonString);
+            LOGGER.info(jsonString);
+        } catch (IOException e) {
+            LOGGER.error(String.format("Error while writing json to response: %s", e.getMessage()), e);
+        }
+    }
+
+    private String getJSONOrderPage(HttpServletRequest request, Page<Book> page, String jsonString, long userId) {
         try {
             String sortBy = Utility.getStringParameter(
                     request.getParameter(Constants.PARAMETER_SORT_BY),
@@ -52,15 +71,8 @@ public class BooksToOrder implements ControllerCommand {
                     userId,
                     sortBy);
         } catch (ServiceException | ConnectionDBException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error(String.format("Error while getting book page which user can order: %s", e.getMessage()), e);
         }
-        try {
-            PrintWriter writer = response.getWriter();
-            writer.print(jsonString);
-            LOGGER.info(jsonString);
-        } catch (IOException e) {
-            LOGGER.error("IO Exception : " + e.getMessage(), e);
-        }
-        return Constants.APP_STRING_DEFAULT_VALUE;
+        return jsonString;
     }
 }

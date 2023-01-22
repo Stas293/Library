@@ -9,7 +9,7 @@ import ua.org.training.library.dao.UserDao;
 import ua.org.training.library.dto.HistoryOrderDTO;
 import ua.org.training.library.exceptions.*;
 import ua.org.training.library.model.HistoryOrder;
-import ua.org.training.library.utility.DTOMapper;
+import ua.org.training.library.utility.Mapper;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.PageService;
 
@@ -81,7 +81,7 @@ public class HistoryOrderService {
     private List<HistoryOrderDTO> formatDataHistoryOrder(Locale locale, List<HistoryOrder> historyOrders) {
         return historyOrders.stream().map(historyOrder -> {
             try {
-                return DTOMapper.historyOrderToDTO(locale, loadFields(historyOrder));
+                return Mapper.historyOrderToDTO(locale, loadFields(historyOrder));
             } catch (ConnectionDBException e) {
                 throw new LoadFieldsException(e.getMessage(), e);
             }

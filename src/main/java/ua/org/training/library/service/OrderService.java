@@ -8,8 +8,7 @@ import ua.org.training.library.exceptions.*;
 import ua.org.training.library.model.Book;
 import ua.org.training.library.model.Order;
 import ua.org.training.library.model.Status;
-import ua.org.training.library.utility.Constants;
-import ua.org.training.library.utility.DTOMapper;
+import ua.org.training.library.utility.Mapper;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.PageService;
 
@@ -109,7 +108,7 @@ public class OrderService {
     private List<OrderDTO> formatDataOrder(Locale locale, List<Order> pageData){
         return pageData.stream().map(order -> {
             try {
-                return DTOMapper.orderToDTO(locale, loadFields(order));
+                return Mapper.orderToDTO(locale, loadFields(order));
             } catch (ServiceException | ConnectionDBException e) {
                 LOGGER.error("Error while formatting data", e);
                 throw new LoadFieldsException(e.getMessage(), e);

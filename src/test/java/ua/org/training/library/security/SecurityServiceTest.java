@@ -199,4 +199,59 @@ class SecurityServiceTest {
         login = SecurityService.getCurrentLogin(request.getSession());
         assertEquals(authorityUser.getLogin(), login);
     }
+
+    @Test
+    void updateUserDataInContext() {
+        Mockito.when(request.getServletContext()).thenReturn(servletContext);
+        Mockito.when(request.getSession()).thenReturn(httpSession);
+        Mockito.when(servletContext.getAttribute(Constants
+                .RequestAttributes
+                .LOGGED_USERS_SET_CONTEXT)).thenReturn(new HashSet<>(Set.of("login")));
+        AuthorityUser authorityUser = new AuthorityUser(
+                User.builder()
+                        .setId(1L)
+                        .setLogin("login")
+                        .setPhone("phone")
+                        .setEmail("email")
+                        .setFirstName("first")
+                        .setLastName("last")
+                        .setRoles(
+                                List.of(
+                                        Role.builder()
+                                                .setId(1L)
+                                                .setName("USER")
+                                                .setCode("USER")
+                                                .createRole()
+                                )
+                        )
+                        .createUser()
+        );
+        AuthorityUser initialAuthorityUser = new AuthorityUser(
+                User.builder()
+                        .setId(1L)
+                        .setLogin("login")
+                        .setPhone("phone")
+                        .setEmail("email")
+                        .setFirstName("first")
+                        .setLastName("last")
+                        .setRoles(
+                                List.of(
+                                        Role.builder()
+                                                .setId(1L)
+                                                .setName("USER")
+                                                .setCode("USER")
+                                                .createRole()
+                                )
+                        )
+                        .createUser()
+        );
+        SecurityService.updateUserDataInContext(request, authorityUser, initialAuthorityUser);
+        Mockito.verify(httpSession).setAttribute(Constants
+                .RequestAttributes
+                .USER_ATTRIBUTE, authorityUser);
+
+        Mockito.verify(servletContext).setAttribute(Constants
+                .RequestAttributes
+                .LOGGED_USERS_SET_CONTEXT, Set.of("login"));
+    }
 }

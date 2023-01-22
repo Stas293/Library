@@ -25,12 +25,15 @@
           <element id="library" level="project" name="Maven: com.mysql:mysql-connector-j:8.0.31" />
           <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:3.19.4" />
           <element id="library" level="project" name="Maven: org.mindrot:jbcrypt:0.4" />
+          <element id="library" level="project" name="Maven: jakarta.activation:jakarta.activation-api:2.1.0" />
           <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:2.0.6" />
+          <element id="library" level="project" name="Maven: jakarta.mail:jakarta.mail-api:2.1.1" />
+          <element id="library" level="project" name="Maven: org.eclipse.angus:angus-mail:1.1.0" />
+          <element id="library" level="project" name="Maven: org.eclipse.angus:angus-activation:1.1.0" />
         </element>
       </element>
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/target/library-1.0-SNAPSHOT/META-INF/MANIFEST.MF" />
-        <element id="file-copy" path="$USER_HOME$/Desktop/context.xml" />
       </element>
       <element id="javaee-facet-resources" facet="library/web/Web" />
     </root>

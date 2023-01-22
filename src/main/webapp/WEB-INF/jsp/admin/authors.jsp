@@ -53,11 +53,19 @@
                     <fmt:message key="author.notDeleted"/>
                 </div>
             </c:if>
+            <c:set var="firstNameErrors">${authorValidationError.firstName}</c:set>
+            <c:if test="${not empty firstNameErrors}">
+                <div class="alert alert-danger"><fmt:message key="${authorValidationError.firstName}"/></div>
+            </c:if>
+            <c:set var="firstNameErrors">${authorValidationError.lastName}</c:set>
+            <c:if test="${not empty firstNameErrors}">
+                <div class="alert alert-danger"><fmt:message key="${authorValidationError.lastName}"/></div>
+            </c:if>
             <input type="checkbox" class="input-modal-window" id="new-book-window">
             <div class="modal hidden-new-book-window">
                 <div class="center">
                     <div class="book-create-form">
-                        <form id="requestForm" data-toggle="validator" novalidate action="/library/admin/new-author">
+                        <form id="requestForm" data-toggle="validator" novalidate action="/library/admin/new-author" method="post">
                             <h1><fmt:message key="newAuthor.pageTitle"/></h1>
                             <div class="form-group">
                                 <input type="text" class="form-control caps" name="firstName"

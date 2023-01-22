@@ -112,11 +112,8 @@ class JDBCHistoryOrderDaoTest {
         Mockito.when(resultSet.getString("book_name")).thenReturn("bookName");
         Mockito.when(resultSet.getTimestamp("date_created")).thenReturn(new Timestamp(1));
         Mockito.when(resultSet.getTimestamp("date_expire")).thenReturn(new Timestamp(1));
-        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenReturn(preparedStatement);
-        ResultSet resultSetCount = Mockito.mock(ResultSet.class);
-        Mockito.when(preparedStatement.executeQuery()).thenReturn(resultSetCount);
-        Mockito.when(resultSetCount.next()).thenReturn(true);
-        Mockito.when(resultSetCount.getLong(1)).thenReturn(2L);
+        Mockito.when(callableStatement.getLong(5)).thenReturn(2L);
+
         historyOrderDao = new JDBCHistoryOrderDao(connection);
         Page<HistoryOrder> page = Page.<HistoryOrder>builder()
                 .setPageNumber(0)
@@ -134,14 +131,14 @@ class JDBCHistoryOrderDaoTest {
                         HistoryOrder.builder()
                                 .setId(1L)
                                 .setBookName("bookName")
-                                .setDateExpire(new Date(1))
-                                .setDateCreated(new Date(1))
+                                .setDateExpire(new Timestamp(1))
+                                .setDateCreated(new Timestamp(1))
                                 .createHistoryOrder(),
                         HistoryOrder.builder()
                                 .setId(1L)
                                 .setBookName("bookName")
-                                .setDateExpire(new Date(1))
-                                .setDateCreated(new Date(1))
+                                .setDateExpire(new Timestamp(1))
+                                .setDateCreated(new Timestamp(1))
                                 .createHistoryOrder()
                 ))
                 .createPage();
@@ -155,9 +152,6 @@ class JDBCHistoryOrderDaoTest {
         Mockito.verify(resultSet, Mockito.times(2)).getString("book_name");
         Mockito.verify(resultSet, Mockito.times(2)).getTimestamp("date_created");
         Mockito.verify(resultSet, Mockito.times(2)).getTimestamp("date_expire");
-        Mockito.verify(preparedStatement, Mockito.times(1)).executeQuery();
-        Mockito.verify(resultSetCount, Mockito.times(1)).next();
-        Mockito.verify(resultSetCount, Mockito.times(1)).getLong(1);
 
         Mockito.when(resultSet.next()).thenReturn(false);
         expectedPage = Page.<HistoryOrder>builder()
@@ -169,9 +163,6 @@ class JDBCHistoryOrderDaoTest {
                 .setData(Collections.emptyList())
                 .createPage();
         assertEquals(expectedPage, historyOrderDao.getPage(page));
-
-        Mockito.when(preparedStatement.executeQuery()).thenThrow(SQLException.class);
-        assertThrows(DaoException.class, () -> historyOrderDao.getPage(page));
 
         Mockito.when(callableStatement.executeQuery()).thenThrow(SQLException.class);
         assertThrows(DaoException.class, () -> historyOrderDao.getPage(page));
@@ -252,11 +243,8 @@ class JDBCHistoryOrderDaoTest {
         Mockito.when(resultSet.getString("book_name")).thenReturn("bookName");
         Mockito.when(resultSet.getTimestamp("date_expire")).thenReturn(new Timestamp(1));
         Mockito.when(resultSet.getTimestamp("date_created")).thenReturn(new Timestamp(1));
-        Mockito.when(connection.prepareStatement(Mockito.anyString())).thenReturn(preparedStatement);
-        ResultSet resultSet1 = Mockito.mock(ResultSet.class);
-        Mockito.when(preparedStatement.executeQuery()).thenReturn(resultSet1);
-        Mockito.when(resultSet1.next()).thenReturn(true);
-        Mockito.when(resultSet1.getLong(1)).thenReturn(2L);
+        Mockito.when(callableStatement.getLong(6)).thenReturn(2L);
+
         historyOrderDao = new JDBCHistoryOrderDao(connection);
         Page<HistoryOrder> page = Page.<HistoryOrder>builder()
                 .setPageNumber(0)
@@ -295,10 +283,6 @@ class JDBCHistoryOrderDaoTest {
         Mockito.verify(resultSet, Mockito.times(2)).getLong(Mockito.anyString());
         Mockito.verify(resultSet, Mockito.times(2)).getString(Mockito.anyString());
         Mockito.verify(resultSet, Mockito.times(4)).getTimestamp(Mockito.anyString());
-        Mockito.verify(connection, Mockito.times(1)).prepareStatement(Mockito.anyString());
-        Mockito.verify(preparedStatement, Mockito.times(1)).executeQuery();
-        Mockito.verify(resultSet1, Mockito.times(1)).next();
-        Mockito.verify(resultSet1, Mockito.times(1)).getLong(Mockito.anyInt());
 
         Mockito.when(callableStatement.executeQuery()).thenThrow(SQLException.class);
         assertThrows(DaoException.class, () -> historyOrderDao.getPageByUserId(page, 1L));

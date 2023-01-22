@@ -1,24 +1,21 @@
 package ua.org.training.library.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.org.training.library.dao.DaoFactory;
 import ua.org.training.library.dao.PlaceDao;
-import ua.org.training.library.dto.OrderDTO;
 import ua.org.training.library.dto.PlaceDTO;
 import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.DaoException;
 import ua.org.training.library.exceptions.JDBCException;
 import ua.org.training.library.exceptions.ServiceException;
 import ua.org.training.library.model.Place;
-import ua.org.training.library.utility.DTOMapper;
+import ua.org.training.library.utility.Mapper;
 import ua.org.training.library.utility.ListService;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.PageService;
 
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -91,7 +88,7 @@ public class PlaceService {
     }
 
     private List<PlaceDTO> formatDataPlace(Locale locale, List<Place> pageData) {
-        return pageData.stream().map(place -> DTOMapper.placeToDTO(locale, place)).toList();
+        return pageData.stream().map(place -> Mapper.placeToDTO(locale, place)).toList();
     }
 
     public void updatePlace(Place place) throws ServiceException, ConnectionDBException {

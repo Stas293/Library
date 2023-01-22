@@ -27,6 +27,15 @@ public interface Constants {
         String APP_DISABLED = "disabled";
         String ORDER_STATUS_ATTRIBUTE = "status";
         String APP_CAPTCHA_RESPONSE_ATTRIBUTE = "g-recaptcha-response";
+        String BOOK_NAME_ATTRIBUTE = "bookName";
+        String BOOK_COUNT_ATTRIBUTE = "count";
+        String BOOK_ISBN_ATTRIBUTE = "ISBN";
+        String BOOK_PUBLICATION_DATE_ATTRIBUTE = "publicationDate";
+        String BOOK_FINE_ATTRIBUTE = "fine";
+        String LOCALE_ATTRIBUTE = "language";
+        String AUTHOR_FIRST_NAME = "firstName";
+        String AUTHOR_LAST_NAME = "lastName";
+        String AUTHOR_IDS_ATTRIBUTE = "authors";
     }
 
     interface BundleStrings {
@@ -37,6 +46,8 @@ public interface Constants {
         String APP_LAST_NAME_PATTERN_UKR = "pattern.ukr.name.regexp";
         String APP_EMAIL_PATTERN = "pattern.email.regexp";
         String APP_PHONE_PATTERN = "pattern.phone.regexp";
+        String APP_BOOK_NAME_PATTERN = "pattern.book.name.regexp";
+        String APP_ISBN_PATTERN = "pattern.isbn.regexp";
     }
 
     interface Validation {
@@ -50,6 +61,28 @@ public interface Constants {
         String PASSWORD_LENGTH = "form.text.error.from.eight";
         String DUPLICATE_FIELD = "error.duplicate";
         String CAPTCHA_ERROR = "error.captcha";
+        String APP_NAME_LENGTH_ERROR = "form.text.error.from.three";
+        String APP_ISBN_LENGTH_ERROR = "form.text.error.equals.thirteen";
+        String APP_NAME_PATTERN_ERROR = "form.book.name.symbols";
+        String APP_ISBN_PATTERN_ERROR = "form.book.isbn.symbols";
+        String APP_COUNT_ERROR = "form.book.count.symbols";
+        String APP_PUBLICATION_DATE_ERROR = "form.book.publication.date.symbols";
+        String APP_FINE_ERROR = "form.book.fine.symbols";
+        String APP_AUTHORS_ERROR = "form.book.authors.symbols";
+        String APP_ISBN_COLLISION_ERROR = "form.book.isbn.collision";
+        String USER_EMAIL_NOT_EXISTS = "error.user.email.not.exists";
+    }
+
+    interface Mail {
+        String MAIL_BOOK_NAME = "mail.book.name";
+        String MAIL_BOOK_AUTHORS = "mail.book.authors";
+        String MAIL_ORDER_EXPIRATION = "mail.order.expiration";
+        String MAIL_ORDER_PLACE = "mail.order.place";
+        String MAIL_STATUS = "mail.status";
+        String MAIL_SUBJECT_RESET_PASSWORD = "mail.subject.reset.password";
+        String MAIL_TEXT_RESET_PASSWORD = "mail.text.reset.password";
+        String MAIL_SUBJECT_CHANGE_ORDER_STATUS = "mail.subject.change.order.status";
+        String MAIL_TEXT_CHANGE_ORDER_STATUS = "mail.text.change.order.status";
     }
 
     String PARAMETER_SORT_BY = "sortBy";
@@ -60,17 +93,23 @@ public interface Constants {
     String STATUS_CODE_REGISTERED = "REGISTER";
     Object APP_DISABLED_USER = "true";
     String DEFAULT_ORDER_SORT_BY = "date_created";
-    int DEFAULT_BOOK_COUNT = 1;
-    Date DEFAULT_DATE = new Date(0);
+    int MIN_THREE = 3;
+    int MIN_EIGHT = 8;
+    int MAX_255 = 255;
+    int DEFAULT_BOOK_COUNT = -1;
+    int MIN_ONE = 1;
+    Date DEFAULT_DATE = new Date(-1);
     int DEFAULT_FINE = 0;
     long INVALID_ID = -1;
     String APP_UNAUTHORIZED_USER = "anonymous";
     int APP_BCRYPT_SALT = 11;
     String APP_ENCODING = "UTF-8";
+    int ISBN_LENGTH = 13;
+    double MIN_ZERO = 0.0;
 
     String APP_DEFAULT_LANGUAGE = "en";
     long APP_DEFAULT_ID = -1;
-    long APP_DEFAULT_USER_MANIPULATION_ID = 1;
+    long APP_DEFAULT_USER_MANIPULATION_ID = -1L;
     int DEFAULT_CURRENCY_EXCHANGE = 0;
 
     String ORDER_STATUS_ACCEPT = "ACCEPT";
@@ -94,6 +133,6 @@ public interface Constants {
     String APP_DEFAULT_PLACE_NAME = "To the reading room";
     String DEFAULT_USER_ROLE = "USER";
     int DEFAULT_MIN_IDLE = 5;
-    int DEFAULT_MAX_IDLE = 10;
     int MYSQL_MAX_POOL_SIZE = 100;
+    int DEFAULT_MAX_LIFETIME = 1800000;
 }

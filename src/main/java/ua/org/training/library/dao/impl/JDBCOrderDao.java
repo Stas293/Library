@@ -16,53 +16,43 @@ import java.util.Optional;
 
 public class JDBCOrderDao implements OrderDao {
     //language=MySQL
-    private static final String CREATE_ORDER = 
+    private static final String CREATE_ORDER =
             "INSERT INTO order_list (date_created, book_id, user_id, place_id, status_id) VALUES (?, ?, ?, ?, ?)";
     //language=MySQL
     private static final String GET_ORDER_BY_ID = "SELECT * FROM order_list WHERE id = ?";
     //language=MySQL
-    private static final String GET_ORDERS_PAGE = "CALL GET_ORDERS_PAGE(?, ?, ?, ?);";
-    //language=MySQL
-    private static final String GET_ORDERS_COUNT = "SELECT COUNT(*) FROM order_list";
+    private static final String GET_ORDERS_PAGE = "CALL GET_ORDERS_PAGE(?, ?, ?, ?, ?);";
     //language=MySQL
     private static final String UPDATE_ORDER =
             "UPDATE order_list SET date_expire = ?, status_id = ? WHERE id = ?";
     //language=MySQL
     private static final String DELETE_ORDER = "DELETE FROM order_list WHERE id = ?";
     //language=MySQL
-    private static final String GET_ORDERS_PAGE_BY_USER_ID = "CALL GET_ORDERS_PAGE_BY_USER_ID(?, ?, ?, ?, ?);";
+    private static final String GET_ORDERS_PAGE_BY_USER_ID = "CALL GET_ORDERS_PAGE_BY_USER_ID(?, ?, ?, ?, ?, ?);";
     //language=MySQL
-    private static final String GET_ORDERS_PAGE_BY_PLACE_ID = "CALL GET_ORDERS_PAGE_BY_PLACE_ID(?, ?, ?, ?, ?);";
+    private static final String GET_ORDERS_PAGE_BY_PLACE_ID = "CALL GET_ORDERS_PAGE_BY_PLACE_ID(?, ?, ?, ?, ?, ?);";
     //language=MySQL
     private static final String GET_ORDERS_PAGE_BY_USER_ID_AND_PLACE_ID =
-            "CALL GET_ORDERS_PAGE_BY_USER_ID_AND_PLACE_ID(?, ?, ?, ?, ?, ?);";
+            "CALL GET_ORDERS_PAGE_BY_USER_ID_AND_PLACE_ID(?, ?, ?, ?, ?, ?, ?);";
     //language=MySQL
-    private static final String GET_ORDERS_PAGE_BY_PLACE_NAME = "CALL GET_ORDERS_PAGE_BY_PLACE_NAME(?, ?, ?, ?, ?);";
+    private static final String GET_ORDERS_PAGE_BY_PLACE_NAME = "CALL GET_ORDERS_PAGE_BY_PLACE_NAME(?, ?, ?, ?, ?, ?);";
     //language=MySQL
-    private static final String GET_ORDERS_PAGE_BY_BOOK_ID = "CALL GET_ORDERS_PAGE_BY_BOOK_ID(?, ?, ?, ?, ?);";
+    private static final String GET_ORDERS_PAGE_BY_BOOK_ID = "CALL GET_ORDERS_PAGE_BY_BOOK_ID(?, ?, ?, ?, ?, ?);";
     //language=MySQL
     private static final String GET_BOOK_COUNT_BY_ID = "SELECT book_count FROM books_catalog WHERE book_id = ?";
     //language=MySQL
     private static final String GET_ORDERS_PAGE_BY_STATUS_AND_USER_ID =
-            "CALL GET_ORDERS_PAGE_BY_STATUS_AND_USER_ID(?, ?, ?, ?, ?, ?);";
+            "CALL GET_ORDERS_PAGE_BY_STATUS_AND_USER_ID(?, ?, ?, ?, ?, ?, ?);";
     //language=MySQL
     private static final String CHANGE_BOOK_COUNT = "UPDATE books_catalog SET book_count = ? WHERE book_id = ?";
     //language=MySQL
-    private static final String GET_ORDERS_PAGE_BY_STATUS_ID = "CALL GET_ORDERS_PAGE_BY_STATUS_ID(?, ?, ?, ?, ?, ?);";
-    //language=MySQL
-    private static final String GET_ORDERS_COUNT_BY_STATUS_ID = "SELECT COUNT(*) FROM order_list WHERE status_id = ?";
+    private static final String GET_ORDERS_PAGE_BY_STATUS_ID = "CALL GET_ORDERS_PAGE_BY_STATUS_ID(?, ?, ?, ?, ?, ?, ?);";
     //language=MySQL
     private static final String GET_ORDERS_PAGE_BY_STATUS_ID_AND_PLACE_ID =
-            "CALL GET_ORDERS_PAGE_BY_STATUS_AND_PLACE_ID(?, ?, ?, ?, ?, ?, ?);";
-    //language=MySQL
-    private static final String GET_ORDERS_COUNT_BY_STATUS_ID_AND_PLACE_ID =
-            "SELECT COUNT(*) FROM order_list WHERE status_id = ? AND place_id = ?";
-    //language=MySQL
-    private static final String GET_ORDERS_COUNT_BY_BOOK_ID = "SELECT COUNT(*) FROM order_list WHERE book_id = ?";
-    //language=MySQL
-    private static final String GET_ORDERS_COUNT_BY_STATUS_AND_USER_ID = "SELECT COUNT(*) FROM order_list WHERE status_id = ? AND user_id = ?";
+            "CALL GET_ORDERS_PAGE_BY_STATUS_AND_PLACE_ID(?, ?, ?, ?, ?, ?, ?, ?);";
     private static final Logger LOGGER = LogManager.getLogger(JDBCOrderDao.class);
     private final Connection connection;
+
     public JDBCOrderDao(Connection connection) {
         this.connection = connection;
     }
@@ -83,9 +73,8 @@ public class JDBCOrderDao implements OrderDao {
                         int bookCount = resultSet.getInt("book_count");
                         LOGGER.debug("Book count: {}", bookCount);
                         if (bookCount > 0) {
-                            bookCount--;
                             try (PreparedStatement preparedStatement = connection.prepareStatement(CHANGE_BOOK_COUNT)) {
-                                preparedStatement.setInt(1, bookCount);
+                                preparedStatement.setInt(1, --bookCount);
                                 preparedStatement.setLong(2, model.getBook().getId());
                                 preparedStatement.executeUpdate();
                             }
@@ -135,19 +124,15 @@ public class JDBCOrderDao implements OrderDao {
             statement.setLong(2, page.getOffset());
             statement.setString(3, page.getSearch());
             statement.setString(4, page.getSorting());
+            statement.registerOutParameter(5, Types.BIGINT);
             try (ResultSet resultSet = statement.executeQuery()) {
+                page.setElementsCount(statement.getLong(5));
                 List<Order> orders = new ArrayList<>();
+                OrderCollector orderCollector = new OrderCollector();
                 while (resultSet.next()) {
-                    orders.add(new OrderCollector().collectFromResultSet(resultSet));
+                    orders.add(orderCollector.collectFromResultSet(resultSet));
                 }
                 page.setData(orders);
-                try (PreparedStatement statement1 = connection.prepareStatement(GET_ORDERS_COUNT)) {
-                    try (ResultSet resultSet1 = statement1.executeQuery()) {
-                        if (resultSet1.next()) {
-                            page.setElementsCount(resultSet1.getInt(1));
-                        }
-                    }
-                }
             }
         } catch (SQLException e) {
             LOGGER.error("Can't get orders page", e);
@@ -208,21 +193,15 @@ public class JDBCOrderDao implements OrderDao {
             statement.setLong(3, bookId);
             statement.setString(4, page.getSearch());
             statement.setString(5, page.getSorting());
+            statement.registerOutParameter(6, Types.BIGINT);
             try (ResultSet resultSet = statement.executeQuery()) {
+                page.setElementsCount(statement.getLong(6));
                 List<Order> orders = new ArrayList<>();
                 OrderCollector orderCollector = new OrderCollector();
                 while (resultSet.next()) {
                     orders.add(orderCollector.collectFromResultSet(resultSet));
                 }
                 page.setData(orders);
-                try (PreparedStatement statement1 = connection.prepareStatement(GET_ORDERS_COUNT_BY_BOOK_ID)) {
-                    statement1.setLong(1, bookId);
-                    try (ResultSet resultSet1 = statement1.executeQuery()) {
-                        if (resultSet1.next()) {
-                            page.setElementsCount(resultSet1.getInt(1));
-                        }
-                    }
-                }
             }
         } catch (SQLException e) {
             LOGGER.error("Can't get orders page by book id", e);
@@ -240,28 +219,25 @@ public class JDBCOrderDao implements OrderDao {
             statement.setLong(4, statusId);
             statement.setString(5, page.getSearch());
             statement.setString(6, page.getSorting());
-            try (ResultSet resultSet = statement.executeQuery()) {
-                List<Order> orders = new ArrayList<>();
-                OrderCollector orderCollector = new OrderCollector();
-                while (resultSet.next()) {
-                    orders.add(orderCollector.collectFromResultSet(resultSet));
-                }
-                page.setData(orders);
-                try (PreparedStatement statement1 = connection.prepareStatement(GET_ORDERS_COUNT_BY_STATUS_AND_USER_ID)) {
-                    statement1.setLong(1, statusId);
-                    statement1.setLong(2, userId);
-                    try (ResultSet resultSet1 = statement1.executeQuery()) {
-                        if (resultSet1.next()) {
-                            page.setElementsCount(resultSet1.getInt(1));
-                        }
-                    }
-                }
-            }
+            setPageData(page, statement);
         } catch (SQLException e) {
             LOGGER.error("Can't get orders page by status and user id", e);
             throw new DaoException("Can't get orders page by status and user id", e);
         }
         return page;
+    }
+
+    private void setPageData(Page<Order> page, CallableStatement statement) throws SQLException {
+        statement.registerOutParameter(7, Types.BIGINT);
+        try (ResultSet resultSet = statement.executeQuery()) {
+            page.setElementsCount(statement.getLong(7));
+            List<Order> orders = new ArrayList<>();
+            OrderCollector orderCollector = new OrderCollector();
+            while (resultSet.next()) {
+                orders.add(orderCollector.collectFromResultSet(resultSet));
+            }
+            page.setData(orders);
+        }
     }
 
     @Override
@@ -273,22 +249,7 @@ public class JDBCOrderDao implements OrderDao {
             statement.setString(4, page.getSearch());
             statement.setString(5, page.getSorting());
             statement.setString(6, sortBy);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                List<Order> orders = new ArrayList<>();
-                OrderCollector orderCollector = new OrderCollector();
-                while (resultSet.next()) {
-                    orders.add(orderCollector.collectFromResultSet(resultSet));
-                }
-                page.setData(orders);
-                try (PreparedStatement statementCount = connection.prepareStatement(GET_ORDERS_COUNT_BY_STATUS_ID)) {
-                    statementCount.setLong(1, statusId);
-                    try (ResultSet resultSetCount = statementCount.executeQuery()) {
-                        if (resultSetCount.next()) {
-                            page.setElementsCount(resultSetCount.getLong(1));
-                        }
-                    }
-                }
-            }
+            setPageData(page, statement);
         } catch (SQLException e) {
             LOGGER.error("Can't get orders page by status id", e);
             throw new DaoException("Can't get orders page by status id", e);
@@ -298,7 +259,7 @@ public class JDBCOrderDao implements OrderDao {
 
     @Override
     public Page<Order> getPageByStatusIdAndPlaceId(Page<Order> page, Long statusId, Long placeId, String sortBy) {
-        try (PreparedStatement preparedStatement = connection.prepareCall(GET_ORDERS_PAGE_BY_STATUS_ID_AND_PLACE_ID)) {
+        try (CallableStatement preparedStatement = connection.prepareCall(GET_ORDERS_PAGE_BY_STATUS_ID_AND_PLACE_ID)) {
             preparedStatement.setLong(1, page.getLimit());
             preparedStatement.setLong(2, page.getOffset());
             preparedStatement.setLong(3, placeId);
@@ -306,22 +267,15 @@ public class JDBCOrderDao implements OrderDao {
             preparedStatement.setString(5, page.getSearch());
             preparedStatement.setString(6, page.getSorting());
             preparedStatement.setString(7, sortBy);
+            preparedStatement.registerOutParameter(8, Types.BIGINT);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                page.setElementsCount(preparedStatement.getLong(8));
                 List<Order> orders = new ArrayList<>();
                 OrderCollector orderCollector = new OrderCollector();
                 while (resultSet.next()) {
                     orders.add(orderCollector.collectFromResultSet(resultSet));
                 }
                 page.setData(orders);
-                try (PreparedStatement statementCount = connection.prepareStatement(GET_ORDERS_COUNT_BY_STATUS_ID_AND_PLACE_ID)) {
-                    statementCount.setLong(1, statusId);
-                    statementCount.setLong(2, placeId);
-                    try (ResultSet resultSetCount = statementCount.executeQuery()) {
-                        if (resultSetCount.next()) {
-                            page.setElementsCount(resultSetCount.getLong(1));
-                        }
-                    }
-                }
             }
         } catch (SQLException e) {
             LOGGER.error("Can't get orders page by status id and place id", e);

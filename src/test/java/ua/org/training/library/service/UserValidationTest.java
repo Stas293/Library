@@ -11,6 +11,7 @@ import ua.org.training.library.exceptions.ServiceException;
 import ua.org.training.library.exceptions.UnexpectedValidationException;
 import ua.org.training.library.form.FormValidationError;
 import ua.org.training.library.model.User;
+import ua.org.training.library.utility.validation.UserValidation;
 
 import java.util.Locale;
 

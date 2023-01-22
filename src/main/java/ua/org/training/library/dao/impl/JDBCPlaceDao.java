@@ -19,7 +19,7 @@ public class JDBCPlaceDao implements PlaceDao {
     //language=MySQL
     private static final String GET_PLACE_BY_ID = "SELECT * FROM place_list WHERE id = ?";
     //language=MySQL
-    private static final String GET_PLACES_PAGE = "CALL GET_PLACES_PAGE(?, ?, ?, ?);";
+    private static final String GET_PLACES_PAGE = "CALL GET_PLACES_PAGE(?, ?, ?, ?, ?);";
     //language=MySQL
     private static final String UPDATE_PLACE = "UPDATE place_list SET `name` = ? WHERE id = ?";
     //language=MySQL
@@ -35,9 +35,11 @@ public class JDBCPlaceDao implements PlaceDao {
     private static final String GET_ALL_PLACES = "SELECT * FROM place_list";
     private static final Logger LOGGER = LogManager.getLogger(JDBCPlaceDao.class);
     private final Connection connection;
+
     public JDBCPlaceDao(Connection connection) {
         this.connection = connection;
     }
+
     public long create(Place model) throws SQLException {
         connection.setAutoCommit(false);
         try (PreparedStatement preparedStatement = connection.prepareStatement(CREATE_PLACE, Statement.RETURN_GENERATED_KEYS)) {
@@ -83,13 +85,14 @@ public class JDBCPlaceDao implements PlaceDao {
             statement.setLong(2, page.getOffset());
             statement.setString(3, page.getSearch());
             statement.setString(4, page.getSorting());
+            statement.registerOutParameter(5, Types.BIGINT);
             try (ResultSet resultSet = statement.executeQuery()) {
+                page.setElementsCount(statement.getLong(5));
                 while (resultSet.next()) {
                     places.add(new PlaceCollector().collectFromResultSet(resultSet));
                 }
             }
             page.setData(places);
-            page.setElementsCount(places.size());
         } catch (SQLException e) {
             LOGGER.error("Can't get places page", e);
             throw new DaoException("Can't get places page", e);

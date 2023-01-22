@@ -1,8 +1,9 @@
-package ua.org.training.library.utility;
+package ua.org.training.library.utility.validation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.org.training.library.exceptions.CaptchaException;
+import ua.org.training.library.utility.Utility;
 
 public class CaptchaValidator {
     private static final Logger LOGGER = LogManager.getLogger(CaptchaValidator.class);

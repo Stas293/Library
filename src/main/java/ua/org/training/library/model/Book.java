@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Objects;
 
 public class Book implements Serializable {
-    private Long id;
+    private long id;
     private String name;
     private int count;
     private String ISBN;
@@ -21,7 +21,7 @@ public class Book implements Serializable {
     public Book() {
     }
 
-    public Book(Long id, String name, int count, String ISBN, Date publicationDate, double fine, String language, Collection<Author> authors) {
+    public Book(long id, String name, int count, String ISBN, Date publicationDate, double fine, String language, Collection<Author> authors) {
         this.id = id;
         this.name = name;
         this.count = count;
@@ -36,11 +36,11 @@ public class Book implements Serializable {
         return new BookBuilder();
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -101,27 +101,13 @@ public class Book implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return "Book{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", count=" + count +
-                ", ISBN='" + ISBN + '\'' +
-                ", publicationDate=" + publicationDate +
-                ", fine=" + fine +
-                ", language='" + language + '\'' +
-                ", authors=" + authors +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Book book)) return false;
 
+        if (id != book.id) return false;
         if (count != book.count) return false;
         if (Double.compare(book.fine, fine) != 0) return false;
-        if (!id.equals(book.id)) return false;
         if (!name.equals(book.name)) return false;
         if (!ISBN.equals(book.ISBN)) return false;
         if (!publicationDate.equals(book.publicationDate)) return false;
@@ -133,7 +119,7 @@ public class Book implements Serializable {
     public int hashCode() {
         int result;
         long temp;
-        result = id.hashCode();
+        result = (int) (id ^ (id >>> 32));
         result = 31 * result + name.hashCode();
         result = 31 * result + count;
         result = 31 * result + ISBN.hashCode();
@@ -143,5 +129,19 @@ public class Book implements Serializable {
         result = 31 * result + language.hashCode();
         result = 31 * result + (authors != null ? authors.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", count=" + count +
+                ", ISBN='" + ISBN + '\'' +
+                ", publicationDate=" + publicationDate +
+                ", fine=" + fine +
+                ", language='" + language + '\'' +
+                ", authors=" + authors +
+                '}';
     }
 }

@@ -21,18 +21,14 @@ public class JDBCHistoryOrderDao implements HistoryOrderDao {
     //language=MySQL
     private static final String GET_HISTORY_ORDER_BY_ID = "SELECT * FROM history_order WHERE id = ?";
     //language=MySQL
-    private static final String GET_PAGE_HISTORY_ORDER = "CALL GET_PAGE_HISTORY_ORDER(?, ?, ?, ?);";
+    private static final String GET_PAGE_HISTORY_ORDER = "CALL GET_PAGE_HISTORY_ORDER(?, ?, ?, ?, ?);";
     //language=MySQL
     private static final String UPDATE_HISTORY_ORDER = "UPDATE history_order SET user_id = ?, date_created = ?, " +
             "date_expire = ?, book_name = ? WHERE id = ?";
     //language=MySQL
     private static final String DELETE_HISTORY_ORDER = "DELETE FROM history_order WHERE id = ?";
     //language=MySQL
-    private static final String GET_PAGE_HISTORY_ORDER_BY_USER_ID = "CALL GET_PAGE_HISTORY_ORDER_BY_USER_ID(?, ?, ?, ?, ?);";
-    //language=MySQL
-    private static final String COUNT_HISTORY_ORDER = "SELECT COUNT(*) FROM history_order";
-    //language=MySQL
-    private static final String COUNT_HISTORY_ORDER_BY_USER_ID = "SELECT COUNT(*) FROM history_order WHERE user_id = ?";
+    private static final String GET_PAGE_HISTORY_ORDER_BY_USER_ID = "CALL GET_PAGE_HISTORY_ORDER_BY_USER_ID(?, ?, ?, ?, ?, ?);";
     private static final Logger LOGGER = LogManager.getLogger(JDBCHistoryOrderDao.class);
     private final Connection connection;
 
@@ -92,20 +88,15 @@ public class JDBCHistoryOrderDao implements HistoryOrderDao {
             statement.setLong(2, page.getOffset());
             statement.setString(3, page.getSearch());
             statement.setString(4, page.getSorting());
+            statement.registerOutParameter(5, Types.BIGINT);
             try (ResultSet resultSet = statement.executeQuery()) {
+                page.setElementsCount(statement.getLong(5));
                 List<HistoryOrder> historyOrders = new ArrayList<>();
                 HistoryOrderCollector collector = new HistoryOrderCollector();
                 while (resultSet.next()) {
                     historyOrders.add(collector.collectFromResultSet(resultSet));
                 }
                 page.setData(historyOrders);
-                try (PreparedStatement preparedStatement = connection.prepareStatement(COUNT_HISTORY_ORDER)) {
-                    try (ResultSet resultSet1 = preparedStatement.executeQuery()) {
-                        if (resultSet1.next()) {
-                            page.setElementsCount(resultSet1.getLong(1));
-                        }
-                    }
-                }
             }
         } catch (SQLException e) {
             LOGGER.error("Cannot get page history order", e);
@@ -168,21 +159,15 @@ public class JDBCHistoryOrderDao implements HistoryOrderDao {
             statement.setLong(3, userId);
             statement.setString(4, page.getSearch());
             statement.setString(5, page.getSorting());
+            statement.registerOutParameter(6, Types.BIGINT);
             try (ResultSet resultSet = statement.executeQuery()) {
+                page.setElementsCount(statement.getLong(6));
                 List<HistoryOrder> historyOrders = new ArrayList<>();
                 HistoryOrderCollector collector = new HistoryOrderCollector();
                 while (resultSet.next()) {
                     historyOrders.add(collector.collectFromResultSet(resultSet));
                 }
                 page.setData(historyOrders);
-                try (PreparedStatement preparedStatement = connection.prepareStatement(COUNT_HISTORY_ORDER_BY_USER_ID)) {
-                    preparedStatement.setLong(1, userId);
-                    try (ResultSet resultSet1 = preparedStatement.executeQuery()) {
-                        if (resultSet1.next()) {
-                            page.setElementsCount(resultSet1.getLong(1));
-                        }
-                    }
-                }
             }
         } catch (SQLException e) {
             LOGGER.error("Cannot get page history order by user id", e);

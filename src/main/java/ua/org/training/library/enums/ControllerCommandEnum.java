@@ -42,7 +42,9 @@ public enum ControllerCommandEnum {
     USER_BOOKS_TO_ORDER("booksToOrder", new BooksToOrder()),
     GET_PLACES("getPlaces", new GetPlaces()),
     PERSONAL_DATA("personalData", new PersonalData()),
-    ERROR("error", new Error()),;
+    ERROR("error", new Error()),
+    FORGOT_PASSWORD("forgotPassword", new ResetPassword()),
+    RESET_PASSWORD("resetPassword", new EnterNewPassword()),;
 
     private final String command;
     private final ControllerCommand controllerCommand;

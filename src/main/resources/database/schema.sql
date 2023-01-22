@@ -222,8 +222,16 @@ VALUES (`id_role`, `id_user`);
 
 END$$
 
+DROP PROCEDURE IF EXISTS `GET_COUNT`$$
+CREATE PROCEDURE `GET_COUNT` (IN `stmt` VARCHAR(1000), OUT `quantity` BIGINT(20) UNSIGNED)  BEGIN
+  SET @qry = stmt;
+  PREPARE stm FROM @qry;
+  EXECUTE stm;
+  SET quantity = @q;
+END$$
+
 DROP PROCEDURE IF EXISTS `GET_USER_PAGE` $$
-CREATE PROCEDURE `GET_USER_PAGE` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `GET_USER_PAGE` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `user_list` u';
@@ -235,6 +243,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' u.phone like ''%', `search_by`, '%''');
 end if;
 SET stmt = concat(stmt, ' order by login ', `ASC_DESC`);
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);  
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
 SET @q = concat('select * ',stmt);
@@ -245,7 +254,7 @@ DEALLOCATE PREPARE stm;
 END$$
 
 DROP PROCEDURE IF EXISTS `GET_AUTHORS_PAGE` $$
-CREATE PROCEDURE `GET_AUTHORS_PAGE` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `GET_AUTHORS_PAGE` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `author_list` u';
@@ -254,6 +263,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' u.last_name like ''%', `search_by`, '%''');
 end if;
 SET stmt = concat(stmt, ' order by last_name ', `ASC_DESC`);
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);  
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
 SET @q = concat('select * ',stmt);
@@ -265,7 +275,7 @@ END$$
 
 
 DROP PROCEDURE IF EXISTS `PAGE_GET_BOOKS_BY_AUTHOR_ID` $$
-CREATE PROCEDURE `PAGE_GET_BOOKS_BY_AUTHOR_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `author_id` BIGINT(20) UNSIGNED, IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `PAGE_GET_BOOKS_BY_AUTHOR_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `author_id` BIGINT(20) UNSIGNED, IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `books_catalog` b';
@@ -276,6 +286,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' b.ISBN like ''%', `search_by`, '%''');
 end if;
 SET stmt = concat(stmt, ' order by book_name ', `ASC_DESC`);
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);  
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
 SET @q = concat('select * ',stmt);
@@ -286,7 +297,7 @@ DEALLOCATE PREPARE stm;
 END$$
 
 DROP PROCEDURE IF EXISTS `PAGE_GET_BOOKS_BY_AUTHOR_ID_AND_LANGUAGE` $$
-CREATE PROCEDURE `PAGE_GET_BOOKS_BY_AUTHOR_ID_AND_LANGUAGE` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `author_id` BIGINT(20) UNSIGNED, IN `language` VARCHAR(255),  IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `PAGE_GET_BOOKS_BY_AUTHOR_ID_AND_LANGUAGE` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `author_id` BIGINT(20) UNSIGNED, IN `language` VARCHAR(255),  IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `books_catalog` b';
@@ -298,6 +309,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' b.ISBN like ''%', `search_by`, '%'' )');
 end if;
 SET stmt = concat(stmt, ' order by book_name ', `ASC_DESC`);
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);  
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
 SET @q = concat('select * ',stmt);
@@ -308,7 +320,7 @@ DEALLOCATE PREPARE stm;
 END$$
 
 DROP PROCEDURE IF EXISTS `PAGE_GET_BOOKS_BY_LANGUAGE` $$
-CREATE PROCEDURE `PAGE_GET_BOOKS_BY_LANGUAGE` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `lang` VARCHAR(255),  IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `PAGE_GET_BOOKS_BY_LANGUAGE` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `lang` VARCHAR(255),  IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `books_catalog` b';
@@ -318,6 +330,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' b.ISBN like ''%', `search_by`, '%'' )');
 end if;
 SET stmt = concat(stmt, ' order by book_name ', `ASC_DESC`);
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);  
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
 SET @q = concat('select * ',stmt);
@@ -345,7 +358,7 @@ if (`ASC_DESC` = 'DESC') THEN
 	SET stmt = concat(stmt, ' order by MAX(', `order_by`, ') DESC');
 else
     SET stmt = concat(stmt, ' order by MIN(', `order_by`, ') ');
-end if;
+end if; 
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
 SET @q = concat('select b.*',stmt);
@@ -354,6 +367,56 @@ EXECUTE stm;
 DEALLOCATE PREPARE stm;
 
 END$$
+
+DROP PROCEDURE IF EXISTS `COUNT_BOOKS` $$
+CREATE PROCEDURE `COUNT_BOOKS` (IN `search_by` VARCHAR(255)) BEGIN
+DECLARE stmt varchar(1000);
+
+SET stmt = ' from (SELECT count(DISTINCT b.book_name) as mycount from `books_catalog` b';
+SET stmt = concat(stmt, ' inner join `author_book` a on b.book_id=a.book_id');
+SET stmt = concat(stmt, ' inner join `author_list` l on a.author_id=l.id');
+if (`search_by` is not null) and (length(`search_by`) > 0) THEN
+    SET stmt = concat(stmt, ' where b.book_name like ''%', `search_by`, '%'' or ');
+    SET stmt = concat(stmt, ' b.ISBN like ''%', `search_by`, '%'' or ');
+    SET stmt = concat(stmt, ' l.first_name like ''%', `search_by`, '%'' or ');
+    SET stmt = concat(stmt, ' l.last_name like ''%', `search_by`, '%''');
+end if;
+SET stmt = concat(stmt, ' group by b.book_id ) as r');
+
+SET @q = concat('select SUM(mycount)',stmt);
+PREPARE stm FROM @q;
+EXECUTE stm;
+DEALLOCATE PREPARE stm;
+
+END$$
+
+
+DROP PROCEDURE IF EXISTS `PAGE_GET_BOOKS_NOT_ORDERED_COUNT` $$
+CREATE PROCEDURE `PAGE_GET_BOOKS_NOT_ORDERED_COUNT` (IN `search_by` VARCHAR(255), IN `id_user` BIGINT(20)) BEGIN
+DECLARE stmt varchar(1000);
+
+SET stmt = ' from (SELECT count(DISTINCT b.book_name) as mycount from `books_catalog` b';
+SET stmt = concat(stmt, ' inner join `author_book` a on b.book_id=a.book_id');
+SET stmt = concat(stmt, ' inner join `author_list` l on a.author_id=l.id');
+SET stmt = concat(stmt, ' WHERE b.book_id NOT IN(
+SELECT bc.book_id FROM library.order_list ol inner join library.books_catalog bc on ol.book_id=bc.book_id where ol.user_id = ', `id_user`, ')');
+SET stmt = concat(stmt, ' AND b.book_count > 0');
+
+if (`search_by` is not null) and (length(`search_by`) > 0) THEN
+    SET stmt = concat(stmt, ' where b.book_name like ''%', `search_by`, '%'' or ');
+    SET stmt = concat(stmt, ' b.ISBN like ''%', `search_by`, '%'' or ');
+    SET stmt = concat(stmt, ' l.first_name like ''%', `search_by`, '%'' or ');
+    SET stmt = concat(stmt, ' l.last_name like ''%', `search_by`, '%''');
+end if;
+SET stmt = concat(stmt, ' group by b.book_id ) as r');
+
+SET @q = concat('select SUM(mycount)',stmt);
+PREPARE stm FROM @q;
+EXECUTE stm;
+DEALLOCATE PREPARE stm;
+
+END$$
+
 
 DROP PROCEDURE IF EXISTS `PAGE_GET_BOOKS_NOT_ORDERED` $$
 CREATE PROCEDURE `PAGE_GET_BOOKS_NOT_ORDERED` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `order_by` VARCHAR(255), IN `id_user` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
@@ -388,7 +451,7 @@ END$$
 
 
 DROP PROCEDURE IF EXISTS `GET_PLACES_PAGE` $$
-CREATE PROCEDURE `GET_PLACES_PAGE` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `GET_PLACES_PAGE` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `place_list` p';
@@ -396,6 +459,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' where p.name like ''%', `search_by`, '%'' or ');
 end if;
 SET stmt = concat(stmt, ' order by name ', `ASC_DESC`);
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
 SET @q = concat('select * ',stmt);
@@ -407,7 +471,7 @@ END$$
 
 
 DROP PROCEDURE IF EXISTS `GET_ORDERS_PAGE` $$
-CREATE PROCEDURE `GET_ORDERS_PAGE` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `GET_ORDERS_PAGE` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `order_list` o';
@@ -420,6 +484,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' u.last_name like ''%', `search_by`, '%''');
 end if;
 SET stmt = concat(stmt, ' order by o.date_created ', `ASC_DESC`);
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
 SET @q = concat('select o.* ', stmt);
@@ -431,7 +496,7 @@ END$$
 
 
 DROP PROCEDURE IF EXISTS `GET_ORDERS_PAGE_BY_USER_ID` $$
-CREATE PROCEDURE `GET_ORDERS_PAGE_BY_USER_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_user` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `GET_ORDERS_PAGE_BY_USER_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_user` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `order_list` o';
@@ -448,7 +513,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' o.date_created like ''%', `search_by`, '%'' or ');
     SET stmt = concat(stmt, ' o.date_expire like ''%', `search_by`, '%'' )');
 end if;
-
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);
 SET stmt = concat(stmt, ' order by o.date_created ', `ASC_DESC`);
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
@@ -461,7 +526,7 @@ END$$
 
 
 DROP PROCEDURE IF EXISTS `GET_ORDERS_PAGE_BY_PLACE_ID` $$
-CREATE PROCEDURE `GET_ORDERS_PAGE_BY_PLACE_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_place` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `GET_ORDERS_PAGE_BY_PLACE_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_place` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `order_list` o';
@@ -478,7 +543,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' o.date_created like ''%', `search_by`, '%'' or ');
     SET stmt = concat(stmt, ' o.date_expire like ''%', `search_by`, '%'' )');
 end if;
-
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);
 SET stmt = concat(stmt, ' order by o.date_created ', `ASC_DESC`);
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
@@ -491,7 +556,7 @@ END$$
 
 
 DROP PROCEDURE IF EXISTS `GET_ORDERS_PAGE_BY_STATUS_ID` $$
-CREATE PROCEDURE `GET_ORDERS_PAGE_BY_STATUS_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_status` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), IN `SORT_BY` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `GET_ORDERS_PAGE_BY_STATUS_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_status` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), IN `SORT_BY` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `order_list` o';
@@ -507,7 +572,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' o.date_created like ''%', `search_by`, '%'' or ');
     SET stmt = concat(stmt, ' o.date_expire like ''%', `search_by`, '%'' )');
 end if;
-
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);
 SET stmt = concat(stmt, ' order by ', `SORT_BY`, ' ', `ASC_DESC`);
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
@@ -520,7 +585,7 @@ END$$
 
 
 DROP PROCEDURE IF EXISTS `GET_ORDERS_PAGE_BY_USER_ID_AND_PLACE_ID` $$
-CREATE PROCEDURE `GET_ORDERS_PAGE_BY_USER_ID_AND_PLACE_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_user` BIGINT(20), IN `id_place` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `GET_ORDERS_PAGE_BY_USER_ID_AND_PLACE_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_user` BIGINT(20), IN `id_place` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `order_list` o';
@@ -538,7 +603,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' o.date_created like ''%', `search_by`, '%'' or ');
     SET stmt = concat(stmt, ' o.date_expire like ''%', `search_by`, '%'' )');
 end if;
-
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);
 SET stmt = concat(stmt, ' order by o.date_created ', `ASC_DESC`);
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
@@ -550,7 +615,7 @@ DEALLOCATE PREPARE stm;
 END$$
 
 DROP PROCEDURE IF EXISTS `GET_ORDERS_PAGE_BY_STATUS_AND_USER_ID` $$
-CREATE PROCEDURE `GET_ORDERS_PAGE_BY_STATUS_AND_USER_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_user` BIGINT(20), IN `id_status` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `GET_ORDERS_PAGE_BY_STATUS_AND_USER_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_user` BIGINT(20), IN `id_status` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `order_list` o';
@@ -569,7 +634,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' o.date_created like ''%', `search_by`, '%'' or ');
     SET stmt = concat(stmt, ' o.date_expire like ''%', `search_by`, '%'' )');
 end if;
-
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);
 SET stmt = concat(stmt, ' order by o.date_created ', `ASC_DESC`);
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
@@ -582,7 +647,7 @@ END$$
 
 
 DROP PROCEDURE IF EXISTS `GET_ORDERS_PAGE_BY_STATUS_AND_PLACE_ID` $$
-CREATE PROCEDURE `GET_ORDERS_PAGE_BY_STATUS_AND_PLACE_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_place` BIGINT(20), IN `id_status` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), IN `SORT_BY` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `GET_ORDERS_PAGE_BY_STATUS_AND_PLACE_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_place` BIGINT(20), IN `id_status` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), IN `SORT_BY` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `order_list` o';
@@ -601,7 +666,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' o.date_created like ''%', `search_by`, '%'' or ');
     SET stmt = concat(stmt, ' o.date_expire like ''%', `search_by`, '%'' )');
 end if;
-
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);
 SET stmt = concat(stmt, ' order by ', `SORT_BY`, ' ', `ASC_DESC`);
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
@@ -613,7 +678,7 @@ DEALLOCATE PREPARE stm;
 END$$
 
 DROP PROCEDURE IF EXISTS `GET_ORDERS_PAGE_BY_PLACE_NAME` $$
-CREATE PROCEDURE `GET_ORDERS_PAGE_BY_PLACE_NAME` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `place_name` VARCHAR(255), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `GET_ORDERS_PAGE_BY_PLACE_NAME` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `place_name` VARCHAR(255), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `order_list` o';
@@ -629,7 +694,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' o.date_created like ''%', `search_by`, '%'' or ');
     SET stmt = concat(stmt, ' o.date_expire like ''%', `search_by`, '%'' )');
 end if;
-
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);
 SET stmt = concat(stmt, ' order by o.date_created ', `ASC_DESC`);
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
@@ -642,7 +707,7 @@ END$$
 
 
 DROP PROCEDURE IF EXISTS `GET_ORDERS_PAGE_BY_BOOK_ID` $$
-CREATE PROCEDURE `GET_ORDERS_PAGE_BY_BOOK_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_book` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `GET_ORDERS_PAGE_BY_BOOK_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_book` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `order_list` o';
@@ -659,7 +724,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' o.date_created like ''%', `search_by`, '%'' or ');
     SET stmt = concat(stmt, ' o.date_expire like ''%', `search_by`, '%'' )');
 end if;
-
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);
 SET stmt = concat(stmt, ' order by o.date_created ', `ASC_DESC`);
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
@@ -672,7 +737,7 @@ END$$
 
 
 DROP PROCEDURE IF EXISTS `GET_PAGE_HISTORY_ORDER` $$
-CREATE PROCEDURE `GET_PAGE_HISTORY_ORDER` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `GET_PAGE_HISTORY_ORDER` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `history_order` o';
@@ -685,7 +750,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' o.date_created like ''%', `search_by`, '%'' or ');
     SET stmt = concat(stmt, ' o.date_expire like ''%', `search_by`, '%'' )');
 end if;
-
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);
 SET stmt = concat(stmt, ' order by o.date_created ', `ASC_DESC`);
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 
@@ -698,7 +763,7 @@ END$$
 
 
 DROP PROCEDURE IF EXISTS `GET_PAGE_HISTORY_ORDER_BY_USER_ID` $$
-CREATE PROCEDURE `GET_PAGE_HISTORY_ORDER_BY_USER_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_user` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255)) BEGIN
+CREATE PROCEDURE `GET_PAGE_HISTORY_ORDER_BY_USER_ID` (IN `limit` BIGINT(20), IN `offset` BIGINT(20), IN `id_user` BIGINT(20), IN `search_by` VARCHAR(255), IN `ASC_DESC` VARCHAR(255), OUT `quantity` BIGINT(20) UNSIGNED) BEGIN
 DECLARE stmt varchar(1000);
 
 SET stmt = 'from `history_order` o';
@@ -712,7 +777,7 @@ if (`search_by` is not null) and (length(`search_by`) > 0) THEN
     SET stmt = concat(stmt, ' o.date_created like ''%', `search_by`, '%'' or ');
     SET stmt = concat(stmt, ' o.date_expire like ''%', `search_by`, '%'' )');
 end if;
-
+CALL GET_COUNT(concat('select count(*) into @q ',stmt) , quantity);
 SET stmt = concat(stmt, ' order by o.date_created ', `ASC_DESC`);
 SET stmt = concat(stmt, ' limit ', `limit`,' offset ', `offset`);
 

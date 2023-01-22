@@ -8,10 +8,7 @@ import ua.org.training.library.context.ApplicationContext;
 import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.ControllerException;
 import ua.org.training.library.exceptions.ServiceException;
-import ua.org.training.library.model.Book;
-import ua.org.training.library.model.Order;
-import ua.org.training.library.model.Status;
-import ua.org.training.library.model.User;
+import ua.org.training.library.model.*;
 import ua.org.training.library.security.SecurityService;
 import ua.org.training.library.service.*;
 import ua.org.training.library.utility.Constants;
@@ -28,6 +25,7 @@ public class NewOrder implements ControllerCommand {
     private final BookService bookService = ApplicationContext.getInstance().getBookService();
     private final PlaceService placeService = ApplicationContext.getInstance().getPlaceService();
     private final StatusService statusService = ApplicationContext.getInstance().getStatusService();
+    private final MailService mailService = ApplicationContext.getInstance().getMailService();
 
     @Override
     public String execute(HttpServletRequest request,
@@ -38,25 +36,25 @@ public class NewOrder implements ControllerCommand {
                     SecurityService.getCurrentLogin(request.getSession())
             );
             Book book = bookService.getBookById(
-                    Utility.parseLongOrDefault(request.getParameter(Constants.RequestAttributes.BOOK_ID_ATTRIBUTE),
+                    Utility.parseLongOrDefault(
+                            request.getParameter(Constants.RequestAttributes.BOOK_ID_ATTRIBUTE),
                             Constants.APP_DEFAULT_ID));
             if (book.getCount() < 1) {
                 throw new ControllerException("Book is not available");
             }
-            newOrder.setBook(
-                    book
-            );
-            newOrder.setPlace(placeService.getPlaceByName(
+            Place place = placeService.getPlaceByName(
                     Utility.parseStringOrDefault(request.getParameter(Constants.RequestAttributes.PLACE_NAME_ATTRIBUTE),
-                            Constants.APP_STRING_DEFAULT_VALUE)
-            ));
+                            Constants.APP_STRING_DEFAULT_VALUE));
             Status status = statusService.getByCode(
                     Constants.ORDER_DEFAULT_STATUS
             );
+            newOrder.setBook(book);
+            newOrder.setPlace(place);
             newOrder.setDateCreated(new Date());
             newOrder.setUser(author);
             newOrder.setStatus(status);
-            LOGGER.info("New order: " + newOrder);
+            LOGGER.info(String.format("New order created: %s", newOrder));
+            mailService.sendOrderMail(Utility.getLocale(request), newOrder);
             long id = orderService.createOrder(newOrder);
             if (id == Constants.INVALID_ID) {
                 return Links.USER_PAGE_REDIRECT_NEW_ORDER_NOT_CREATED;

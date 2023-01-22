@@ -101,6 +101,8 @@ class JDBCPlaceDaoTest {
         Mockito.when(resultSet.next()).thenReturn(true, false);
         Mockito.when(resultSet.getLong("id")).thenReturn(1L);
         Mockito.when(resultSet.getString("name")).thenReturn("name");
+        Mockito.when(callableStatement.getLong(5)).thenReturn(1L);
+
         placeDao = new JDBCPlaceDao(connection);
         Place expected = Place.builder()
                 .setId(1L)
@@ -133,6 +135,7 @@ class JDBCPlaceDaoTest {
         Mockito.when(resultSet.next()).thenReturn(false);
         expectedPage.setElementsCount(0);
         expectedPage.setData(List.of());
+        Mockito.when(callableStatement.getLong(5)).thenReturn(0L);
         assertEquals(expectedPage, placeDao.getPage(page));
 
         Mockito.doThrow(SQLException.class).when(callableStatement).executeQuery();

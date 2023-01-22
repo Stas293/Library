@@ -18,14 +18,12 @@ import java.util.Optional;
 
 public class JDBCBookDao implements BookDao {
     //language=MySQL
-    private static final String TOTAL_BOOKS_COUNT = "SELECT COUNT(*) FROM books_catalog";
-    //language=MySQL
-    private static final String PAGE_GET_BOOKS_BY_AUTHOR_ID = "CALL PAGE_GET_BOOKS_BY_AUTHOR_ID(?, ?, ?, ?, ?)";
+    private static final String PAGE_GET_BOOKS_BY_AUTHOR_ID = "CALL PAGE_GET_BOOKS_BY_AUTHOR_ID(?, ?, ?, ?, ?, ?)";
     //language=MySQL
     private static final String PAGE_GET_BOOKS_BY_AUTHOR_ID_AND_LANGUAGE =
-            "CALL PAGE_GET_BOOKS_BY_AUTHOR_ID_AND_LANGUAGE(?, ?, ?, ?, ?, ?)";
+            "CALL PAGE_GET_BOOKS_BY_AUTHOR_ID_AND_LANGUAGE(?, ?, ?, ?, ?, ?, ?)";
     //language=MySQL
-    private static final String PAGE_GET_BOOKS_BY_LANGUAGE = "CALL PAGE_GET_BOOKS_BY_LANGUAGE(?, ?, ?, ?, ?)";
+    private static final String PAGE_GET_BOOKS_BY_LANGUAGE = "CALL PAGE_GET_BOOKS_BY_LANGUAGE(?, ?, ?, ?, ?, ?)";
     //language=MySQL
     private static final String INSERT_BOOK = "INSERT INTO books_catalog (book_name, book_count, ISBN, " +
             "book_date_publication, fine_per_day, `language`) VALUES (?, ?, ?, ?, ?, ?)";
@@ -49,19 +47,18 @@ public class JDBCBookDao implements BookDao {
     private static final String PAGE_GET_BOOKS_WHICH_USER_DID_NOT_ORDER =
             "CALL PAGE_GET_BOOKS_NOT_ORDERED(?, ?, ?, ?, ?, ?)";
     //language=MySQL
-    private static final String COUNT_BOOKS_WHICH_USER_DID_NOT_ORDER =
-            "SELECT COUNT(*)  from books_catalog b where b.book_id " +
-                    "NOT IN(" +
-                    "SELECT bc.book_id FROM order_list ol " +
-                    "inner join books_catalog bc on ol.book_id=bc.book_id " +
-                    "where ol.user_id = ?) ";
+    private static final String PAGE_GET_BOOKS_COUNT_WHICH_USER_DID_NOT_ORDER =
+            "CALL PAGE_GET_BOOKS_NOT_ORDERED_COUNT(?, ?)";
     //language=MySQL
     private static final String INSERT_BOOK_AUTHOR = "INSERT INTO author_book (author_id, book_id) VALUES (?, ?)";
-    //language=MySQL
-    private static final String BOOKS_COUNT_BY_LANGUAGE = "SELECT COUNT(*) FROM books_catalog WHERE `language` = ?";
     private static final Logger LOGGER = LogManager.getLogger(JDBCBookDao.class);
+    //language=MySQL
+    private static final String COUNT_BOOKS = "CALL COUNT_BOOKS(?)";
+    //language=MySQL
+    private static final String BOOK_BY_ISBN = "SELECT * FROM books_catalog WHERE ISBN = ?";
 
     private final Connection connection;
+
     public JDBCBookDao(Connection connection) {
         this.connection = connection;
     }
@@ -73,7 +70,7 @@ public class JDBCBookDao implements BookDao {
             statement.setLong(1, page.getLimit());
             statement.setLong(2, page.getOffset());
             statement.setLong(3, authorId);
-            getUniqueBooksSortedBy(page, books, statement);
+            setCallFillPage(page, books, statement);
         } catch (SQLException e) {
             LOGGER.error(String.format("Cannot get books by author id: %s", authorId), e);
             throw new DaoException("Cannot get books by author id: " + authorId, e);
@@ -88,22 +85,7 @@ public class JDBCBookDao implements BookDao {
             statement.setLong(1, page.getLimit());
             statement.setLong(2, page.getOffset());
             statement.setString(3, language);
-            statement.setString(4, page.getSearch());
-            statement.setString(5, page.getSorting());
-            try (ResultSet resultSet = statement.executeQuery()) {
-                BookCollector bookCollector = new BookCollector();
-                while (resultSet.next()) {
-                    books.add(bookCollector.collectFromResultSet(resultSet));
-                }
-            }
-            page.setData(books);
-            try (PreparedStatement preparedStatement = connection.prepareStatement(BOOKS_COUNT_BY_LANGUAGE)) {
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        page.setElementsCount(resultSet.getLong(1));
-                    }
-                }
-            }
+            setCallFillPage(page, books, statement);
         } catch (SQLException e) {
             LOGGER.error(String.format("Cannot get books by language: %s", language), e);
             throw new DaoException("Cannot get books by language: " + language, e);
@@ -111,14 +93,28 @@ public class JDBCBookDao implements BookDao {
         return page;
     }
 
+    private void setCallFillPage(Page<Book> page, List<Book> books, CallableStatement statement) throws SQLException {
+        statement.setString(4, page.getSearch());
+        statement.setString(5, page.getSorting());
+        statement.registerOutParameter(6, Types.BIGINT);
+        try (ResultSet resultSet = statement.executeQuery()) {
+            page.setElementsCount(statement.getLong(6));
+            BookCollector bookCollector = new BookCollector();
+            while (resultSet.next()) {
+                books.add(bookCollector.collectFromResultSet(resultSet));
+            }
+        }
+        page.setData(books);
+    }
+
     @Override
     public Page<Book> getBooksSortedBy(Page<Book> page, String orderBy) {
         List<Book> books = new ArrayList<>();
-        try (CallableStatement statement = connection.prepareCall(PAGE_GET_BOOKS)){
+        try (CallableStatement statement = connection.prepareCall(PAGE_GET_BOOKS)) {
             statement.setLong(1, page.getLimit());
             statement.setLong(2, page.getOffset());
             statement.setString(3, orderBy);
-            getUniqueBooksSortedBy(page, books, statement);
+            setStatementGetBooks(page, books, statement);
         } catch (Exception e) {
             LOGGER.error(String.format("Cannot get books sorted by: %s", orderBy), e);
             throw new DaoException("Cannot get books sorted by: " + orderBy, e);
@@ -159,11 +155,12 @@ public class JDBCBookDao implements BookDao {
                     books.add(bookCollector.collectFromResultSet(resultSet));
                 }
                 page.setData(books);
-                try (PreparedStatement preparedStatement = connection.prepareStatement(COUNT_BOOKS_WHICH_USER_DID_NOT_ORDER)) {
-                    preparedStatement.setLong(1, userId);
-                    try (ResultSet resultSet1 = preparedStatement.executeQuery()) {
-                        if (resultSet1.next()) {
-                            page.setElementsCount(resultSet1.getInt(1));
+                try (PreparedStatement countStatement = connection.prepareStatement(PAGE_GET_BOOKS_COUNT_WHICH_USER_DID_NOT_ORDER)) {
+                    countStatement.setString(1, page.getSearch());
+                    countStatement.setLong(2, userId);
+                    try (ResultSet countResultSet = countStatement.executeQuery()) {
+                        if (countResultSet.next()) {
+                            page.setElementsCount(countResultSet.getLong(1));
                         }
                     }
                 }
@@ -173,6 +170,23 @@ public class JDBCBookDao implements BookDao {
             throw new DaoException("Cannot get books which user did not order: " + userId, e);
         }
         return page;
+    }
+
+    @Override
+    public Optional<Book> getBookByISBN(String isbn) {
+        try (PreparedStatement statement = connection.prepareStatement(BOOK_BY_ISBN)) {
+            statement.setString(1, isbn);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                BookCollector bookCollector = new BookCollector();
+                if (resultSet.next()) {
+                    return Optional.ofNullable(bookCollector.collectFromResultSet(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error(String.format("Cannot get book by isbn: %s", isbn), e);
+            throw new DaoException("Cannot get book by isbn: " + isbn, e);
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -237,7 +251,7 @@ public class JDBCBookDao implements BookDao {
             statement.setLong(1, page.getLimit());
             statement.setLong(2, page.getOffset());
             statement.setString(3, "book_name");
-            getUniqueBooksSortedBy(page, books, statement);
+            setStatementGetBooks(page, books, statement);
         } catch (SQLException e) {
             LOGGER.error("Cannot get books", e);
             throw new DaoException("Cannot get books", e);
@@ -245,7 +259,7 @@ public class JDBCBookDao implements BookDao {
         return page;
     }
 
-    private void getUniqueBooksSortedBy(Page<Book> page, List<Book> books, CallableStatement statement) throws SQLException {
+    private void setStatementGetBooks(Page<Book> page, List<Book> books, CallableStatement statement) throws SQLException {
         statement.setString(4, page.getSearch());
         statement.setString(5, page.getSorting());
         try (ResultSet resultSet = statement.executeQuery()) {
@@ -253,15 +267,16 @@ public class JDBCBookDao implements BookDao {
             while (resultSet.next()) {
                 books.add(bookCollector.collectFromResultSet(resultSet));
             }
-        }
-        page.setData(books);
-        try (PreparedStatement preparedStatement = connection.prepareStatement(TOTAL_BOOKS_COUNT)) {
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    page.setElementsCount(resultSet.getLong(1));
+            try (PreparedStatement preparedStatement = connection.prepareStatement(COUNT_BOOKS)) {
+                preparedStatement.setString(1, page.getSearch());
+                try (ResultSet resultSet1 = preparedStatement.executeQuery()) {
+                    if (resultSet1.next()) {
+                        page.setElementsCount(resultSet1.getLong(1));
+                    }
                 }
             }
         }
+        page.setData(books);
     }
 
     @Override
