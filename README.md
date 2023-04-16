@@ -2,6 +2,20 @@
 
 ![img.png](img.png)
 
+## Description
+
+I have created my own application context in this application. There is not Spring in this project. I have used the following technologies:
+- Java 20 (+Virtual Threads)
+- JDBC
+- PostgreSQL
+- JSP
+- JSTL
+- HTML
+- CSS
+- Bootstrap 5
+- Maven
+- Tomcat 11
+
 The reader registers in the system and then can:
 - search (by author / title);
 - place an order for a Book from the Catalog.
@@ -25,3 +39,22 @@ And also:
 - adding / deleting a book, editing information about the book;
 - create / delete librarian;
 - blocking / unblocking the user.
+
+## How to run
+
+Before you run the application please make sure to execute the SQL script from the `src/main/resources/schema.sql` file.
+The script will create the database and the necessary tables. 
+Then you have to execute the SQL script from the `src/main/resources/data.sql` file. 
+The script will insert some data into the database.
+
+1. Clone the repository
+2. Open the project in your IDE
+3. Run the project (it will bootstrap all the necessary classes and start the server on port 8080)
+4. Open the browser and go to http://localhost:8080
+5. Enjoy!
+
+## How to use
+
+1. Register a new user
+2. Log in
+3. Enjoy!
