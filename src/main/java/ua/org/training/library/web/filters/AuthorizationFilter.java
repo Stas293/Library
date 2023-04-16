@@ -1,15 +1,16 @@
 package ua.org.training.library.web.filters;
 
-import com.project.university.system_library.constants.Values;
-import com.project.university.system_library.context.annotations.Autowired;
-import com.project.university.system_library.context.annotations.Component;
-import com.project.university.system_library.security.AuthorityUser;
-import com.project.university.system_library.security.SecurityService;
+
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ua.org.training.library.constants.Values;
+import ua.org.training.library.context.annotations.Autowired;
+import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.security.AuthorityUser;
+import ua.org.training.library.security.SecurityService;
 
 import java.io.IOException;
 import java.util.Arrays;

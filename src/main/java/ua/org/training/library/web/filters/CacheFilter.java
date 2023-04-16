@@ -1,9 +1,10 @@
 package ua.org.training.library.web.filters;
 
-import com.project.university.system_library.context.annotations.Component;
+
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import ua.org.training.library.context.annotations.Component;
 
 import java.io.IOException;
 

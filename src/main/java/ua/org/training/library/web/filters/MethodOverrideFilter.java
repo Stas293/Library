@@ -1,12 +1,13 @@
 package ua.org.training.library.web.filters;
 
-import com.project.university.system_library.context.annotations.Autowired;
-import com.project.university.system_library.context.annotations.Component;
-import com.project.university.system_library.utility.mapper.HttpServletRequestMethodMapper;
+
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ua.org.training.library.context.annotations.Autowired;
+import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.utility.mapper.HttpServletRequestMethodMapper;
 
 import java.io.IOException;
 
