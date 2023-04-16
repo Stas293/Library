@@ -1,123 +1,103 @@
 package ua.org.training.library.security;
 
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import ua.org.training.library.dao.DaoFactory;
-import ua.org.training.library.dao.SecurityDao;
-import ua.org.training.library.exceptions.ConnectionDBException;
-import ua.org.training.library.exceptions.DaoException;
-import ua.org.training.library.exceptions.JDBCException;
+import lombok.extern.slf4j.Slf4j;
+import ua.org.training.library.constants.Values;
+import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.exceptions.ServiceException;
-import ua.org.training.library.utility.Constants;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
+@Component
 public class SecurityService {
-    private static final Logger LOGGER = LogManager.getLogger(SecurityService.class);
 
-    private SecurityService() {
-    }
-
-    public static AuthorityUser getAuthorityUser(HttpServletRequest request) {
+    public AuthorityUser getAuthorityUser(HttpServletRequest request) {
         return Optional.ofNullable(
                         (AuthorityUser) request.getSession()
-                                .getAttribute(Constants.RequestAttributes
-                                        .USER_ATTRIBUTE))
+                                .getAttribute(Values.USER_ATTRIBUTE))
                 .orElse(AuthorityUser.ANONYMOUS);
     }
 
     @SuppressWarnings("unchecked")
-    public static boolean checkIfUserIsLogged(HttpServletRequest request, String login) {
+    public boolean checkIfUserIsLogged(HttpServletRequest request, String login) {
         Set<String> loggedLogins = Optional.ofNullable(
                         (Set<String>) request.getServletContext()
-                                .getAttribute(Constants
-                                        .RequestAttributes
-                                        .LOGGED_USERS_SET_CONTEXT))
+                                .getAttribute(Values.LOGGED_USERS_SET_CONTEXT))
                 .orElse(new HashSet<>());
         if (loggedLogins.stream().anyMatch(login::equals)) {
-            LOGGER.info("User with login {} is already logged in", login);
+            log.info("User with login {} is already logged in", login);
             return true;
         }
         return false;
     }
 
     @SuppressWarnings("unchecked")
-    public static void addLoggedUserToContext(HttpServletRequest request, AuthorityUser authorityUser) {
+    public void addLoggedUserToContext(HttpServletRequest request, AuthorityUser authorityUser) {
         Set<String> loggedUserLogins = Optional.ofNullable(
                         (Set<String>) request.getServletContext()
-                                .getAttribute(Constants
-                                        .RequestAttributes
-                                        .LOGGED_USERS_SET_CONTEXT))
+                                .getAttribute(Values.LOGGED_USERS_SET_CONTEXT))
                 .orElse(new HashSet<>());
         loggedUserLogins.add(authorityUser.getLogin());
-        request.getSession().setAttribute(Constants.RequestAttributes.USER_ATTRIBUTE, authorityUser);
-        request.getServletContext().setAttribute(Constants.RequestAttributes.LOGGED_USERS_SET_CONTEXT, loggedUserLogins);
+        request.getSession().setAttribute(Values.USER_ATTRIBUTE, authorityUser);
+        request.getServletContext().setAttribute(Values.LOGGED_USERS_SET_CONTEXT, loggedUserLogins);
     }
 
     @SuppressWarnings("unchecked")
-    public static void updateUserDataInContext(HttpServletRequest request, AuthorityUser newAuthorityUser, AuthorityUser initialAuthorityUser) {
+    public void updateUserDataInContext(HttpServletRequest request,
+                                               AuthorityUser newAuthorityUser,
+                                               AuthorityUser initialAuthorityUser) {
         Set<String> loggedUserLogins = Optional.ofNullable(
                         (Set<String>) request.getServletContext()
-                                .getAttribute(Constants
-                                        .RequestAttributes
-                                        .LOGGED_USERS_SET_CONTEXT))
+                                .getAttribute(Values.LOGGED_USERS_SET_CONTEXT))
                 .orElse(new HashSet<>());
         loggedUserLogins.remove(initialAuthorityUser.getLogin());
         loggedUserLogins.add(newAuthorityUser.getLogin());
-        request.getSession().setAttribute(Constants.RequestAttributes.USER_ATTRIBUTE, newAuthorityUser);
-        request.getServletContext().setAttribute(Constants.RequestAttributes.LOGGED_USERS_SET_CONTEXT, loggedUserLogins);
+        request.getSession().setAttribute(Values.USER_ATTRIBUTE, newAuthorityUser);
+        request.getServletContext().setAttribute(Values.LOGGED_USERS_SET_CONTEXT, loggedUserLogins);
     }
 
     @SuppressWarnings("unchecked")
-    public static void removeLoggedUserFromSession(HttpServletRequest request, String login) {
+    public void removeLoggedUserFromSession(HttpServletRequest request, String login) {
         Set<String> loggedUserLogins = Optional.ofNullable(
                         (Set<String>) request.getServletContext()
-                                .getAttribute(Constants
-                                        .RequestAttributes
-                                        .LOGGED_USERS_SET_CONTEXT))
+                                .getAttribute(Values.LOGGED_USERS_SET_CONTEXT))
                 .orElse(new HashSet<>());
         loggedUserLogins.remove(login);
-        request.getSession().removeAttribute(Constants.RequestAttributes.USER_ATTRIBUTE);
-        request.getServletContext().setAttribute(Constants.RequestAttributes.LOGGED_USERS_SET_CONTEXT, loggedUserLogins);
+        request.getSession().removeAttribute(Values.USER_ATTRIBUTE);
+        request.getServletContext().setAttribute(Values.LOGGED_USERS_SET_CONTEXT, loggedUserLogins);
     }
 
     @SuppressWarnings("unchecked")
-    public static void removeLoggedUserFromContextAndSession(HttpSession session) throws ServiceException {
+    public void removeLoggedUserFromContextAndSession(HttpSession session) throws ServiceException {
         Set<String> loggedUserLogins = Optional.ofNullable(
                         (Set<String>)
                                 session.getServletContext()
-                                        .getAttribute(Constants
-                                                .RequestAttributes
-                                                .LOGGED_USERS_SET_CONTEXT))
+                                        .getAttribute(Values.LOGGED_USERS_SET_CONTEXT))
                 .orElse(new HashSet<>());
         AuthorityUser authorityUser = (AuthorityUser) Optional
-                .ofNullable(session.getAttribute(Constants.RequestAttributes.USER_ATTRIBUTE))
+                .ofNullable(session.getAttribute(Values.USER_ATTRIBUTE))
                 .orElseThrow(() -> new ServiceException("User not found in session"));
         loggedUserLogins.remove(authorityUser.getLogin());
-        session.removeAttribute(Constants.RequestAttributes.USER_ATTRIBUTE);
-        session.getServletContext().setAttribute(Constants.RequestAttributes.LOGGED_USERS_SET_CONTEXT, loggedUserLogins);
+        session.removeAttribute(Values.USER_ATTRIBUTE);
+        session.getServletContext().setAttribute(Values.LOGGED_USERS_SET_CONTEXT, loggedUserLogins);
     }
 
-    public static String getCurrentLogin(HttpSession session) throws ServiceException {
+    public String getCurrentLogin(HttpSession session) throws ServiceException {
         AuthorityUser authorityUser = (AuthorityUser) Optional
-                .ofNullable(session.getAttribute(Constants.RequestAttributes.USER_ATTRIBUTE))
+                .ofNullable(session.getAttribute(Values.USER_ATTRIBUTE))
                 .orElseThrow(() -> new ServiceException("User not found in session"));
         return authorityUser.getLogin();
     }
 
-    public static String getUserPassword(String login) throws ServiceException, ConnectionDBException {
-        try (SecurityDao securityDao = DaoFactory.getInstance().createSecurityDao()) {
-            return securityDao.getPasswordByLogin(login);
-        } catch (JDBCException | DaoException e) {
-            LOGGER.error(e.getMessage(), e);
-            throw new ConnectionDBException(e.getMessage(), e);
-        } catch (Exception e) {
-            LOGGER.error("Error while getting user password", e);
-            throw new ServiceException("Error while getting user password", e);
-        }
+    public boolean checkIfCurrentUserIsLogged(HttpServletRequest request) {
+        return Optional.ofNullable(
+                        (AuthorityUser) request.getSession()
+                                .getAttribute(Values.USER_ATTRIBUTE))
+                .isPresent();
     }
 }

@@ -1,6 +1,7 @@
 package ua.org.training.library.utility.page;
 
-import com.project.university.system_library.utility.page.impl.Sort;
+
+import ua.org.training.library.utility.page.impl.Sort;
 
 enum Unpaged implements Pageable {
     INSTANCE;

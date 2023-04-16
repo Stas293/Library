@@ -1,8 +1,8 @@
-var user = "users";
-var urlPath = `/library/admin/users`;
+let user = "users";
+let urlPath = `/library/admin/users`;
 
 window.onload = () => {
-    wizard(urlPath);
+    wizard(urlPath, null);
 }
 
 const makeRow = (rowData) => {

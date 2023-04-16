@@ -1,12 +1,13 @@
 package ua.org.training.library.constants.postgres_queries.impl;
 
-import com.project.university.system_library.constants.postgres_queries.AuthorQueries;
-import com.project.university.system_library.context.annotations.Autowired;
-import com.project.university.system_library.context.annotations.Component;
-import com.project.university.system_library.utility.WeakConcurrentHashMap;
-import com.project.university.system_library.utility.page.impl.Sort;
-import com.project.university.system_library.utility.query.QueryBuilder;
-import com.project.university.system_library.utility.query.QueryBuilderImpl;
+
+import ua.org.training.library.constants.postgres_queries.AuthorQueries;
+import ua.org.training.library.context.annotations.Autowired;
+import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.utility.WeakConcurrentHashMap;
+import ua.org.training.library.utility.page.impl.Sort;
+import ua.org.training.library.utility.query.QueryBuilder;
+import ua.org.training.library.utility.query.QueryBuilderImpl;
 
 import java.util.Map;
 

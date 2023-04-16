@@ -1,16 +1,17 @@
 package ua.org.training.library.utility.mapper;
 
-import com.project.university.system_library.context.annotations.Component;
-import com.project.university.system_library.dto.*;
-import com.project.university.system_library.model.Book;
-import com.project.university.system_library.model.Order;
-import com.project.university.system_library.model.Place;
-import com.project.university.system_library.security.AuthorityUser;
-import com.project.university.system_library.utility.page.Pageable;
-import com.project.university.system_library.utility.page.impl.PageRequest;
-import com.project.university.system_library.utility.page.impl.Sort;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.dto.*;
+import ua.org.training.library.model.Book;
+import ua.org.training.library.model.Order;
+import ua.org.training.library.model.Place;
+import ua.org.training.library.security.AuthorityUser;
+import ua.org.training.library.utility.page.Pageable;
+import ua.org.training.library.utility.page.impl.PageRequest;
+import ua.org.training.library.utility.page.impl.Sort;
 
 import java.time.LocalDate;
 import java.util.Objects;

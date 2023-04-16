@@ -8,7 +8,7 @@ window.onload = () => {
     document.getElementById('date_expire').setAttribute('style','display:none');
     urlPath = registeresOrders;
     setOrderListeners(urlPath);
-    wizard(urlPath);
+    wizard(urlPath, null);
 }
 
 function showUsersOrders() {
@@ -16,7 +16,7 @@ function showUsersOrders() {
     document.getElementById('date_created').setAttribute('style','display');
     urlPath = registeresOrders;
     setOrderListeners(urlPath);
-    wizard(urlPath);
+    wizard(urlPath, null);
 }
 
 function showAcceptedOrdersOnSubscription() {
@@ -24,7 +24,7 @@ function showAcceptedOrdersOnSubscription() {
     document.getElementById('date_created').setAttribute('style','display:none');
     urlPath = urlAcceptedOrders + '&placeName=On a subscription';
     setOrderListeners(urlPath);
-    wizard(urlPath);
+    wizard(urlPath, null);
 }
 
 function showAcceptedOrdersReadingRoom() {
@@ -32,7 +32,7 @@ function showAcceptedOrdersReadingRoom() {
     document.getElementById('date_created').setAttribute('style','display:none');
     urlPath = urlAcceptedOrders + '&placeName=To the reading room';
     setOrderListeners(urlPath);
-    wizard(urlPath);
+    wizard(urlPath, null);
 }
 
 const updateOrder = (hiddenDesk, rowData, hiddenId) => {

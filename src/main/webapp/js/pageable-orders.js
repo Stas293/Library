@@ -1,3 +1,4 @@
+
 const makeRow = (rowData, index) => {
     let tableRow = document.createElement('tr');
     let tableData = document.createElement('td');

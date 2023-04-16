@@ -7,15 +7,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.org.training.library.dao.*;
-import ua.org.training.library.dto.PlaceDTO;
 import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.DaoException;
 import ua.org.training.library.exceptions.JDBCException;
 import ua.org.training.library.exceptions.ServiceException;
 import ua.org.training.library.model.Place;
-import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.page.Page;
-import ua.org.training.library.utility.page.PageService;
 
 import java.sql.SQLException;
 import java.util.List;

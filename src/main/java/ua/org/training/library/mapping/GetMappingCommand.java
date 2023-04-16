@@ -1,9 +1,10 @@
 package ua.org.training.library.mapping;
 
-import com.project.university.system_library.context.HttpMapping;
-import com.project.university.system_library.context.annotations.Component;
-import com.project.university.system_library.context.annotations.Get;
-import com.project.university.system_library.enums.RequestMethod;
+
+import ua.org.training.library.context.HttpMapping;
+import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.context.annotations.Get;
+import ua.org.training.library.enums.RequestMethod;
 
 import java.lang.reflect.Method;
 

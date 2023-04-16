@@ -1,13 +1,14 @@
 package ua.org.training.library.utility.mapper;
 
-import com.project.university.system_library.context.annotations.Component;
-import com.project.university.system_library.dto.*;
-import com.project.university.system_library.model.*;
-import com.project.university.system_library.security.AuthorityUser;
-import com.project.university.system_library.utility.page.Page;
-import com.project.university.system_library.utility.page.Pageable;
-import com.project.university.system_library.utility.page.impl.PageImpl;
+
 import lombok.extern.slf4j.Slf4j;
+import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.dto.*;
+import ua.org.training.library.model.*;
+import ua.org.training.library.security.AuthorityUser;
+import ua.org.training.library.utility.page.Page;
+import ua.org.training.library.utility.page.Pageable;
+import ua.org.training.library.utility.page.impl.PageImpl;
 
 import java.time.LocalDate;
 import java.util.List;

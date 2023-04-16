@@ -1,26 +1,32 @@
 package ua.org.training.library.dao;
 
+
 import ua.org.training.library.model.Book;
 import ua.org.training.library.utility.page.Page;
+import ua.org.training.library.utility.page.Pageable;
 
+import java.sql.Connection;
 import java.util.Optional;
 
 public interface BookDao extends GenericDao<Book> {
-    Page<Book> getBooksByAuthorId(
-            Page<Book> page,
-            Long authorId);
+    Page<Book> getBooksByAuthorId(Connection connection,
+                                  Pageable page, Long authorId);
 
-    Page<Book> getBooksByLanguage(
-            Page<Book> page,
-            String language);
+    Page<Book> getBooksByLanguage(Connection connection,
+                                  Pageable page, String language);
 
-    Page<Book> getBooksSortedBy(
-            Page<Book> page,
-            String orderBy);
+    Optional<Book> getBookByOrderId(Connection connection,
+                                    Long orderId);
 
-    Optional<Book> getBookByOrderId(Long orderId);
+    Page<Book> getBooksWhichUserDidNotOrder(Connection connection,
+                                            Pageable page, Long userId);
 
-    Page<Book> getBooksWhichUserDidNotOrder(Page<Book> page, Long userId, String orderBy);
+    Page<Book> searchBooksWhichUserDidNotOrder(Connection connection, Pageable page,
+                                               Long userId, String search);
 
-    Optional<Book> getBookByISBN(String isbn);
+    Optional<Book> getBookByISBN(Connection connection,
+                                 String isbn);
+
+    Page<Book> searchBooks(Connection connection,
+                              Pageable page, String search);
 }

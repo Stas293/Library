@@ -1,14 +1,15 @@
 package ua.org.training.library.utility.mail;
 
-import com.project.university.system_library.constants.Values;
-import com.project.university.system_library.context.annotations.Autowired;
-import com.project.university.system_library.context.annotations.Component;
-import com.project.university.system_library.enums.Mail;
-import com.project.university.system_library.model.Author;
-import com.project.university.system_library.model.Order;
-import com.project.university.system_library.utility.Utility;
+
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import ua.org.training.library.constants.Values;
+import ua.org.training.library.context.annotations.Autowired;
+import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.enums.Mail;
+import ua.org.training.library.model.Order;
+import ua.org.training.library.model.Author;
+import ua.org.training.library.utility.Utility;
 
 import java.text.MessageFormat;
 import java.util.Locale;

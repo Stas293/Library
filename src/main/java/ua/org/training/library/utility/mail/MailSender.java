@@ -1,12 +1,13 @@
 package ua.org.training.library.utility.mail;
 
-import com.project.university.system_library.context.annotations.Component;
-import com.project.university.system_library.context.annotations.InjectProperty;
+
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.context.annotations.InjectProperty;
 
 import java.util.Properties;
 

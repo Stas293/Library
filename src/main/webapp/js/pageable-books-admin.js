@@ -2,7 +2,7 @@ const urlPath = `/library/books-page`;
 
 window.onload = () => {
     setBookListeners(urlPath);
-    wizard(urlPath);
+    wizard(urlPath, null);
 }
 
 const makeRow = (rowData, index) => {

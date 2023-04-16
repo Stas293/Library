@@ -4,6 +4,8 @@ let size;
 let sorting = 'asc';
 let search;
 let sortBy = 'book_name';
+let sorting_desc;
+let sorting_asc;
 
 function ajaxJS (url, callback) {
     let xhr = new XMLHttpRequest();
@@ -55,7 +57,7 @@ const makePages = i => {
     anchor.type = 'button';
     anchor.appendChild(document.createTextNode(i+1));
     anchor.onclick = () => {
-        showResults(`${urlPath}?page=${i}&limit=${size.value}&search=${search.value}&sorting=${sorting}`);
+        showResults(`${urlPath}?page=${i}&limit=${size.value}&search=${search.value}&sorting=${sorting}`, null);
     }
     return anchor;
 }
@@ -84,11 +86,11 @@ const setSize = () => {
 const addListeners = (url) => {
     sorting_desc.onclick = () => {
         sorting = sorting_desc.value;
-        showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`);
+        showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`, null);
     }
     sorting_asc.onclick = () => {
         sorting = sorting_asc.value;
-        showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`);
+        showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`, null);
     }
     size.onclick = () => {
         if (size.value < 2) {
@@ -96,15 +98,15 @@ const addListeners = (url) => {
         } else if (size.value > 8) {
             size.value = 8;
         }
-        showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}`);
+        showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}`, null);
     }
     search.onkeyup = () => {
-        showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}`);
+        showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}`, null);
     }
 }
 
 const func = (url) => {
-    showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`);
+    showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`, null);
 }
 
 const wizard = (urlPath, callback) => {
@@ -117,10 +119,10 @@ const wizard = (urlPath, callback) => {
 }
 
 function setBookListeners (url) {
-    author = document.querySelector(`#author`);
-    book_name = document.querySelector(`#book_name`);
-    isbn = document.querySelector(`#isbn`);
-    date_publication = document.querySelector(`#date_publication`);
+    let author = document.querySelector(`#author`);
+    let book_name = document.querySelector(`#book_name`);
+    let isbn = document.querySelector(`#isbn`);
+    let date_publication = document.querySelector(`#date_publication`);
     author.onclick = () => {
         sortBy = 'last_name';
         func(url);
@@ -140,11 +142,11 @@ function setBookListeners (url) {
 }
 
 function setOrderListeners (url) {
-    login = document.querySelector(`#login`);
-    book_name = document.querySelector(`#book_name`);
-    date_created = document.querySelector(`#date_created`);
-    isbn = document.querySelector(`#isbn`);
-    date_expire = document.querySelector(`#date_expire`);
+    let login = document.querySelector(`#login`);
+    let book_name = document.querySelector(`#book_name`);
+    let date_created = document.querySelector(`#date_created`);
+    let isbn = document.querySelector(`#isbn`);
+    let date_expire = document.querySelector(`#date_expire`);
     login.onclick = () => {
         sortBy = 'login';
         func(url);

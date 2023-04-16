@@ -1,9 +1,10 @@
 package ua.org.training.library.constants.postgres_queries.impl;
 
-import com.project.university.system_library.constants.postgres_queries.SecurityQueries;
-import com.project.university.system_library.context.annotations.Autowired;
-import com.project.university.system_library.context.annotations.Component;
-import com.project.university.system_library.utility.query.QueryBuilderImpl;
+
+import ua.org.training.library.constants.postgres_queries.SecurityQueries;
+import ua.org.training.library.context.annotations.Autowired;
+import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.utility.query.QueryBuilderImpl;
 
 import java.lang.ref.WeakReference;
 

@@ -1,7 +1,8 @@
 package ua.org.training.library.utility.page.impl;
 
-import com.project.university.system_library.utility.page.Page;
-import com.project.university.system_library.utility.page.Pageable;
+
+import ua.org.training.library.utility.page.Page;
+import ua.org.training.library.utility.page.Pageable;
 
 import java.util.List;
 

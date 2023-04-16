@@ -1,5 +1,8 @@
 package ua.org.training.library.dao;
 
-public interface SecurityDao extends AutoCloseable {
-    String getPasswordByLogin(String username);
+import java.sql.Connection;
+
+public interface SecurityDao {
+    String getPasswordByLogin(Connection connection,
+                              String username);
 }

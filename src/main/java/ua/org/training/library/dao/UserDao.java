@@ -1,28 +1,42 @@
 package ua.org.training.library.dao;
 
+
+import ua.org.training.library.model.Role;
 import ua.org.training.library.model.User;
 
-import java.sql.SQLException;
+import java.sql.Connection;
+import java.util.Collection;
 import java.util.Optional;
 
 public interface UserDao extends GenericDao<User> {
-    long create(User entity, String password) throws SQLException;
+    User create(Connection connection,
+                User entity, String password);
 
-    void update(User entity, String password) throws SQLException;
+    void update(Connection connection,
+                User entity, String password);
 
-    void updateData(User entity) throws SQLException;
+    Optional<User> getByLogin(Connection connection,
+                              String username);
 
-    Optional<User> getByLogin(String username);
+    Optional<User> getByEmail(Connection connection,
+                              String email);
 
-    Optional<User> getByEmail(String email);
+    Optional<User> getByPhone(Connection connection,
+                              String phone);
 
-    Optional<User> getByPhone(String phone);
+    Optional<User> getByOrderId(Connection connection,
+                                Long id);
 
-    Optional<User> getByOrderId(Long id);
+    Optional<User> getByHistoryOrderId(Connection connection,
+                                       Long id);
 
-    Optional<User> getByHistoryOrderId(Long id);
+    void disable(Connection connection,
+                 Long id);
 
-    void disable(Long id) throws SQLException;
+    void enable(Connection connection,
+                Long id);
 
-    void enable(Long id) throws SQLException;
+    void updateRolesByUserId(Connection connection,
+                             Long id,
+                             Collection<Role> roles);
 }

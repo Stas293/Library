@@ -12,7 +12,7 @@ window.onload = () => {
     });
     urlPath = urlMakeOrders;
     setBookListeners(urlPath);
-    wizard(urlPath);
+    wizard(urlPath, null);
 }
 
 const listOrderToChoose = () => {
@@ -20,7 +20,7 @@ const listOrderToChoose = () => {
     clearTextFields();
     urlPath = urlMakeOrders;
     setBookListeners(urlPath);
-    wizard(urlPath);
+    wizard(urlPath, null);
 }
 
 const listRegisteredOrders = () => {
@@ -28,7 +28,7 @@ const listRegisteredOrders = () => {
     clearTextFields();
     urlPath = urlRegisteredOrders;
     setBookListeners(urlRegisteredOrders);
-    wizard(urlRegisteredOrders);
+    wizard(urlRegisteredOrders, null);
 }
 
 const listAcceptedOrder = () => {
@@ -36,7 +36,7 @@ const listAcceptedOrder = () => {
     clearTextFields();
     urlPath = urlAcceptedOrders;
     setBookListeners(urlAcceptedOrders);
-    wizard(urlAcceptedOrders);
+    wizard(urlAcceptedOrders, null);
 }
 
 const addFormOrder = (hiddenDesk, rowData, hiddenId) => {
@@ -52,18 +52,18 @@ const addFormOrder = (hiddenDesk, rowData, hiddenId) => {
     button.className = 'btn btn-primary';
     button.innerHTML = document.getElementById('make_order').innerHTML;
 
-    var radioInput = document.createElement('input');
+    let radioInput = document.createElement('input');
     radioInput.type = 'radio';
     radioInput.name = 'placeName';
 
-    for (var i = 0; i < places.length; i++) {
-        var div = document.createElement('div');
-        var label = document.createElement('label');
-        var clone = radioInput.cloneNode(true);
-        clone.setAttribute('value', places[i].name);
-        clone.setAttribute('id', `place-${places[i].id}`);
-        label.setAttribute('for', `place-${places[i].id}`);
-        label.appendChild(document.createTextNode(places[i].data));
+    for (const element of places) {
+        const div = document.createElement('div');
+        const label = document.createElement('label');
+        const clone = radioInput.cloneNode(true)
+        clone.setAttribute('value', element.name);
+        clone.setAttribute('id', `place-${element.id}`);
+        label.setAttribute('for', `place-${element.id}`);
+        label.appendChild(document.createTextNode(element.data));
         div.appendChild(clone);
         div.appendChild(label);
         form.appendChild(div);

@@ -1,6 +1,7 @@
 package ua.org.training.library.utility.query;
 
-import com.project.university.system_library.utility.page.impl.Sort;
+
+import ua.org.training.library.utility.page.impl.Sort;
 
 public interface QueryBuilder {
     QueryBuilder select(String... columns);

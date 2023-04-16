@@ -1,6 +1,7 @@
 package ua.org.training.library.constants.postgres_queries;
 
-import com.project.university.system_library.utility.page.impl.Sort;
+
+import ua.org.training.library.utility.page.impl.Sort;
 
 public interface AuthorQueries {
     String getAuthorsByBookId();

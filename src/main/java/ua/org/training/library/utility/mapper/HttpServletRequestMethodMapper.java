@@ -1,10 +1,11 @@
 package ua.org.training.library.utility.mapper;
 
-import com.project.university.system_library.constants.Values;
-import com.project.university.system_library.context.annotations.Component;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import lombok.extern.slf4j.Slf4j;
+import ua.org.training.library.constants.Values;
+import ua.org.training.library.context.annotations.Component;
 
 @Component
 @Slf4j

@@ -1,21 +1,38 @@
 package ua.org.training.library.dao;
 
-import ua.org.training.library.exceptions.DaoException;
-import ua.org.training.library.utility.page.Page;
 
-import java.sql.SQLException;
+import ua.org.training.library.utility.page.Page;
+import ua.org.training.library.utility.page.Pageable;
+import ua.org.training.library.utility.page.impl.Sort;
+
+import java.sql.Connection;
+import java.util.List;
 import java.util.Optional;
 
-public interface GenericDao<T> extends AutoCloseable {
-    long create(T model) throws SQLException;
+public interface GenericDao<T> {
+    T create(Connection connection, T model);
 
-    Optional<T> getById(long id);
+    List<T> create(Connection connection, List<T> models);
 
-    Page<T> getPage(Page<T> page);
+    Optional<T> getById(Connection connection, long id);
 
-    void update(T entity) throws SQLException;
+    List<T> getByIds(Connection connection, List<Long> ids);
 
-    void delete(long id) throws SQLException;
+    List<T> getAll(Connection connection);
 
-    void close();
+    List<T> getAll(Connection connection, Sort sort);
+
+    Page<T> getPage(Connection connection, Pageable page);
+
+    void update(Connection connection, T entity);
+
+    void delete(Connection connection, long id);
+
+    long count(Connection conn);
+
+    void deleteAll(Connection conn);
+
+    void deleteAll(Connection conn, List<? extends Long> longs);
+
+    void update(Connection conn, List<T> entities);
 }

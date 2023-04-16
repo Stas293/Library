@@ -1,6 +1,4 @@
-
-
-const makeRow = (rowData, index, callback) => {
+const makeRow = (rowData, index) => {
     let tableRow = document.createElement('tr');
     let tableData = document.createElement('td');
     let anchor = document.createElement('a');
@@ -8,7 +6,7 @@ const makeRow = (rowData, index, callback) => {
     let hiddenId = `hidden-request-data-${index}`;
 
     if (rowData.name) {
-        tableRow.appendChild(createHiddenOrderRegisterDiv(hiddenId, rowData, callback));
+        tableRow.appendChild(createHiddenOrderRegisterDiv(hiddenId, rowData));
     } else if (rowData.book.name) {
         tableRow.appendChild(createHiddenRequestDiv(hiddenId, rowData));
     }

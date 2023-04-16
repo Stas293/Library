@@ -1,7 +1,8 @@
 package ua.org.training.library.utility.page.impl;
 
-import com.project.university.system_library.utility.page.Pageable;
-import com.project.university.system_library.utility.page.Slice;
+
+import ua.org.training.library.utility.page.Pageable;
+import ua.org.training.library.utility.page.Slice;
 
 import java.io.Serializable;
 import java.util.ArrayList;

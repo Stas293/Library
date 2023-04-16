@@ -1,7 +1,7 @@
 const urlPath = `/library/admin/authors-page`;
 
 window.onload = () => {
-    wizard(urlPath);
+    wizard(urlPath, null);
 }
 
 const makeRow = (rowData, index) => {

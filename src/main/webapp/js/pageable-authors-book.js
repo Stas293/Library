@@ -1,7 +1,7 @@
 const urlPath = `/library/admin/authors-page`;
 
 window.onload = () => {
-    wizard(urlPath);
+    wizard(urlPath, null);
 }
 
 const addAuthors = () => {
@@ -10,13 +10,13 @@ const addAuthors = () => {
     }
     let authorsList = document.getElementById("authors-list");
     let authors = [];
-    for (let i = 0; i < authorsList.children.length; i++) {
-        authors.push(authorsList.children[i].id);
+    for (const element of authorsList.children) {
+        authors.push(element.id);
     }
     let hiddenAuthors = document.createElement("input");
     hiddenAuthors.setAttribute("type", "hidden");
     hiddenAuthors.setAttribute("name", "authors");
-    hiddenAuthors.setAttribute("value", authors);
+    hiddenAuthors.setAttribute("value", authors.join(","));
     let form = document.getElementById("add-book-form");
     form.appendChild(hiddenAuthors);
 }
@@ -29,17 +29,18 @@ const makeRow = (rowData, index) => {
 
     anchor.setAttribute('href', '#');
     let authorsList = document.getElementById("authors-list");
-    for (let i = 0; i < authorsList.children.length; i++) {
-        authorsList.children[i].onmouseover = () => {
-            authorsList.children[i].style.color = "red";
-        }
-        authorsList.children[i].onmouseout = () => {
-            authorsList.children[i].style.color = "black";
-        }
-        authorsList.children[i].onclick = () => {
-            authorsList.removeChild(authorsList.children[i]);
-        }
+    for (const element of authorsList.children) {
+        element.onmouseover = () => {
+            element.style.color = "red";
+        };
+        element.onmouseout = () => {
+            element.style.color = "black";
+        };
+        element.onclick = () => {
+            authorsList.removeChild(element);
+        };
     }
+
     anchor.onclick = () => {
         let authorsList = document.getElementById("authors-list");
         if (authorsList.contains(document.getElementById(rowData.id))) {

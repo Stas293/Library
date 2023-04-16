@@ -1,15 +1,13 @@
 package ua.org.training.library.dao;
 
-import ua.org.training.library.model.Place;
-import ua.org.training.library.utility.page.Page;
 
-import java.util.List;
+import ua.org.training.library.model.Place;
+
+import java.sql.Connection;
 import java.util.Optional;
 
 public interface PlaceDao extends GenericDao<Place> {
-    Optional<Place> getByOrderId(Long id);
+    Optional<Place> getByOrderId(Connection connection, Long id);
 
-    Optional<Place> getByName(String name);
-
-    List<Place> getAll();
+    Optional<Place> getByCode(Connection connection, String name);
 }
