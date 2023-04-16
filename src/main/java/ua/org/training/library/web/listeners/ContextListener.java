@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ua.org.training.library.context.ApplicationContext;
 import ua.org.training.library.dao.impl.ConnectionPool;
+import ua.org.training.library.enums.ControllerCommandEnum;
 
 import java.sql.Connection;
 import java.sql.Driver;
@@ -23,6 +24,7 @@ public class ContextListener implements ServletContextListener {
     public void contextInitialized(jakarta.servlet.ServletContextEvent sce) {
         LOGGER.info("Context initialized");
         ApplicationContext.getInstance();
+        LOGGER.info(ControllerCommandEnum.values().length + " commands initialized");
         try {
             LOGGER.info("Initializing connection pool");
             Connection connection = ConnectionPool.getConnection();

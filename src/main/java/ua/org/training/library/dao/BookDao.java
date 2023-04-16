@@ -1,6 +1,5 @@
 package ua.org.training.library.dao;
 
-import ua.org.training.library.model.Author;
 import ua.org.training.library.model.Book;
 import ua.org.training.library.utility.page.Page;
 
