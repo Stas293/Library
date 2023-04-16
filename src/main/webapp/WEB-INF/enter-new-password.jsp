@@ -19,8 +19,12 @@
                 <li class="breadcrumb-item active"><a href="/library/login"><fmt:message key="subhead.welcome"/></a>
                 </li>
             </ol>
-            <h1><fmt:message key="user.reset.password"/></h1>
+            <h1 class="text-center mb-4"><fmt:message key="user.reset.password"/></h1>
             <form class="form-floating" method="post">
+                <c:set var="userMail" value="${requestScope.email}"/>
+                <c:if test="${not empty userMail}">
+                    <input name="email" type="hidden" value="${userMail}"/>
+                </c:if>
                 <p><fmt:message key="user.reset.all.fields"/></p>
                 <div class="mb-3">
                     <label for="password">
@@ -35,7 +39,7 @@
                     <input required name="confirmPassword" type="password" class="form-control" id="confirmPassword"/>
                     <c:set var="passwordErrors">${resetValidationError.password}</c:set>
                     <c:if test="${not empty passwordErrors}">
-                        <div class="alert alert-danger"><fmt:message key="${resetValidationError.password}"/></div>
+                        <div class="alert alert-danger">${resetValidationError.password}"</div>
                     </c:if>
                 </div>
                 <button type="submit" class="btn btn-primary">

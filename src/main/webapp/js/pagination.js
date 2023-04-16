@@ -1,170 +1,142 @@
-const defaultSizeValue = 5;
-const defaultStringValue = '';
-let size;
-let sorting = 'asc';
-let search;
-let sortBy = 'book_name';
-let sorting_desc;
-let sorting_asc;
+let defaultSizeValue = 5;
+let defaultStringValue = '';
+let size, sorting = 'ASC', search, sortBy = "", sorting_desc, sorting_asc;
 
-function ajaxJS (url, callback) {
-    let xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function(){
-        if (xhr.status === 200 && xhr.readyState === 4){
-            console.log(xhr.response);
-            console.log(JSON.parse(xhr.response));
-            callback(JSON.parse(xhr.response));
+function ajaxJS(url, callback) {
+    console.log(url);
+    let indexFirst = url.indexOf("?");
+    let lastIndexOf = url.lastIndexOf("?");
+    if (indexFirst !== lastIndexOf) {
+        url = url.substring(0, lastIndexOf) + '&' + url.substring(lastIndexOf + 1);
+    }
+    console.log(url);
+    $.ajax({
+        url: url,
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            console.log(data);
+            callback(data);
+        },
+        error: function (xhr, status, error) {
+            console.log(xhr);
+            console.log(status);
+            console.log(error);
         }
-    }
-    if (url.lastIndexOf('?') === url.indexOf('?')) {
-        xhr.open('GET', url, true);
-    } else {
-        let lastIndexOf = url.lastIndexOf('?');
-        xhr.open('GET', url.substring(0, lastIndexOf) + '&' + url.substring(lastIndexOf + 1), true);
-    }
-    xhr.send();
+    });
 }
 
-const clearTextFields = () => {
-    search = document.querySelector(`#search`);
-    search.value = defaultStringValue;
-}
-
-const clear = tag => {
-	while (tag.firstChild) {
-		tag.removeChild(tag.firstChild);
-	}
-}
-const makeHTMLRows = (data, callback) => {
-    let documentFragment = document.createDocumentFragment();
-	for(let index in data){
-	    documentFragment.appendChild(makeRow(data[index], index, callback));
-     }
+const clearTextFields = function () {
+    let querySelector = document.querySelector("#search");
+    querySelector.setAttribute("value", "");
+};
+const clear = function (tag) {
+    while (tag.firstChild) {
+        tag.removeChild(tag.firstChild);
+    }
+};
+const makeHTMLRows = function (data, callback) {
+    const documentFragment = document.createDocumentFragment();
+    data.forEach(function (rowData, index) {
+        documentFragment.appendChild(makeRow(rowData, index, callback));
+    });
     return documentFragment;
-}
-
-const makePageNavigation = pages => {
-    let documentFragment = document.createDocumentFragment();
-    for(let i = 0; i < pages; i++)
-        documentFragment.appendChild(makePages(i));
-    return documentFragment;
-}
-
-const makePages = i => {
-    let anchor = document.createElement('button');
-    anchor.setAttribute('class','btn btn-light btn-sm');
-    anchor.style.marginLeft='5px';
-    anchor.type = 'button';
-    anchor.appendChild(document.createTextNode(i+1));
-    anchor.onclick = () => {
-        showResults(`${urlPath}?page=${i}&limit=${size.value}&search=${search.value}&sorting=${sorting}`, null);
-    }
-    return anchor;
-}
-
-const showResults = (url, callback) => {
-	ajaxJS(url, (response) => {
-        let tbody = document.getElementById('pageable-list');
-        let div = document.getElementById('page-navigation');
+};
+const showResults = function (url, callback) {
+    ajaxJS(url, function (response) {
+        const tbody = document.getElementById('pageable-list');
+        const div = document.getElementById('page-navigation');
         clear(div);
         clear(tbody);
-        div.setAttribute('class','container');
+        div.setAttribute('class', 'container');
         div.style.textAlign = 'center';
-        let totalElements = response.elementsCount;
-        let pageSize = response.limit;
-        let pages = Math.ceil(totalElements/pageSize);
+        const pages = response.totalPages;
         tbody.appendChild(makeHTMLRows(response.content, callback));
         div.appendChild(makePageNavigation(pages));
-	});
-}
+    });
+};
+const makePages = function (i) {
+    const anchor = document.createElement('button');
+    anchor.setAttribute('class', 'btn btn-light btn-sm');
+    anchor.style.marginLeft = '5px';
+    anchor.type = 'button';
+    anchor.appendChild(document.createTextNode(i + 1));
+    anchor.onclick = function () {
+        let pathToRequest = `${urlPath}?page=${i}&limit=${size.value}&search=${search.value}&sorting=${sorting}`;
+        showResults(pathToRequest);
+    };
+    return anchor;
+};
+const makePageNavigation = function (pages) {
+    const documentFragment = document.createDocumentFragment();
+    for (let i = 0; i < pages; i++)
+        documentFragment.appendChild(makePages(i));
+    return documentFragment;
+};
+const addListeners = function (url) {
+    sorting_desc.onclick = function () {
+        sorting = sorting_desc.value;
+        let pathToRequest = `${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`;
+        showResults(pathToRequest);
+    };
+    sorting_asc.onclick = function () {
+        sorting = sorting_asc.value;
+        let pathToRequest = `${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`;
+        showResults(pathToRequest);
+    };
+    size.onclick = function () {
+        if (size.value < 2) {
+            size.value = 2;
+        } else if (size.value > 8) {
+            size.value = 8;
+        }
+        let pathToRequest = `${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`;
+        showResults(pathToRequest);
+    };
+    search.onkeyup = function () {
+        let pathToRequest = `${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}`;
+        showResults(pathToRequest);
+    };
+};
+const func = function (url) {
+    let pathToRequest = `${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`;
+    showResults(pathToRequest);
+};
+const wizard = function (urlPath, callback) {
+    size = document.querySelector("#size");
+    search = document.querySelector("#search");
+    sorting_desc = document.querySelector("#desc");
+    sorting_asc = document.querySelector("#asc");
+    sortBy = "";
+    addListeners(urlPath);
+    func(urlPath);
+};
 
 const setSize = () => {
     size = document.querySelector(`#size`);
     size.value = defaultSizeValue;
 }
 
-const addListeners = (url) => {
-    sorting_desc.onclick = () => {
-        sorting = sorting_desc.value;
-        showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`, null);
-    }
-    sorting_asc.onclick = () => {
-        sorting = sorting_asc.value;
-        showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`, null);
-    }
-    size.onclick = () => {
-        if (size.value < 2) {
-            size.value = 2;
-        } else if (size.value > 8) {
-            size.value = 8;
-        }
-        showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}`, null);
-    }
-    search.onkeyup = () => {
-        showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}`, null);
-    }
-}
-
-const func = (url) => {
-    showResults(`${url}?limit=${size.value}&search=${search.value}&sorting=${sorting}&sortBy=${sortBy}`, null);
-}
-
-const wizard = (urlPath, callback) => {
-    size = document.querySelector(`#size`);
-    search = document.querySelector(`#search`);
-    sorting_desc = document.querySelector(`#desc`);
-    sorting_asc = document.querySelector(`#asc`);
-    addListeners(urlPath);
-	showResults(urlPath, callback);
-}
-
-function setBookListeners (url) {
-    let author = document.querySelector(`#author`);
-    let book_name = document.querySelector(`#book_name`);
-    let isbn = document.querySelector(`#isbn`);
-    let date_publication = document.querySelector(`#date_publication`);
-    author.onclick = () => {
-        sortBy = 'last_name';
+function setBookListeners(url) {
+    const book_title = document.querySelector("#book_title");
+    const isbn = document.querySelector("#isbn");
+    const date_publication = document.querySelector("#date_publication");
+    const language = document.querySelector("#language");
+    book_title.onclick = function () {
+        sortBy = "title";
         func(url);
-    }
-    book_name.onclick = () => {
-        sortBy = 'book_name';
+    };
+    isbn.onclick = function () {
+        sortBy = "isbn";
         func(url);
-    }
-    isbn.onclick = () => {
-        sortBy = 'ISBN';
+    };
+    date_publication.onclick = function () {
+        sortBy = "date_publication";
         func(url);
-    }
-    date_publication.onclick = () => {
-        sortBy = "book_date_publication";
+    };
+    language.onclick = function () {
+        sortBy = "language";
         func(url);
-    }
-}
-
-function setOrderListeners (url) {
-    let login = document.querySelector(`#login`);
-    let book_name = document.querySelector(`#book_name`);
-    let date_created = document.querySelector(`#date_created`);
-    let isbn = document.querySelector(`#isbn`);
-    let date_expire = document.querySelector(`#date_expire`);
-    login.onclick = () => {
-        sortBy = 'login';
-        func(url);
-    }
-    book_name.onclick = () => {
-        sortBy = 'book_name';
-        func(url);
-    }
-    isbn.onclick = () => {
-        sortBy = 'ISBN';
-        func(url);
-    }
-    date_created.onclick = () => {
-        sortBy = "date_created";
-        func(url);
-    }
-    date_expire.onclick = () => {
-        sortBy = "date_expire";
-        func(url);
-    }
+    };
+    sortBy = "title";
 }

@@ -18,7 +18,7 @@
                 <li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
                 <li class="breadcrumb-item active"><a href="/library/login"><fmt:message key="subhead.welcome"/></a></li>
             </ol>
-            <h1><fmt:message key="user.reset.password"/></h1>
+            <h1 class="text-center mb-4"><fmt:message key="user.reset.password"/></h1>
             <form class="form-floating" method="post">
                 <p><fmt:message key="user.reset.all.fields"/></p>
                 <div class="mb-3">
@@ -26,9 +26,9 @@
                         <fmt:message key="user.input.email"/>
                     </label>
                     <input required name="email" type="email" class="form-control" id="email">
-                    <c:set var="emailError">${resetValidationError.email}</c:set>
+                    <c:set var="emailError">${error}</c:set>
                     <c:if test="${not empty emailError}">
-                        <div class="alert alert-danger"><fmt:message key="${resetValidationError.email}"/></div>
+                        <div class="alert alert-danger"><fmt:message key="user.email.not.exists"/></div>
                     </c:if>
                 </div>
                 <button type="submit" class="btn btn-primary">

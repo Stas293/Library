@@ -1,26 +1,26 @@
 .box-slider{
-	height: 100%;
+    height: 100%;
 }
 
 .box-slider .carousel-inner{
-	height: 100%;
+    height: 100%;
 }
 
 .first-section {
     position: relative;
     overflow: hidden;
     height: 100%;
-	vertical-align: middle;
-    background-image: url('../img/library-main.jpg');
+    vertical-align: middle;
+    background-image: url('https://images.unsplash.com/photo-1569511166187-97eb6e387e19?w=1750');
 }
 
 .first-section::before {
     content: "";
-    position: absolute;
+    position: relative;
     height: 100%;
     width: 100%;
-	top: 0;
-	left: 0;
+    top: 0;
+    left: 0;
     display: block;
     background: rgba(0,0,0,0.5);
 }
@@ -37,7 +37,7 @@
 }
 
 .first-section h2 strong{
-	color: #c76700;
+    color: #c76700;
 }
 
 .first-section .lead {
@@ -50,14 +50,14 @@
 }
 
 .box-slider .first-section{
-	display: table;
-	position: relative;
-	width: 100%;
+    display: table;
+    position: relative;
+    width: 100%;
 }
 
 .dtab{
-	display: table-cell;
-	vertical-align: middle;
+    display: table-cell;
+    vertical-align: middle;
 }
 
 #carouselExampleControls{

@@ -5,7 +5,7 @@
 <%@ taglib prefix="tag" tagdir="/WEB-INF/tags" %>
 
 <fmt:requestEncoding value="UTF-8"/>
-<fmt:setLocale value="${lang}"/>
+<fmt:setLocale value="${sessionScope.lang}"/>
 <fmt:setBundle basename="interface"/>
 
 <tag:authorization>
@@ -13,14 +13,11 @@
     	<title><fmt:message key="login.in.please"/></title>
     </jsp:attribute>
   <jsp:body>
-    <div class="container main-content">
-      <h1><fmt:message key="login.in.please"/></h1>
-      <form action="library/login" method="post">
-        <c:if test="${error}">
+    <div class="container mt-5 main-content">
+      <h1 class="text-center mb-4"><fmt:message key="login.in.please"/></h1>
+      <form action="/library/login" method="post">
+        <c:if test="${requestScope.error}">
           <div class="alert alert-danger"><fmt:message key="login.warning.alert"/></div>
-        </c:if>
-        <c:if test="${param.disabled}">
-          <div class="alert alert-danger"><fmt:message key="login.disabled.alert"/></div>
         </c:if>
         <div class="mb-3">
           <label for="login" class="form-label"><fmt:message key="login.login"/></label>

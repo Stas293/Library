@@ -1,18 +1,24 @@
 let urlPath = "";
-let urlMakeOrders = `/library/user/books-to-order`;
-const createOrderPath = `/library/user/new-order`;
-let places;
-const urlGetPlaces = `/library/get-places`;
-const urlRegisteredOrders = `/library/user/order?statusCode=REGISTER`;
-const urlAcceptedOrders = `/library/user/order?statusCode=ACCEPT`;
+let urlMakeOrders = `/library/order/user/books-to-order`;
+const urlRegisteredOrders = `/library/order/user/get-order?statusCode=REGISTER`;
+const urlAcceptedOrders = `/library/order/user/get-order?statusCode=ACCEPT`;
+const createOrderPath = `/library/order/user`;
+const urlGetOrder = `/library/order/user/view`;
 
 window.onload = () => {
-    ajaxJS(urlGetPlaces, (data) => {
-        places = data;
-    });
     urlPath = urlMakeOrders;
     setBookListeners(urlPath);
-    wizard(urlPath, null);
+    wizard(urlPath);
+}
+
+function setTableHeadersDefault() {
+    let isbn = document.querySelector(`#isbn`);
+    let date_publication = document.querySelector(`#date_publication`);
+    let language = document.querySelector(`#language`);
+
+    isbn.innerHTML = document.querySelector(`#label_ISBN`).innerHTML;
+    date_publication.innerHTML = document.querySelector(`#label_date_publication`).innerHTML;
+    language.innerHTML = document.querySelector(`#label_language`).innerHTML;
 }
 
 const listOrderToChoose = () => {
@@ -20,7 +26,18 @@ const listOrderToChoose = () => {
     clearTextFields();
     urlPath = urlMakeOrders;
     setBookListeners(urlPath);
-    wizard(urlPath, null);
+    setTableHeadersDefault();
+    wizard(urlPath);
+}
+
+function setTableHeadersGetOrder() {
+    let isbn = document.querySelector(`#isbn`);
+    let date_publication = document.querySelector(`#date_publication`);
+    let language = document.querySelector(`#language`);
+
+    isbn.innerHTML = document.querySelector(`#label_date_created`).innerHTML;
+    date_publication.innerHTML = document.querySelector(`#label_place`).innerHTML;
+    language.innerHTML = document.querySelector(`#label_fine`).innerHTML;
 }
 
 const listRegisteredOrders = () => {
@@ -28,7 +45,8 @@ const listRegisteredOrders = () => {
     clearTextFields();
     urlPath = urlRegisteredOrders;
     setBookListeners(urlRegisteredOrders);
-    wizard(urlRegisteredOrders, null);
+    setTableHeadersGetOrder();
+    wizard(urlRegisteredOrders);
 }
 
 const listAcceptedOrder = () => {
@@ -36,43 +54,117 @@ const listAcceptedOrder = () => {
     clearTextFields();
     urlPath = urlAcceptedOrders;
     setBookListeners(urlAcceptedOrders);
-    wizard(urlAcceptedOrders, null);
+    wizard(urlAcceptedOrders);
 }
 
-const addFormOrder = (hiddenDesk, rowData, hiddenId) => {
-    let form = document.createElement('form');
-    form.id = `form-${hiddenId}`;
-    let bookId = document.createElement('input');
-    bookId.name = 'id';
-    bookId.value = rowData.id;
-    bookId.style.display = 'none';
-    form.appendChild(bookId);
-    let button = document.createElement('button');
-    button.type = 'submit';
-    button.className = 'btn btn-primary';
-    button.innerHTML = document.getElementById('make_order').innerHTML;
-
-    let radioInput = document.createElement('input');
-    radioInput.type = 'radio';
-    radioInput.name = 'placeName';
-
-    for (const element of places) {
-        const div = document.createElement('div');
-        const label = document.createElement('label');
-        const clone = radioInput.cloneNode(true)
-        clone.setAttribute('value', element.name);
-        clone.setAttribute('id', `place-${element.id}`);
-        label.setAttribute('for', `place-${element.id}`);
-        label.appendChild(document.createTextNode(element.data));
-        div.appendChild(clone);
-        div.appendChild(label);
-        form.appendChild(div);
+class Book {
+    constructor(id, title, isbn, publicationDate, language, fine) {
+        this.id = id;
+        this.title = title;
+        this.isbn = isbn;
+        this.publicationDate = new Date(publicationDate);
+        this.language = language;
+        this.fine = fine;
     }
 
-    form.setAttribute('action', createOrderPath);
-    form.setAttribute('method', 'POST');
-    form.appendChild(button);
-    console.log(rowData);
-    hiddenDesk.appendChild(form);
+    static from = function (rowData) {
+        return new Book(
+            rowData.id,
+            rowData.title,
+            rowData.isbn,
+            rowData.publicationDate,
+            rowData.language,
+            rowData.fine);
+    };
 }
 
+class Order {
+    constructor(id, dateCreated, dateExpire, book, status, user, place) {
+        this.id = id;
+        this.dateCreated = dateCreated;
+        this.dateExpire = dateExpire;
+        this.book = book;
+        this.place = place;
+    }
+
+    static from = function (rowData) {
+        return new Order(
+            rowData.id,
+            rowData.dateCreated,
+            rowData.dateExpire,
+            Book.from(rowData.book),
+            Place.from(rowData.place)
+        )
+    }
+}
+
+class Place {
+    constructor(id, name, defaultDays, choosable) {
+        this.id = id;
+        this.name = name;
+        this.defaultDays = defaultDays;
+        this.choosable = choosable;
+    }
+
+    static from = function (rowData) {
+        return new Place(
+            rowData.id,
+            rowData.name,
+            rowData.defaultDays,
+            rowData.choosable);
+    }
+}
+
+
+function makeRowOrder(rowData) {
+    console.log(rowData);
+    let tableRow = document.createElement('tr');
+    let tableData = document.createElement('td');
+    let anchor = document.createElement('a');
+
+    anchor.setAttribute('href', `${urlGetOrder}/${rowData.id}`);
+    anchor.appendChild(document.createTextNode(rowData.book.title));
+    tableData.appendChild(anchor);
+    tableRow.appendChild(tableData);
+
+    tableData = document.createElement('td');
+    tableData.appendChild(document.createTextNode(rowData.dateCreated));
+    tableRow.appendChild(tableData);
+    tableData = document.createElement('td');
+    tableData.appendChild(document.createTextNode(rowData.place.name));
+    tableRow.appendChild(tableData);
+    tableData = document.createElement('td');
+    tableData.appendChild(document.createTextNode(rowData.book.fine));
+    tableRow.appendChild(tableData);
+    return tableRow;
+}
+
+const makeRow = (rowData, index) => {
+    if (urlPath === urlRegisteredOrders) {
+        return makeRowOrder(rowData);
+    }
+    rowData = Book.from(rowData);
+    console.log(rowData);
+    let tableRow = document.createElement('tr');
+    let tableData = document.createElement('td');
+    let anchor = document.createElement('a');
+
+    anchor.setAttribute('href', `${createOrderPath}/${rowData.id}`);
+    anchor.appendChild(document.createTextNode(rowData.title));
+    tableData.appendChild(anchor);
+    tableRow.appendChild(tableData);
+
+    tableData = document.createElement('td');
+    tableData.appendChild(document
+        .createTextNode(rowData.isbn));
+    tableRow.appendChild(tableData);
+    tableData = document.createElement('td');
+    tableData.appendChild(document
+        .createTextNode(rowData.publicationDate.toLocaleDateString()));
+    tableRow.appendChild(tableData);
+    tableData = document.createElement('td');
+    tableData.appendChild(document
+        .createTextNode(rowData.language));
+    tableRow.appendChild(tableData);
+    return tableRow;
+}

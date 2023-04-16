@@ -13,20 +13,10 @@
         <title>
             Library
         </title>
-        <script src="${pageContext.request.contextPath}/js/pageable-books-user.js"></script>
         <script src="${pageContext.request.contextPath}/js/pageable-book-user-onload.js"></script>
         <script src="${pageContext.request.contextPath}/js/pagination.js"></script>
     </jsp:attribute>
     <jsp:body>
-        <div id="label_ISBN" hidden="hidden"><fmt:message key="order.label.ISBN"/></div>
-        <div id="date_order" hidden="hidden"><fmt:message key="order.label.date_created"/></div>
-        <div id="authors" hidden="hidden"><fmt:message key="order.label.authors"/></div>
-        <div id="publication_date" hidden="hidden"><fmt:message key="order.label.publication_date"/></div>
-        <div id="fine" hidden="hidden"><fmt:message key="order.label.fine"/></div>
-        <div id="place" hidden="hidden" ><fmt:message key="order.label.place"/></div>
-        <div id="make_order" hidden="hidden"><fmt:message key="order.label.make_order"/></div>
-        <div id="status" hidden="hidden"><fmt:message key="order.label.status"/></div>
-        <div id="date_expire" hidden="hidden"><fmt:message key="order.label.date_expire"/></div>
         <div class="container main-content">
             <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item active"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
@@ -40,6 +30,13 @@
             <h1>
                 <fmt:message key="orderList.pageTitle"/>
             </h1>
+            <div id="label_ISBN" hidden="hidden"><fmt:message key="orderList.table.ISBN"/></div>
+            <div id="label_date_publication" hidden="hidden"><fmt:message key="orderList.table.date_publication"/></div>
+            <div id="label_language" hidden="hidden"><fmt:message key="orderList.table.language"/></div>
+            <div id="label_book_title" hidden="hidden"><fmt:message key="orderList.table.title"/></div>
+            <div id="label_date_created" hidden="hidden"><fmt:message key="orderList.table.dateCreated"/></div>
+            <div id="label_place" hidden="hidden"><fmt:message key="orderList.table.place"/></div>
+            <div id="label_fine" hidden="hidden"><fmt:message key="orderList.table.fine"/></div>
             <div class="grid-container">
                 <div class="grid-left-3">
                     <div class="list-group list-group-flush components">
@@ -68,13 +65,12 @@
                         <div id="page-navigation" class="pagination"></div>
                     </div>
                     <table class="table table-bordered table-active table-hover table-striped">
-                        <thead class="table-header table-dark">
+                        <thead class="table-header table-dark ">
                         <tr>
-                            <th id="book_name" scope="col"><fmt:message key="orderList.table.name"/></th>
+                            <th id="book_title" scope="col"><fmt:message key="orderList.table.title"/></th>
                             <th id="isbn" scope="col"><fmt:message key="orderList.table.ISBN"/></th>
-                            <th id="date_publication" scope="col"><fmt:message
-                                    key="orderList.table.date_publication"/></th>
-                            <th id="author" scope="col"><fmt:message key="orderList.table.authors"/></th>
+                            <th id="date_publication" scope="col"><fmt:message key="orderList.table.date_publication"/></th>
+                            <th id="language" scope="col"><fmt:message key="orderList.table.language"/></th>
                         </tr>
                         </thead>
                         <tbody id="pageable-list">

@@ -20,21 +20,8 @@
             </ol>
             <h1><fmt:message key="personal.edit.data"/></h1>
             <form class="form-floating" method="post">
+                <input type="hidden" name="_method" value="PUT"/>
                 <p><fmt:message key="personal.edit.data.allFieldsRequired"/></p>
-                <div class="mb-3">
-                    <label for="login">
-                        <fmt:message key="personal.edit.data.login"/>
-                    </label>
-                    <c:set var="userInfo">${account.login}</c:set>
-                    <c:if test="${not empty userInfo}">
-                        <c:set var="loginFieldValue">${account.login}</c:set>
-                    </c:if>
-                    <input required name="login" type="text" class="form-control" id="login" value=${loginFieldValue}>
-                    <c:set var="loginErrors">${errors.login}</c:set>
-                    <c:if test="${not empty loginErrors}">
-                        <div class="alert alert-danger"><fmt:message key="${errors.login}"/></div>
-                    </c:if>
-                </div>
                 <div class="mb-3">
                     <label for="firstName">
                         <fmt:message key="personal.edit.data.firstName"/>

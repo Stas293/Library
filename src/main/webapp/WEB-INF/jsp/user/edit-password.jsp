@@ -20,6 +20,7 @@
             </ol>
             <h1><fmt:message key="personal.edit.password"/></h1>
             <form class="form-floating" method="post">
+                <input type="hidden" name="_method" value="PUT"/>
                 <p><fmt:message key="personal.edit.password.allFieldsRequired"/></p>
                 <div class="mb-3">
                     <label for="password">

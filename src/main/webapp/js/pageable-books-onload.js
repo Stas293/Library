@@ -1,37 +1,51 @@
-const urlPath = `/library/books-page`;
+let urlPath = "/library/books/page";
+let books = "books";
 
-window.onload = () => {
+window.onload = function () {
     setBookListeners(urlPath);
-    wizard(urlPath, null);
+    wizard(urlPath);
+};
+
+class Book {
+    constructor(id, title, isbn, publicationDate, language) {
+        this.id = id;
+        this.title = title;
+        this.isbn = isbn;
+        this.publicationDate = new Date(publicationDate);
+        this.language = language;
+    }
+
+    static from = function (rowData) {
+        return new Book(
+            rowData.id,
+            rowData.title,
+            rowData.isbn,
+            rowData.publicationDate,
+            rowData.language);
+    };
 }
 
-const makeRow = (rowData) => {
+const makeRow = function (rowData) {
+    let book = Book.from(rowData);
+    console.log(book);
     let tableRow = document.createElement('tr');
-
     let tableData = document.createElement('td');
-    tableData.appendChild(
-        document
-            .createTextNode(rowData.name))
-    tableRow.appendChild(tableData);
-
-    tableData = document.createElement('td');
-    tableData.appendChild(
-        document
-            .createTextNode(rowData.isbn))
-    tableRow.appendChild(tableData);
-
-    tableData = document.createElement('td');
-    tableData.appendChild(
-        document
-            .createTextNode(rowData.publicationDate))
+    let anchor = document.createElement('a');
+    anchor.setAttribute('href', `${books}/${book.id}`);
+    anchor.appendChild(document.createTextNode(book.title));
+    tableData.appendChild(anchor);
     tableRow.appendChild(tableData);
     tableData = document.createElement('td');
-    tableData.style.width = '25%';
-    let authorsString = rowData.authors.map(author => `${author.firstName} ${author.lastName}`).join(', ');
-    tableData.appendChild(
-        document
-            .createTextNode(
-                authorsString))
+    tableData.appendChild(document
+        .createTextNode(book.isbn));
+    tableRow.appendChild(tableData);
+    tableData = document.createElement('td');
+    tableData.appendChild(document
+        .createTextNode(book.publicationDate.toLocaleDateString()));
+    tableRow.appendChild(tableData);
+    tableData = document.createElement('td');
+    tableData.appendChild(document
+        .createTextNode(book.language));
     tableRow.appendChild(tableData);
     return tableRow;
-}
+};

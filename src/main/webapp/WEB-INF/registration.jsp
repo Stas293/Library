@@ -14,9 +14,9 @@
         <script src="https://www.google.com/recaptcha/api.js"></script>
     </jsp:attribute>
     <jsp:body>
-        <div class="container main-content">
-            <h1><fmt:message key="newUserRegistration.pageTitle"/></h1>
-            <form method="post">
+        <div class="container mt-5 main-content">
+            <h1 class="text-center mb-4"><fmt:message key="newUserRegistration.pageTitle"/></h1>
+            <form action="/library/register" method="post">
                 <p><fmt:message key="newUserRegistration.message.allFieldsRequired"/></p>
                 <div class="mb-3">
                     <label for="login">
@@ -33,13 +33,13 @@
                     </c:if>
                 </div>
                 <div class="mb-3">
-                    <label for="password">
+                    <label for="password" class="form-label">
                         <fmt:message key="newUserRegistration.label.password"/>
                     </label>
                     <input required name="password" type="password" class="form-control" id="password"/>
                 </div>
                 <div class="mb-3">
-                    <label for="confirmPassword">
+                    <label for="confirmPassword" class="form-label">
                         <fmt:message key="newUserRegistration.label.confirmPassword"/>
                     </label>
                     <input required name="confirmPassword" type="password" class="form-control" id="confirmPassword"/>
@@ -49,7 +49,7 @@
                     </c:if>
                 </div>
                 <div class="mb-3">
-                    <label for="firstName">
+                    <label for="firstName" class="form-label">
                         <fmt:message key="newUserRegistration.label.firstName"/>
                     </label>
                     <c:set var="userInfo">${user_reg.firstName}</c:set>
@@ -64,7 +64,7 @@
                     </c:if>
                 </div>
                 <div class="mb-3">
-                    <label for="lastName">
+                    <label for="lastName" class="form-label">
                         <fmt:message key="newUserRegistration.label.lastName"/>
                     </label>
                     <c:set var="userInfo">${user_reg.lastName}</c:set>
@@ -79,7 +79,7 @@
                     </c:if>
                 </div>
                 <div class="mb-3">
-                    <label for="email">
+                    <label for="email" class="form-label">
                         <fmt:message key="newUserRegistration.label.email"/>
                     </label>
                     <c:set var="userInfo">${user_reg.email}</c:set>
@@ -93,7 +93,7 @@
                     </c:if>
                 </div>
                 <div class="mb-3">
-                    <label for="phone">
+                    <label for="phone" class="form-label">
                         <fmt:message key="newUserRegistration.label.phone"/>
                     </label>
                     <c:set var="userInfo">${user_reg.phone}</c:set>
@@ -106,7 +106,7 @@
                         <div class="alert alert-danger"><fmt:message key="${errors.phone}"/></div>
                     </c:if>
                 </div>
-                <div class="form-group">
+                <div class="form-group" class="mb-3">
                     <label hidden="hidden" id="recaptchaLabel"><fmt:message key="newUserRegistration.input.recaptcha"/></label>
                     <div class="g-recaptcha" data-sitekey="6LeBIPUjAAAAABOzDNe4GDN4WdhheYH2Oax_bdJv"></div>
                     <c:set var="captchaErrors">${errors.captcha}</c:set>

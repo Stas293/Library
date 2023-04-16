@@ -8,8 +8,8 @@
 <fmt:setLocale value="${lang}" />
 <fmt:setBundle basename="interface"/>
 
-<c:url var="editUserUrl" value="library/personal-data/edit" />
-<c:url var="editUserPasswordUrl" value="library/personal-data/editPassword" />
+<c:url var="editUserUrl" value="personal-data/edit" />
+<c:url var="editUserPasswordUrl" value="personal-data/editPassword" />
 
 <tag:authorization>
     <jsp:attribute name="head">
@@ -53,18 +53,6 @@
                         <div class="col-sm-2"><fmt:message key="user.phone" /></div>
                         <div class="col-sm-6">
                             <span>${authority.phone}</span>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-sm-2"><fmt:message key="user.dateCreated" /></div>
-                        <div class="col-sm-6">
-                            <span>${authority.dateCreated}</span>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-sm-2"><fmt:message key="user.dateUpdated" /></div>
-                        <div class="col-sm-6">
-                            <span>${authority.dateUpdated}</span>
                         </div>
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 let urlPath = ''
-const registeresOrders = `/library/librarian-order?statusCode=REGISTER`;
-const urlEditRequest = `/library/librarian/edit-order`;
-let urlAcceptedOrders = `/library/librarian-order?statusCode=ACCEPT`;
+const registeresOrders = `/library/order/librarian?statusCode=REGISTER`;
+const urlEditRequest = `/library/order/librarian/edit-order`;
+let urlAcceptedOrders = `/library/order/librarian?statusCode=ACCEPT`;
 
 
 window.onload = () => {
@@ -35,42 +35,85 @@ function showAcceptedOrdersReadingRoom() {
     wizard(urlPath, null);
 }
 
-const updateOrder = (hiddenDesk, rowData, hiddenId) => {
-    let form = document.createElement('form');
-    form.setAttribute('id',`form-${hiddenId}`);
-    let requestId = document.createElement('input');
-    requestId.setAttribute('name','id');
-    requestId.setAttribute('value', rowData.id);
-    requestId.setAttribute('style','display:none');
-    form.appendChild(requestId);
-    let select = document.createElement('select');
-    let button = document.createElement('button');
-    rowData.status.nextStatuses.map((nextStatus) => {
-        let option = document.createElement('option');
-        option.setAttribute('value', nextStatus.key);
-        option.appendChild(document.createTextNode(nextStatus.value));
-        select.appendChild(option);
-    });
-    if (rowData.chooseDateExpire === true) {
-        let input = document.createElement('input');
-        input.setAttribute('id', `input-${hiddenId}`);
-        input.setAttribute('name', 'dateExpire');
-        input.setAttribute('type', 'date');
-        input.setAttribute('min', new Date().toISOString().split('T')[0]);
-        input.required = true;
-        form.appendChild(input)
+function setOrderListeners(url) {
+    let login = document.querySelector(`#login`);
+    let book_name = document.querySelector(`#book_name`);
+    let date_created = document.querySelector(`#date_created`);
+    let isbn = document.querySelector(`#isbn`);
+    let date_expire = document.querySelector(`#date_expire`);
+    login.onclick = () => {
+        sortBy = 'login';
+        func(url);
     }
-    select.setAttribute('name', 'status');
-    select.setAttribute('id',`select-${hiddenId}`);
-    select.setAttribute('class','form-control');
-    select.setAttribute('style','background: white; margin: 10px 0; border: 1px solid #dee2e6;');
-    button.setAttribute('type', 'submit');
-    button.setAttribute('class', 'btn btn-primary');
-    button.setAttribute('style', 'margin: 10px 0;');
-    button.appendChild(document.createTextNode(document.getElementById('edit_order').innerHTML));
-    form.setAttribute('action',urlEditRequest);
-    form.setAttribute('method','POST');
-    form.appendChild(select);
-    form.appendChild(button);
-    hiddenDesk.appendChild(form);
+    book_name.onclick = () => {
+        sortBy = 'book_name';
+        func(url);
+    }
+    isbn.onclick = () => {
+        sortBy = 'ISBN';
+        func(url);
+    }
+    date_created.onclick = () => {
+        sortBy = "date_created";
+        func(url);
+    }
+    date_expire.onclick = () => {
+        sortBy = "date_expire";
+        func(url);
+    }
+}
+
+class Order {
+    constructor(dateCreated, dateExpire, book, status, user, place) {
+        this.dateCreated = new Date(dateCreated);
+        this.dateExpire = new Date(dateExpire);
+        this.book = book;
+        this.status = status;
+        this.user = user;
+        this.place = place;
+    }
+
+    static from(json) {
+        return new Order(
+            json.dateCreated,
+            json.dateExpire,
+            json.book,
+            json.status,
+            json.user,
+            json.place
+        );
+    }
+}
+
+const makeRow = (rowData) => {
+    let order = Order.from(rowData);
+    console.log(rowData);
+    let tableRow = document.createElement('tr');
+    let tableData = document.createElement('td');
+    let anchor = document.createElement('a');
+
+    anchor.setAttribute('href', `${urlEditRequest}/${rowData.id}`);
+    anchor.appendChild(document.createTextNode(order.user.login));
+    tableData.appendChild(anchor);
+    tableRow.appendChild(tableData);
+
+    tableData = document.createElement('td');
+    tableData.appendChild(
+        document
+            .createTextNode(order.book.title));
+    tableRow.appendChild(tableData);
+
+    tableData = document.createElement('td');
+    tableData.appendChild(
+        document
+            .createTextNode(order.dateCreated.toDateString()));
+    tableRow.appendChild(tableData);
+    tableData = document.createElement('td');
+
+    tableData.appendChild(
+        document
+            .createTextNode(
+                order.book.isbn));
+    tableRow.appendChild(tableData);
+    return tableRow;
 }

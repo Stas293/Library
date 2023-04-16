@@ -18,7 +18,6 @@
         </title>
         <script src="${pageContext.request.contextPath}/js/pagination.js"></script>
         <script src="${pageContext.request.contextPath}/js/pageable-librarian-orders.js"></script>
-        <script src="${pageContext.request.contextPath}/js/pageable-orders.js"></script>
     </jsp:attribute>
     <jsp:body>
         <div id="label_ISBN" hidden="hidden"><fmt:message key="order.label.ISBN"/></div>

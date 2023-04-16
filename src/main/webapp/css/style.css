@@ -10,16 +10,6 @@ body{
     color: #494949;
 }
 
-td, th {
-    height: 40px;
-    position: relative;
-    overflow: hidden;
-    display: inline-block;
-    width: 25%;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
 
 .library-login-logout-btn {
     text-underline-mode: none;

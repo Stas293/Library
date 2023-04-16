@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -8,7 +8,6 @@
 
 <fmt:setLocale value="${sessionScope.lang}"/>
 <fmt:setBundle basename="interface"/>
-
 
 <t:authorization>
     <jsp:attribute name="head">
@@ -19,9 +18,9 @@
     </jsp:attribute>
     <jsp:body>
         <div class="container main-content">
-            <div id="carouselExampleControls" class="carousel box-slider">
+            <div id="carouselExampleControls" class="box-slider">
                 <div class="carousel-inner" role="listbox">
-                    <div id="home" class="first-section">
+                    <div class="first-section">
                         <div class="dtab">
                             <div class="container">
                                 <div class="col-md-12 col-sm-12">

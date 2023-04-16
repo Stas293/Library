@@ -21,7 +21,6 @@
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/error.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Serif+Pro:400,600,700">
-    <link rel="icon" href="${pageContext.request.contextPath}/bookshelf.ico" type="image/x-icon">
 </head>
 <body>
 <header>
@@ -42,36 +41,50 @@
                         <fmt:message key="app.books"/>
                     </a>
                     <authorization-role:authority role="isNonAuthorized()">
-                        <a class="nav-item nav-link" href="/library/registration">
+                        <a class="nav-item nav-link" href="/library/register">
                             <fmt:message key="app.registration"/>
                         </a>
                     </authorization-role:authority>
                     <authorization-role:authority role="hasRole('ADMIN')">
-                        <a class="nav-item nav-link" href="/library/admin/page">
-                            <fmt:message key="app.pageTitle.manage-users"/>
-                        </a>
-                        <a class="nav-item nav-link" href="/library/admin/books">
-                            <fmt:message key="app.pageTitle.manage-books"/>
-                        </a>
-                        <a class="nav-item nav-link" href="/library/admin/authors">
-                            <fmt:message key="app.pageTitle.manage-authors"/>
-                        </a>
+                        <div class="navbar-nav dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <fmt:message key="app.pageTitle.admin"/>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li class="nav-item nav-link">
+                                    <a class="dropdown-item" href="/library/admin/page">
+                                        <fmt:message key="app.pageTitle.manage-users"/>
+                                    </a>
+                                </li>
+                                <li class="nav-item nav-link">
+                                    <a class="dropdown-item" href="/library/admin/books">
+                                        <fmt:message key="app.pageTitle.manage-books"/>
+                                    </a>
+                                </li>
+                                <li class="nav-item nav-link">
+                                    <a class="dropdown-item" href="/library/admin/authors">
+                                        <fmt:message key="app.pageTitle.manage-authors"/>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </authorization-role:authority>
                     <authorization-role:authority role="hasRole('LIBRARIAN')">
-                        <a class="nav-item nav-link" href="/library/librarian/page">
+                        <a class="nav-item nav-link" href="/library/order/librarian/page">
                             <fmt:message key="app.pageTitle.librarian"/>
                         </a>
                     </authorization-role:authority>
                     <authorization-role:authority role="hasRole('USER')">
-                        <a class="nav-item nav-link" href="/library/user/page">
+                        <a class="nav-item nav-link" href="/library/order/user/page">
                             <fmt:message key="app.pageTitle.user"/>
                         </a>
-                        <a class="nav-item nav-link" href="/library/user/history">
+                        <a class="nav-item nav-link" href="/library/user/history/page">
                             <fmt:message key="app.pageTitle.history"/>
                         </a>
                     </authorization-role:authority>
                     <authorization-role:authority role="isAuthorized()">
-                        <a class="nav-item nav-link" href="/library/personal-data">
+                        <a class="nav-item nav-link" href="/library/user/personal-data">
                             <fmt:message key="app.pagePersonal"/>
                         </a>
                     </authorization-role:authority>
@@ -81,7 +94,7 @@
             <div class="navbar-nav dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
                    aria-expanded="false">
-                    EN/УКР
+                    <fmt:message key="app.lang"/>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <li class="nav-item nav-link">
@@ -97,7 +110,7 @@
                 </ul>
             </div>
 
-            <div class="navbar-nav">
+            <ul class="navbar-nav">
                 <li class="nav-item nav-link">
                     <authorization-role:authority role="isNonAuthorized()">
                         <div class="library-sessionInfo">
@@ -118,7 +131,7 @@
                         </div>
                     </authorization-role:authority>
                 </li>
-            </div>
+            </ul>
         </div>
     </nav>
 </header>
@@ -126,9 +139,7 @@
     <jsp:doBody/>
 </div>
 <footer class="footer">
-    <div class="container">
-        <p class="text-center text-uppercase text-muted">&copy;<fmt:message key="app.footer"/></p>
-    </div>
+    <p class="text-center text-uppercase text-muted">&copy;<fmt:message key="app.footer"/></p>
 </footer>
 </body>
 </html>
