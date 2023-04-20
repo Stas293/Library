@@ -5,18 +5,18 @@ import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode
-public class ResetValidationError {
-    private String code;
+public class LoggedUserUpdatePasswordFormValidationError {
+    private String oldPassword;
     private String password;
     private String confirmPassword;
     private boolean containsErrors = false;
 
-    public String getCode() {
-        return code;
+    public String getOldPassword() {
+        return oldPassword;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setOldPassword(String oldPassword) {
+        this.oldPassword = oldPassword;
         this.containsErrors = true;
     }
 

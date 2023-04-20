@@ -3,7 +3,7 @@ package ua.org.training.library.web;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.constants.Values;
+import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.context.HttpMapping;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.context.annotations.ControllerFactoryAnnotation;
@@ -22,7 +22,7 @@ public class ControllerFactory implements Serializable {
     private final Pattern patternParams = Pattern.compile("\\?.*");
 
     public HttpMapping getControllerCommand(String httpMethod, String httpPath) {
-        httpPath = httpPath.replace(Values.LIBRARY_PATH, "");
+        httpPath = httpPath.replace(DefaultValues.LIBRARY_PATH.getValue(), "");
         if (patternId.matcher(httpPath).find()) {
             httpPath = httpPath.replaceAll("\\d+", "{id}");
         }

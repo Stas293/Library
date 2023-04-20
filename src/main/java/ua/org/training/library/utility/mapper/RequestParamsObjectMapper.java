@@ -148,4 +148,12 @@ public class RequestParamsObjectMapper {
                 .lastName(request.getParameter("lastName"))
                 .build();
     }
+
+    public UserLoggedUpdatePasswordDto collectFromEditPasswordForm(HttpServletRequest request) {
+        return UserLoggedUpdatePasswordDto.builder()
+                .oldPassword(request.getParameter("oldPassword"))
+                .password(request.getParameter("password"))
+                .confirmPassword(request.getParameter("confirmPassword"))
+                .build();
+    }
 }

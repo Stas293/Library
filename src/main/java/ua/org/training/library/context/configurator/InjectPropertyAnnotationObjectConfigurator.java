@@ -3,7 +3,7 @@ package ua.org.training.library.context.configurator;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.constants.Values;
+import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.context.AnnotationConfigApplicationContext;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.context.annotations.InjectProperty;
@@ -27,7 +27,7 @@ public class InjectPropertyAnnotationObjectConfigurator implements ObjectConfigu
         log.info("Initializing properties");
         ResourceBundle bundle = ResourceBundle.getBundle(
                 APP_PROPERTIES_NAME,
-                Locale.of(Values.APP_DEFAULT_LOCALE));
+                Locale.of(DefaultValues.APP_DEFAULT_LOCALE.getValue()));
         propertiesMap = bundle.keySet().stream()
                 .map(key -> Map.entry(key, getEnvOrProperty(bundle.getString(key))))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

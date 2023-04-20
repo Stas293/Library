@@ -21,6 +21,7 @@ import ua.org.training.library.utility.mapper.RequestParamsObjectMapper;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
 
+import java.util.Locale;
 import java.util.Optional;
 
 @Controller("/books")
@@ -44,7 +45,8 @@ public class BookController {
         log.info("Get books page");
         Pageable pageable = requestParamsObjectMapper.getPageable(request);
         String search = request.getParameter("search");
-        Page<BookDto> bookDtoPage = bookService.searchBooks(pageable, search);
+        Locale locale = Utility.getLocale(request);
+        Page<BookDto> bookDtoPage = bookService.searchBooks(pageable, locale, search);
         jsonMapper.toJson(response.getWriter(), bookDtoPage);
         return "";
     }
@@ -53,7 +55,8 @@ public class BookController {
     public String getBookById(HttpServletRequest request, HttpServletResponse response) {
         log.info("Get book by id");
         long id = Utility.getIdFromUri(request);
-        Optional<BookDto> bookDto = bookService.getBookById(id);
+        Locale locale = request.getLocale();
+        Optional<BookDto> bookDto = bookService.getBookById(id, locale);
         if (bookDto.isPresent()) {
             request.setAttribute("book", bookDto.get());
             return "/WEB-INF/book.jsp";
@@ -71,7 +74,8 @@ public class BookController {
     public String getAdminBookById(HttpServletRequest request, HttpServletResponse response) {
         log.info("Get admin book by id");
         long id = Utility.getIdFromUri(request);
-        Optional<BookDto> bookDto = bookService.getBookById(id);
+        Locale locale = Utility.getLocale(request);
+        Optional<BookDto> bookDto = bookService.getBookById(id, locale);
         if (bookDto.isPresent()) {
             request.setAttribute("book", bookDto.get());
             return "/WEB-INF/jsp/admin/book.jsp";

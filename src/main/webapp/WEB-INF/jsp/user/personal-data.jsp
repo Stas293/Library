@@ -9,7 +9,7 @@
 <fmt:setBundle basename="interface"/>
 
 <c:url var="editUserUrl" value="personal-data/edit" />
-<c:url var="editUserPasswordUrl" value="personal-data/editPassword" />
+<c:url var="editUserPasswordUrl" value="personal-data/password" />
 
 <tag:authorization>
     <jsp:attribute name="head">

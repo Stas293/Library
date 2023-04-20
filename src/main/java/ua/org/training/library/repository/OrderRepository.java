@@ -6,6 +6,7 @@ import ua.org.training.library.repository.base.JRepository;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -27,4 +28,6 @@ public interface OrderRepository extends JRepository<Order, Long> {
     Page<Order> getPageByStatusAndPlace(Pageable page, Status statusOrder, Place placeOrder);
 
     Optional<Order> findOrderByUserIdAndBookId(Long authorityUserId, long bookId);
+
+    List<Order> findOrdersByBookId(long id);
 }

@@ -461,6 +461,21 @@ public class OrderDaoImpl implements OrderDao {
         }
     }
 
+    @Override
+    public List<Order> getOrdersByBookId(Connection conn, long id) {
+        log.info("Getting orders by book id: {}", id);
+        try (PreparedStatement ps = conn.prepareStatement(
+                orderQueries.getSelectByBookIdQuery())) {
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return orderCollector.collectList(rs);
+            }
+        } catch (SQLException e) {
+            log.error("Error getting orders by book id: {}", id, e);
+            throw new DaoException("Error getting orders by book id: " + id, e);
+        }
+    }
+
     private long countByStatusAndPlace(Connection conn, Long statusOrderId, Long placeOrderId) {
         log.info("Counting orders by status id: {} and place id: {}", statusOrderId, placeOrderId);
         try (PreparedStatement ps = conn.prepareStatement(

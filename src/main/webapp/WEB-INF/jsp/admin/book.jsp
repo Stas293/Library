@@ -49,12 +49,20 @@
                         <fmt:message key="book.keywords"/>:
                             ${book.keywords}
                     </div>
-                    <a href="${pageContext.request.contextPath}/library/books/admin/${book.id}/edit" class="btn btn-primary">
-                        <fmt:message key="admin.edit"/>
-                    </a>
+                    <form method="get" action="${pageContext.request.contextPath}/library/books/admin/${book.id}/edit">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <span><fmt:message key="admin.edit"/></span>
+                            </button>
+                        </div>
+                    </form>
                     <form action="${pageContext.request.contextPath}/library/books/admin/${book.id}" method="post">
                         <input type="hidden" name="_method" value="DELETE"/>
-                        <input type="submit" class="btn btn-danger" value="<fmt:message key="admin.delete"/>"/>
+                        <div class="form-group">
+                        <button type="submit" id="form-submit" class="btn btn-danger">
+                            <span><fmt:message key="admin.delete"/></span>
+                        </button>
+                        </div>
                     </form>
                 </div>
             </div>

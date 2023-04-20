@@ -300,20 +300,20 @@ class BookServiceTest {
         Mockito.when(authorDao.getAuthorsByBookId(id)).thenReturn(List.of(new Author(1L, "name", "surname")));
         Mockito.when(daoFactory.createBookDao()).thenReturn(bookDao);
         bookService = new BookService(daoFactory);
-        Book result = bookService.getBookById(id);
+        Book result = bookService.getBookById(id, locale);
         assertEquals(book, result);
         Mockito.when(bookDao.getById(id)).thenReturn(Optional.empty());
         Mockito.when(daoFactory.createBookDao()).thenReturn(bookDao);
         bookService = new BookService(daoFactory);
-        assertThrows(ServiceException.class, () -> bookService.getBookById(id));
+        assertThrows(ServiceException.class, () -> bookService.getBookById(id, locale));
         daoFactory = Mockito.mock(DaoFactory.class);
         Mockito.when(daoFactory.createBookDao()).thenThrow(JDBCException.class);
         bookService = new BookService(daoFactory);
-        assertThrows(ConnectionDBException.class, () -> bookService.getBookById(id));
+        assertThrows(ConnectionDBException.class, () -> bookService.getBookById(id, locale));
         daoFactory = Mockito.mock(DaoFactory.class);
         Mockito.when(daoFactory.createBookDao()).thenThrow(DaoException.class);
         bookService = new BookService(daoFactory);
-        assertThrows(ServiceException.class, () -> bookService.getBookById(id));
+        assertThrows(ServiceException.class, () -> bookService.getBookById(id, locale));
     }
 
     @Test

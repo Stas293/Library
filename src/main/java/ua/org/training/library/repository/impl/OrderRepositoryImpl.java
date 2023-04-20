@@ -209,6 +209,13 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public List<Order> findOrdersByBookId(long id) {
+        log.info("Getting orders by book id: {}", id);
+        Connection conn = transactionManager.getConnection();
+        return orderDao.getOrdersByBookId(conn, id);
+    }
+
+    @Override
     public boolean existsById(Long aLong) {
         log.info("Checking if order exists by id: {}", aLong);
         Connection conn = transactionManager.getConnection();

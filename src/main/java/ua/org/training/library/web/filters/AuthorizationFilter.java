@@ -1,16 +1,18 @@
 package ua.org.training.library.web.filters;
 
 
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.constants.Values;
+import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.security.AuthorityUser;
 import ua.org.training.library.security.SecurityService;
+import ua.org.training.library.service.RoleService;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -18,9 +20,16 @@ import java.util.Objects;
 
 @Slf4j
 @Component
-@AllArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AuthorizationFilter implements Filter {
     private final SecurityService securityService;
+    private final RoleService roleService;
+    private String[] CODE_ROLES;
+
+    @PostConstruct
+    public void init() {
+        CODE_ROLES = roleService.findAllCode();
+    }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
@@ -43,13 +52,13 @@ public class AuthorizationFilter implements Filter {
             log.debug(String.format("User %s has no access to %s", authorityUser, path));
             res.sendError(HttpServletResponse.SC_FORBIDDEN);
             securityService.removeLoggedUserFromSession(req, Objects.requireNonNull(authorityUser).getLogin());
-            req.setAttribute(Values.APP_MESSAGE_ATTRIBUTE,
-                    Values.BUNDLE_ACCESS_DENIED_MESSAGE);
+            req.setAttribute(DefaultValues.APP_MESSAGE_ATTRIBUTE.getValue(),
+                    DefaultValues.BUNDLE_ACCESS_DENIED_MESSAGE.getValue());
         } else filterChain.doFilter(req, res);
     }
 
     private boolean checkAccess(String path, AuthorityUser authorityUser) {
-        return Arrays.stream(Values.APP_ROLES)
+        return Arrays.stream(CODE_ROLES)
                 .filter(role -> path.contains(role.toLowerCase()))
                 .findFirst()
                 .map(role -> authorityUser != null &&

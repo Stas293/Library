@@ -2,6 +2,7 @@ package ua.org.training.library.service;
 
 
 import ua.org.training.library.dto.*;
+import ua.org.training.library.form.LoggedUserUpdatePasswordFormValidationError;
 import ua.org.training.library.form.PersonalEditFormValidationError;
 import ua.org.training.library.form.RegistrationFormValidation;
 import ua.org.training.library.form.ResetValidationError;
@@ -44,4 +45,7 @@ public interface UserService {
     Optional<UserManagementDto> getUserManagementDtoById(Long id);
 
     Optional<UserDto> deleteUserById(Long id);
+
+    LoggedUserUpdatePasswordFormValidationError updatePassword(UserLoggedUpdatePasswordDto userFromRequest,
+                                                               AuthorityUser authorityUser);
 }

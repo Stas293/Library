@@ -2,7 +2,7 @@ package ua.org.training.library.security;
 
 
 import lombok.EqualsAndHashCode;
-import ua.org.training.library.constants.Values;
+import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.model.Role;
 import ua.org.training.library.model.User;
 
@@ -11,7 +11,7 @@ import java.util.HashSet;
 
 @EqualsAndHashCode(callSuper = true)
 public class AuthorityUser extends User {
-    public static final AuthorityUser ANONYMOUS = new AuthorityUser(Values.APP_UNAUTHORIZED_USER);
+    public static final AuthorityUser ANONYMOUS = new AuthorityUser(DefaultValues.APP_UNAUTHORIZED_USER.getValue());
     
     private AuthorityUser(String login) {
         super(login);

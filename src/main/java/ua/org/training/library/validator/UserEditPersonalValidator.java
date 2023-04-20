@@ -1,9 +1,7 @@
 package ua.org.training.library.validator;
 
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.enums.Patterns;
 import ua.org.training.library.enums.Validation;
@@ -14,7 +12,6 @@ import java.util.regex.Pattern;
 
 @Component
 @Slf4j
-@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class UserEditPersonalValidator {
 
     public PersonalEditFormValidationError validation(User user) {

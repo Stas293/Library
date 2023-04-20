@@ -4,7 +4,7 @@ package ua.org.training.library.utility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.constants.Values;
+import ua.org.training.library.enums.DefaultValues;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -22,8 +22,8 @@ public class Utility {
         try {
             return Double.parseDouble(applicationProperty);
         } catch (NumberFormatException e) {
-            log.error( String.format("Number format exception %s", applicationProperty));
-            log.info( String.format("Setting default value %s", defaultValue));
+            log.error(String.format("Number format exception %s", applicationProperty));
+            log.info(String.format("Setting default value %s", defaultValue));
         }
         return defaultValue;
     }
@@ -32,8 +32,8 @@ public class Utility {
         try {
             return Integer.parseInt(applicationProperty);
         } catch (NumberFormatException e) {
-            log.error( String.format("Number format exception %s", applicationProperty));
-            log.info( String.format("Setting default value %s", defaultValue));
+            log.error(String.format("Number format exception %s", applicationProperty));
+            log.info(String.format("Setting default value %s", defaultValue));
         }
         return defaultValue;
     }
@@ -42,8 +42,8 @@ public class Utility {
         try {
             return Long.parseLong(applicationProperty);
         } catch (NumberFormatException e) {
-            log.error( String.format("Number format exception %s", applicationProperty));
-            log.info( String.format("Setting default value %s", defaultValue));
+            log.error(String.format("Number format exception %s", applicationProperty));
+            log.info(String.format("Setting default value %s", defaultValue));
         }
         return defaultValue;
     }
@@ -54,24 +54,17 @@ public class Utility {
 
     public static String getBundleInterface(Locale locale, String bundleValue) {
         ResourceBundle bundle = ResourceBundle.getBundle(
-                Values.BUNDLE_NAME,
+                DefaultValues.BUNDLE_NAME.getValue(),
                 locale);
         return bundle.getString(bundleValue);
     }
 
-    public static String getLocaleFine(Locale locale, double fine) {
-        double exchangeRate = Utility.tryParseDouble(
+    public static double getLocaleFine(Locale locale, double fine) {
+        double exchangeRate = Double.parseDouble(
                 Utility.getBundleInterface(
                         locale,
-                        Values.BUNDLE_CURRENCY_EXCHANGE),
-                Values.DEFAULT_CURRENCY_EXCHANGE);
-        return fine * exchangeRate + " " + Utility.getBundleInterface(locale, Values.BUNDLE_CURRENCY);
-    }
-
-    public static String getLanguage(Locale locale) {
-        return getBundleInterface(
-                locale,
-                Values.BUNDLE_LANGUAGE_FOR_BOOK);
+                        DefaultValues.BUNDLE_CURRENCY_EXCHANGE.getValue()));
+        return Math.round(fine * exchangeRate * 100.0) / 100.0;
     }
 
     public static String getStringParameter(String getProperty, String defaultProperty) {
@@ -82,8 +75,8 @@ public class Utility {
         return Locale.of(
                 parseStringOrDefault(
                         (String) request.getSession()
-                                .getAttribute(Values.APP_LANG_ATTRIBUTE),
-                        Values.APP_DEFAULT_LANGUAGE));
+                                .getAttribute(DefaultValues.APP_LANG_ATTRIBUTE.getValue()),
+                        DefaultValues.APP_DEFAULT_LANGUAGE.getValue()));
     }
 
     public static long getIdFromUri(HttpServletRequest request) {

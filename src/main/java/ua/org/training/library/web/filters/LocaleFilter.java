@@ -4,7 +4,7 @@ package ua.org.training.library.web.filters;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.constants.Values;
+import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.context.annotations.Component;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class LocaleFilter implements Filter {
             throws IOException, ServletException {
         log.debug("Locale filter");
         HttpServletRequest req = (HttpServletRequest) request;
-        String lang = Values.APP_LANG_ATTRIBUTE;
+        String lang = DefaultValues.APP_LANG_ATTRIBUTE.getValue();
         log.debug(String.format("locale was: %s", req.getSession().getAttribute(lang)));
         if (req.getParameter(lang) != null &&
                 !req.getParameter(lang).equals(req.getSession().getAttribute(lang))) {

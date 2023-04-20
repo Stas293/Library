@@ -16,26 +16,40 @@
         <div class="container main-content">
             <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
-                <li class="breadcrumb-item active"><a href="/library/personal-data"><fmt:message key="personal.pageTitle"/></a></li>
+                <li class="breadcrumb-item active"><a href="/library/user/personal-data"><fmt:message key="personal.pageTitle"/></a></li>
             </ol>
             <h1><fmt:message key="personal.edit.password"/></h1>
             <form class="form-floating" method="post">
                 <input type="hidden" name="_method" value="PUT"/>
                 <p><fmt:message key="personal.edit.password.allFieldsRequired"/></p>
                 <div class="mb-3">
-                    <label for="password">
+                    <label for="oldPassword">
                         <fmt:message key="personal.edit.password.check"/>
                     </label>
+                    <input required name="oldPassword" type="password" class="form-control" id="oldPassword"/>
+                    <c:set var="oldPasswordError">${errors.oldPassword}</c:set>
+                    <c:if test="${not empty oldPasswordError}">
+                        <div class="alert alert-danger"><fmt:message key="${errors.oldPassword}"/></div>
+                    </c:if>
+                </div>
+                <div class="mb-3">
+                    <label for="password">
+                        <fmt:message key="personal.edit.password.new"/>
+                    </label>
                     <input required name="password" type="password" class="form-control" id="password"/>
+                    <c:set var="passwordError">${errors.password}</c:set>
+                    <c:if test="${not empty passwordError}">
+                        <div class="alert alert-danger"><fmt:message key="${errors.password}"/></div>
+                    </c:if>
                 </div>
                 <div class="mb-3">
                     <label for="confirmPassword">
                         <fmt:message key="personal.edit.password.confirmPassword"/>
                     </label>
                     <input required name="confirmPassword" type="password" class="form-control" id="confirmPassword"/>
-                    <c:set var="passwordErrors">${errors.password}</c:set>
-                    <c:if test="${not empty passwordErrors}">
-                        <div class="alert alert-danger"><fmt:message key="${errors.password}"/></div>
+                    <c:set var="confirmPasswordError">${errors.confirmPassword}</c:set>
+                    <c:if test="${not empty confirmPasswordError}">
+                        <div class="alert alert-danger"><fmt:message key="${errors.confirmPassword}"/></div>
                     </c:if>
                 </div>
                 <button type="submit" class="btn btn-primary">

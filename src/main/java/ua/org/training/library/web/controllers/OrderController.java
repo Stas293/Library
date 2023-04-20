@@ -52,10 +52,12 @@ public class OrderController {
         log.info("Get books to order");
         Pageable pageable = requestParamsObjectMapper.getPageable(request);
         String search = request.getParameter("search");
+        Locale locale = Utility.getLocale(request);
         Page<BookDto> bookPage = bookService.searchBooksExceptUserOrders(
                 pageable,
                 securityService.getAuthorityUser(request),
-                search
+                search,
+                locale
         );
         jsonMapper.toJson(response.getWriter(), bookPage);
         return "";
@@ -86,7 +88,7 @@ public class OrderController {
         Locale locale = Utility.getLocale(request);
         long id = Utility.getIdFromUri(request);
         AuthorityUser authorityUser = securityService.getAuthorityUser(request);
-        Optional<BookDto> bookDto = bookService.getBookById(id, authorityUser);
+        Optional<BookDto> bookDto = bookService.getBookById(id, locale, authorityUser);
         if (bookDto.isPresent()) {
             request.setAttribute("book", bookDto.get());
             List<PlaceDto> placeDtos = placeService.getAllPlaces(locale);

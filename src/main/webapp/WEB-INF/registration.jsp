@@ -114,9 +114,11 @@
                         <div class="alert alert-danger"><fmt:message key="${errors.captcha}"/></div>
                     </c:if>
                 </div>
-                <button type="submit" class="btn btn-primary">
-                    <fmt:message key="newUserRegistration.label.submit"/>
-                </button>
+                <div class="form-group">
+                    <button type="submit" id="form-submit" class="btn btn-primary">
+                        <fmt:message key="newUserRegistration.label.submit"/>
+                    </button>
+                </div>
             </form>
         </div>
         <script type="text/javascript">

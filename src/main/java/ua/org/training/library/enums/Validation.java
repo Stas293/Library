@@ -9,7 +9,8 @@ public enum Validation {
     DUPLICATE_FIELD_ERROR("This field already exists"),
     CAPTCHA_ERROR("Captcha is not valid"),
     EMPTY_PASSWORD("Password is empty"),
-    PASSWORD_NOT_MATCH_ERROR("Passwords do not match");
+    PASSWORD_NOT_MATCH_ERROR("Passwords do not match"),
+    INCORRECT_PASSWORD("Incorrect password");
     private final String message;
 
     Validation(String message) {

@@ -3,7 +3,7 @@ package ua.org.training.library.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.constants.Values;
+import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.context.annotations.Service;
@@ -103,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
         }
         Place place = placeRepository.findById(orderCreationDto.getPlaceId()).orElseThrow();
         User user = userRepository.getByLogin(authorityUser.getLogin()).orElseThrow();
-        Status status = statusRepository.findByCode(Values.REGISTERED).orElseThrow();
+        Status status = statusRepository.findByCode(DefaultValues.REGISTERED.getValue()).orElseThrow();
         Order order = Order.builder()
                 .user(user)
                 .book(book)
@@ -152,7 +152,7 @@ public class OrderServiceImpl implements OrderService {
             log.info("Book count updated");
             HistoryOrder historyOrder = objectMapper.mapOrderToHistoryOrder(order);
             log.info("History order: {}", historyOrder);
-            if (previousStatus.getCode().equals(Values.REGISTERED)) {
+            if (previousStatus.getCode().equals(DefaultValues.REGISTERED.getValue())) {
                 historyOrder.setDateReturned(null);
             }
             historyOrderRepository.save(historyOrder);

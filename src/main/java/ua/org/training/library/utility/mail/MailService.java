@@ -3,7 +3,7 @@ package ua.org.training.library.utility.mail;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import ua.org.training.library.constants.Values;
+import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.enums.Mail;
@@ -43,9 +43,9 @@ public class MailService {
         String dateExpire = order.getDateExpire() != null ?
                 order.getDateExpire()
                         .toString() :
-                Utility.getBundleInterface(locale, Values.BUNDLE_ORDER_STATUS_NOT_SET);
+                Utility.getBundleInterface(locale, DefaultValues.BUNDLE_ORDER_STATUS_NOT_SET.getValue());
         String status = Utility.getBundleInterface(locale,
-                Values.BUNDLE_ORDER_STATUS_PREFIX +
+                DefaultValues.BUNDLE_ORDER_STATUS_PREFIX.getValue() +
                         order.getStatus()
                                 .getCode()
                                 .toLowerCase()

@@ -1,16 +1,17 @@
 package ua.org.training.library.service.impl;
 
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
-import ua.org.training.library.constants.Values;
+import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.context.annotations.Service;
 import ua.org.training.library.context.annotations.Transactional;
 import ua.org.training.library.dto.*;
 import ua.org.training.library.enums.Validation;
+import ua.org.training.library.form.LoggedUserUpdatePasswordFormValidationError;
 import ua.org.training.library.form.PersonalEditFormValidationError;
 import ua.org.training.library.form.RegistrationFormValidation;
 import ua.org.training.library.form.ResetValidationError;
@@ -23,6 +24,7 @@ import ua.org.training.library.service.UserService;
 import ua.org.training.library.utility.mapper.ObjectMapper;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
+import ua.org.training.library.validator.LoggedUserEditPasswordValidator;
 import ua.org.training.library.validator.ResetPasswordValidator;
 import ua.org.training.library.validator.UserEditPersonalValidator;
 import ua.org.training.library.validator.UserRegistrationValidator;
@@ -34,7 +36,7 @@ import java.util.Optional;
 @Component
 @Slf4j
 @Service
-@AllArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -42,6 +44,8 @@ public class UserServiceImpl implements UserService {
     private final UserEditPersonalValidator userEditPersonalValidator;
     private final UserRegistrationValidator userRegistrationValidator;
     private final ResetPasswordValidator resetPasswordValidator;
+    private final LoggedUserEditPasswordValidator loggedUserEditPasswordValidator;
+    private static final int APP_BCRYPT_SALT = 10;
 
     @Override
     @Transactional
@@ -55,12 +59,12 @@ public class UserServiceImpl implements UserService {
             return registrationFormValidation;
         }
         String bcryptPassword = BCrypt.hashpw(
-                userRegistrationDto.getPassword(), BCrypt.gensalt(Values.APP_BCRYPT_SALT));
+                userRegistrationDto.getPassword(), BCrypt.gensalt(APP_BCRYPT_SALT));
         User user = objectMapper.map(userRegistrationDto);
         user.setEnabled(true);
         User newUser = userRepository.save(user, bcryptPassword);
         List<Role> roles = Collections.singletonList(
-                roleRepository.findByCode(Values.ROLE_USER).orElseThrow());
+                roleRepository.findByCode(DefaultValues.ROLE_USER.getValue()).orElseThrow());
         newUser.setRoles(roles);
         userRepository.updateRolesForUser(newUser);
         return registrationFormValidation;
@@ -160,23 +164,37 @@ public class UserServiceImpl implements UserService {
         }
         User user = userRepository.getByLogin(userChangePasswordDto.getLogin()).orElseThrow();
         String bcryptPassword = BCrypt.hashpw(
-                userChangePasswordDto.getNewPassword(), BCrypt.gensalt(Values.APP_BCRYPT_SALT));
+                userChangePasswordDto.getNewPassword(), BCrypt.gensalt(APP_BCRYPT_SALT));
         userRepository.updatePassword(user, bcryptPassword);
         return null;
     }
 
     @Override
-    public PersonalEditFormValidationError updatePersonalData(UserUpdateDto userFromRequest, AuthorityUser authorityUser) {
+    @Transactional
+    public PersonalEditFormValidationError updatePersonalData(UserUpdateDto userFromRequest,
+                                                              AuthorityUser authorityUser) {
+        log.info("Updating personal data for user: {}", userFromRequest);
         User user = userRepository.getByLogin(authorityUser.getLogin()).orElseThrow();
         User updatedUser = objectMapper.updateUserData(user, userFromRequest);
         PersonalEditFormValidationError validationError = userEditPersonalValidator.validation(updatedUser);
         validateEmail(userFromRequest.getEmail(), validationError, user);
         validatePhone(userFromRequest.getPhone(), validationError, user);
         if (validationError.isContainsErrors()) {
+            log.info("Validation error: {}", validationError);
             return validationError;
         }
-        userRepository.save(updatedUser);
+        if (checkIfPersonalDataChanged(user, updatedUser)) {
+            log.info("Personal data changed for user: {}", userFromRequest);
+            userRepository.save(updatedUser);
+        }
         return validationError;
+    }
+
+    private boolean checkIfPersonalDataChanged(User user, User updatedUser) {
+        return !user.getFirstName().equals(updatedUser.getFirstName())
+                || !user.getLastName().equals(updatedUser.getLastName())
+                || !user.getEmail().equals(updatedUser.getEmail())
+                || !user.getPhone().equals(updatedUser.getPhone());
     }
 
     private void validateEmail(String email, PersonalEditFormValidationError errors, User user) {
@@ -238,6 +256,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public Optional<UserDto> deleteUserById(Long id) {
         log.info("Deleting user by id: {}", id);
         Optional<User> user = userRepository.findById(id);
@@ -246,5 +265,35 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.delete(user.get());
         return Optional.of(objectMapper.mapUserToUserDto(user.get()));
+    }
+
+    @Override
+    @Transactional
+    public LoggedUserUpdatePasswordFormValidationError updatePassword(UserLoggedUpdatePasswordDto userFromRequest,
+                                                                      AuthorityUser authorityUser) {
+        log.info("Updating password for user: {}", userFromRequest);
+        LoggedUserUpdatePasswordFormValidationError validationError = loggedUserEditPasswordValidator.validate(userFromRequest);
+        User user = userRepository.getByLogin(authorityUser.getLogin()).orElseThrow();
+        validateOldPassword(userFromRequest, validationError, user);
+        if (validationError.containsErrors()) {
+            log.info("Validation error: {}", validationError);
+            return validationError;
+        }
+        if (userFromRequest.getPassword().equals(userFromRequest.getOldPassword())) {
+            return validationError;
+        }
+        String bcryptPassword = BCrypt.hashpw(
+                userFromRequest.getPassword(), BCrypt.gensalt(APP_BCRYPT_SALT));
+        userRepository.updatePassword(user, bcryptPassword);
+        return validationError;
+    }
+
+    private void validateOldPassword(UserLoggedUpdatePasswordDto userFromRequest,
+                                     LoggedUserUpdatePasswordFormValidationError validationError,
+                                     User user) {
+        String correctPassword = userRepository.getPasswordForUser(user);
+        if (!BCrypt.checkpw(userFromRequest.getOldPassword(), correctPassword)) {
+            validationError.setOldPassword(Validation.INCORRECT_PASSWORD.getMessage());
+        }
     }
 }

@@ -22,6 +22,7 @@ import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.PageRequest;
 import ua.org.training.library.utility.page.impl.Sort;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -38,10 +39,10 @@ public class BookServiceImpl implements BookService {
     private final OrderRepository orderRepository;
 
     @Override
-    public Optional<BookDto> getBookById(long id) {
+    public Optional<BookDto> getBookById(long id, Locale locale) {
         log.info("Getting book by id: {}", id);
         return bookRepository.findById(id)
-                .map(objectMapper::mapBookToBookDto);
+                .map(book1 -> objectMapper.mapBookToBookDto(book1, locale));
     }
 
     @Override
@@ -52,7 +53,7 @@ public class BookServiceImpl implements BookService {
                     bookRepository.delete(book);
                     return book;
                 })
-                .map(objectMapper::mapBookToBookDto);
+                .map(book -> objectMapper.mapBookToBookDto(book, Locale.getDefault()));
     }
 
     @Override
@@ -74,22 +75,23 @@ public class BookServiceImpl implements BookService {
                     book1.setKeywords(null);
                     return book1;
                 })
-                .map(objectMapper::mapBookToBookDto);
+                .map(book -> objectMapper.mapBookToBookDto(book, Locale.getDefault()));
     }
 
     @Override
     public Optional<BookDto> deleteBook(long id) {
         log.info("Deleting book by id: {}", id);
-        return bookRepository.findById(id)
-                .map(book -> {
-                    bookRepository.delete(book);
-                    return book;
-                })
-                .map(objectMapper::mapBookToBookDto);
+        Optional<Book> book = bookRepository.findById(id);
+        List<Order> orders = orderRepository.findOrdersByBookId(id);
+        if (book.isPresent() && orders.isEmpty()) {
+            bookRepository.delete(book.get());
+            return book.map(book1 -> objectMapper.mapBookToBookDto(book1, Locale.getDefault()));
+        }
+        return Optional.empty();
     }
 
     @Override
-    public Optional<BookDto> getBookById(long bookId, AuthorityUser authorityUser) {
+    public Optional<BookDto> getBookById(long bookId, Locale locale, AuthorityUser authorityUser) {
         log.info("Getting book by bookId: {}", bookId);
         User user = userRepository.getByLogin(authorityUser.getLogin()).orElseThrow();
         Optional<Order> userOrder = orderRepository.findOrderByUserIdAndBookId(user.getId(), bookId);
@@ -97,7 +99,7 @@ public class BookServiceImpl implements BookService {
             return Optional.empty();
         }
         return bookRepository.findById(bookId)
-                .map(objectMapper::mapBookToBookDto);
+                .map(book1 -> objectMapper.mapBookToBookDto(book1, locale));
     }
 
     @Override
@@ -113,7 +115,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Page<BookDto> searchBooksExceptUserOrders(Pageable page, User user, String search) {
+    public Page<BookDto> searchBooksExceptUserOrders(Pageable page, User user, String search, Locale locale) {
         log.info("Searching books except user orders: {} {} {}", page, user, search);
         User userWithOrders = userRepository.getByLogin(user.getLogin()).orElseThrow();
         if (search == null || search.isEmpty()) {
@@ -122,10 +124,10 @@ public class BookServiceImpl implements BookService {
                 page = PageRequest.of(page.getPageNumber(), page.getPageSize(), sort);
             }
             Page<Book> booksExceptUserOrders = bookRepository.getBooksExceptUserOrders(page, userWithOrders);
-            return objectMapper.mapBookPageToBookDtoPage(booksExceptUserOrders);
+            return objectMapper.mapBookPageToBookDtoPage(booksExceptUserOrders, locale);
         } else {
             Page<Book> bookPage = bookRepository.searchBooksExceptUserOrders(page, userWithOrders, search);
-            return objectMapper.mapBookPageToBookDtoPage(bookPage);
+            return objectMapper.mapBookPageToBookDtoPage(bookPage, locale);
         }
     }
 
@@ -136,19 +138,19 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Page<BookDto> searchBooks(Pageable page, String search) {
+    public Page<BookDto> searchBooks(Pageable page, Locale locale, String search) {
         log.info("Searching books: {} {}", page, search);
+        Page<Book> bookPage;
         if (search == null || search.isEmpty()) {
             if (page.getSort() == null || !page.getSort().isOrdered()) {
                 Sort sort = Sort.by(Sort.Direction.ASC, "title");
                 page = PageRequest.of(page.getPageNumber(), page.getPageSize(), sort);
             }
-            Page<Book> bookPage = bookRepository.findAll(page);
-            return objectMapper.mapBookPageToBookDtoPage(bookPage);
+            bookPage = bookRepository.findAll(page);
         } else {
-            Page<Book> bookPage = bookRepository.searchBooks(page, search);
-            return objectMapper.mapBookPageToBookDtoPage(bookPage);
+            bookPage = bookRepository.searchBooks(page, search);
         }
+        return objectMapper.mapBookPageToBookDtoPage(bookPage, locale);
     }
 
     @Override

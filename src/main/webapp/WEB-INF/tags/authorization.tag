@@ -82,8 +82,6 @@
                         <a class="nav-item nav-link" href="/library/history/user/page">
                             <fmt:message key="app.pageTitle.history"/>
                         </a>
-                    </authorization-role:authority>
-                    <authorization-role:authority role="isAuthorized()">
                         <a class="nav-item nav-link" href="/library/user/personal-data">
                             <fmt:message key="app.pagePersonal"/>
                         </a>

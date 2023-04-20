@@ -4,7 +4,7 @@ package ua.org.training.library.security;
 import jakarta.servlet.jsp.PageContext;
 import jakarta.servlet.jsp.tagext.TagSupport;
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.constants.Values;
+import ua.org.training.library.enums.DefaultValues;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
@@ -32,7 +32,7 @@ public class AuthorizationTag extends TagSupport {
     public int doStartTag() {
         AuthorityUser authorityUser = Optional.ofNullable(
                 (AuthorityUser) pageContext.findAttribute(
-                        Values.USER_ATTRIBUTE))
+                        DefaultValues.USER_ATTRIBUTE.getValue()))
                 .orElse(AuthorityUser.ANONYMOUS);
         log.info(role);
         log.info("AuthorityUser: {}", authorityUser);

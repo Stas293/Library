@@ -13,4 +13,6 @@ public interface RoleService {
     Optional<Role> getByName(String name);
 
     List<RoleDto> getAllRoles();
+
+    String[] findAllCode();
 }

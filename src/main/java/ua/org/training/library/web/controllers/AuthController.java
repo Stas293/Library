@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.constants.Values;
+import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.context.annotations.Controller;
@@ -124,15 +124,17 @@ public class AuthController {
     public String getResetPassword(HttpServletRequest request, HttpServletResponse response) {
         log.info("Get reset password");
         HttpSession session = request.getSession();
-        if (session.getAttribute(Values.CODE) == null
-                || session.getAttribute(Values.EMAIL) == null
-                || !request.getParameter(Values.CODE).equals(session.getAttribute(Values.CODE))
-                || !request.getParameter(Values.EMAIL).equals(session.getAttribute(Values.EMAIL))) {
+        if (session.getAttribute(DefaultValues.CODE_ATTRIBUTE.getValue()) == null
+                || session.getAttribute(DefaultValues.EMAIL_ATTRIBUTE.getValue()) == null
+                || !request.getParameter(DefaultValues.CODE_ATTRIBUTE.getValue())
+                .equals(session.getAttribute(DefaultValues.CODE_ATTRIBUTE.getValue()))
+                || !request.getParameter(DefaultValues.EMAIL_ATTRIBUTE.getValue())
+                .equals(session.getAttribute(DefaultValues.EMAIL_ATTRIBUTE.getValue()))) {
             return Links.RESET_PASSWORD_PAGE_REDIRECT.getLink();
         }
-        request.setAttribute("email", session.getAttribute(Values.EMAIL));
-        session.removeAttribute(Values.CODE);
-        session.removeAttribute(Values.EMAIL);
+        request.setAttribute("email", session.getAttribute(DefaultValues.EMAIL_ATTRIBUTE.getValue()));
+        session.removeAttribute(DefaultValues.CODE_ATTRIBUTE.getValue());
+        session.removeAttribute(DefaultValues.EMAIL_ATTRIBUTE.getValue());
         return Links.ENTER_NEW_PASSWORD_PAGE.getLink();
     }
 

@@ -375,4 +375,14 @@ public class OrderQueriesImpl implements OrderQueries {
                         .and("book_id = ?")
                         .build());
     }
+
+    @Override
+    public String getSelectByBookIdQuery() {
+        return queries.computeIfAbsent("getSelectByBookIdQuery",
+                key -> queryBuilderImpl.setUp()
+                        .select("*")
+                        .from("orders")
+                        .where("book_id = ?")
+                        .build());
+    }
 }

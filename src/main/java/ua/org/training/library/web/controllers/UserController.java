@@ -13,10 +13,8 @@ import ua.org.training.library.context.annotations.mapping.Delete;
 import ua.org.training.library.context.annotations.mapping.Get;
 import ua.org.training.library.context.annotations.mapping.Patch;
 import ua.org.training.library.context.annotations.mapping.Put;
-import ua.org.training.library.dto.UserChangeRolesDto;
-import ua.org.training.library.dto.UserDto;
-import ua.org.training.library.dto.UserManagementDto;
-import ua.org.training.library.dto.UserUpdateDto;
+import ua.org.training.library.dto.*;
+import ua.org.training.library.form.LoggedUserUpdatePasswordFormValidationError;
 import ua.org.training.library.form.PersonalEditFormValidationError;
 import ua.org.training.library.security.AuthorityUser;
 import ua.org.training.library.security.SecurityService;
@@ -59,6 +57,12 @@ public class UserController {
         return "/WEB-INF/jsp/user/edit-personal.jsp";
     }
 
+    @Get("/user/personal-data/password")
+    public String getEditPassword(HttpServletRequest request, HttpServletResponse response) {
+        log.info("Get edit password");
+        return "/WEB-INF/jsp/user/edit-password.jsp";
+    }
+
     @Put("/user/personal-data/edit")
     public String putEditPersonalData(HttpServletRequest request, HttpServletResponse response) {
         log.info("Put edit personal data");
@@ -69,6 +73,19 @@ public class UserController {
             request.setAttribute("errors", validationError);
             request.setAttribute("account", userFromRequest);
             return "/WEB-INF/jsp/user/edit-personal.jsp";
+        }
+        return "redirect:library/user/personal-data";
+    }
+
+    @Put("/user/personal-data/password")
+    public String putEditPassword(HttpServletRequest request, HttpServletResponse response) {
+        log.info("Put edit password");
+        AuthorityUser authorityUser = securityService.getAuthorityUser(request);
+        UserLoggedUpdatePasswordDto userFromRequest = requestParamsObjectMapper.collectFromEditPasswordForm(request);
+        LoggedUserUpdatePasswordFormValidationError validationError = userService.updatePassword(userFromRequest, authorityUser);
+        if (validationError.containsErrors()) {
+            request.setAttribute("errors", validationError);
+            return "/WEB-INF/jsp/user/edit-password.jsp";
         }
         return "redirect:library/user/personal-data";
     }

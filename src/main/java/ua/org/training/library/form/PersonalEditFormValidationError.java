@@ -1,5 +1,10 @@
 package ua.org.training.library.form;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+@ToString
+@EqualsAndHashCode
 public class PersonalEditFormValidationError {
     private String login;
     private String firstName;

@@ -56,4 +56,6 @@ public interface OrderQueries {
     String getCountByStatusAndPlaceQuery();
 
     String getSelectByUserIdAndBookIdQuery();
+
+    String getSelectByBookIdQuery();
 }

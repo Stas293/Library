@@ -6,12 +6,14 @@ import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.dto.*;
 import ua.org.training.library.model.*;
 import ua.org.training.library.security.AuthorityUser;
+import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.PageImpl;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -37,7 +39,7 @@ public class ObjectMapper {
         );
     }
 
-    public BookDto mapBookToBookDto(Book book) {
+    public BookDto mapBookToBookDto(Book book, Locale locale) {
         log.info("Map book to book dto");
         log.info("Book: {}", book);
         String authors = book.getAuthors() == null ? "" : book.getAuthors()
@@ -59,7 +61,7 @@ public class ObjectMapper {
                 .isbn(book.getIsbn())
                 .count(book.getCount())
                 .publicationDate(book.getPublicationDate())
-                .fine(book.getFine())
+                .fine(Utility.getLocaleFine(locale, book.getFine()))
                 .language(book.getLanguage())
                 .location(book.getLocation())
                 .authors(authors)
@@ -81,16 +83,16 @@ public class ObjectMapper {
                 .build();
     }
 
-    public Page<BookDto> mapBookPageToBookDtoPage(Page<Book> page) {
+    public Page<BookDto> mapBookPageToBookDtoPage(Page<Book> page, Locale locale) {
         List<BookDto> bookDtoList = page.getContent()
                 .parallelStream()
-                .map(this::mapBookPage)
+                .map(book -> mapBookPage(book, locale))
                 .toList();
         Pageable pageable = page.getPageable();
         return new PageImpl<>(bookDtoList, pageable, page.getTotalElements());
     }
 
-    private BookDto mapBookPage(Book book) {
+    private BookDto mapBookPage(Book book, Locale locale) {
         String authors = book.getAuthors() == null ? "" : book.getAuthors()
                 .stream()
                 .map(Author::getFullName)
@@ -103,7 +105,7 @@ public class ObjectMapper {
                 .isbn(book.getIsbn())
                 .count(book.getCount())
                 .publicationDate(book.getPublicationDate())
-                .fine(book.getFine())
+                .fine(Utility.getLocaleFine(locale, book.getFine()))
                 .language(book.getLanguage())
                 .location(book.getLocation())
                 .authors(authors)
@@ -124,7 +126,7 @@ public class ObjectMapper {
                 .id(order.getId())
                 .dateCreated(order.getDateCreated())
                 .dateExpire(order.getDateExpire())
-                .book(mapBookToBookDto(order.getBook()))
+                .book(mapBookToBookDto(order.getBook(), Locale.getDefault()))
                 .place(mapPlaceToPlaceDto(order.getPlace()))
                 .build();
     }
@@ -201,7 +203,7 @@ public class ObjectMapper {
     public OrderDto mapOrderToOrderDto(Order order) {
         return OrderDto.builder()
                 .id(order.getId())
-                .book(mapBookToBookDto(order.getBook()))
+                .book(mapBookToBookDto(order.getBook(), Locale.getDefault()))
                 .dateCreated(order.getDateCreated())
                 .dateExpire(order.getDateExpire())
                 .place(mapPlaceToPlaceDto(order.getPlace()))
@@ -213,7 +215,7 @@ public class ObjectMapper {
     public OrderDto mapOrderSimpleToOrderDto(Order order) {
         return OrderDto.builder()
                 .id(order.getId())
-                .book(mapBookToBookDto(order.getBook()))
+                .book(mapBookToBookDto(order.getBook(), Locale.getDefault()))
                 .dateCreated(order.getDateCreated())
                 .dateExpire(order.getDateExpire())
                 .place(mapPlaceToPlaceDto(order.getPlace()))
@@ -232,7 +234,7 @@ public class ObjectMapper {
     private OrderDto mapOrderUserBookToOrderDto(Order order) {
         return OrderDto.builder()
                 .id(order.getId())
-                .book(mapBookToBookDto(order.getBook()))
+                .book(mapBookToBookDto(order.getBook(), Locale.getDefault()))
                 .dateCreated(order.getDateCreated())
                 .dateExpire(order.getDateExpire())
                 .user(mapUserToUserDto(order.getUser()))

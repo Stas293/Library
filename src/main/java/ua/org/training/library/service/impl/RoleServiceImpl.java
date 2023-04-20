@@ -43,4 +43,13 @@ public class RoleServiceImpl implements RoleService {
                 .map(objectMapper::mapRoleToRoleDto)
                 .toList();
     }
+
+    @Override
+    public String[] findAllCode() {
+        log.info("Getting all roles code");
+        List<Role> roles = roleRepository.findAll();
+        return roles.parallelStream()
+                .map(Role::getCode)
+                .toArray(String[]::new);
+    }
 }

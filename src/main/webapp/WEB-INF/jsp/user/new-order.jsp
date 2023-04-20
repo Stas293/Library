@@ -20,7 +20,7 @@
                 <li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
                 <li class="breadcrumb-item active">
                     <a href="/library/order/user/page">
-                        <fmt:message key="home.pageTitle"/>
+                        <fmt:message key="orderList.pageTitle"/>
                     </a>
                 </li>
             </ol>
