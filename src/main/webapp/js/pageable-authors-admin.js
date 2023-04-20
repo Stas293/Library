@@ -1,120 +1,143 @@
-const urlPath = `/library/admin/authors-page`;
+const urlPath = `/library/authors/admin`;
 
 window.onload = () => {
-    wizard(urlPath, null);
+    wizard(urlPath);
+}
+
+const createModal = (rowData, index, urlPath) => {
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.id = `author${index}`;
+
+    const modalDialog = document.createElement('div');
+    modalDialog.className = 'modal-dialog modal-dialog-centered';
+
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+
+    const modalHeader = document.createElement('div');
+    modalHeader.className = 'modal-header';
+
+    const modalTitle = document.createElement('h5');
+    modalTitle.className = 'modal-title';
+    modalTitle.innerHTML = rowData.id;
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'btn-close';
+    closeBtn.setAttribute('data-bs-dismiss', 'modal');
+
+    const modalBody = document.createElement('div');
+    modalBody.className = 'modal-body';
+
+    const firstName = document.createElement('p');
+    firstName.innerHTML = rowData.firstName;
+    modalBody.appendChild(firstName);
+
+    const middleName = document.createElement('p');
+    middleName.innerHTML = rowData.middleName;
+    modalBody.appendChild(middleName);
+
+    const lastName = document.createElement('p');
+    lastName.innerHTML = rowData.lastName;
+    modalBody.appendChild(lastName);
+
+    const modalFooter = document.createElement('div');
+    modalFooter.className = 'modal-footer';
+
+    const editBtn = document.createElement('a');
+    editBtn.className = 'btn btn-warning';
+    editBtn.innerHTML = 'Edit';
+    editBtn.href = urlPath + `/${rowData.id}/edit`;
+    modalFooter.appendChild(editBtn);
+
+    const deleteForm = document.createElement('form');
+    deleteForm.method = 'POST';
+    deleteForm.action = urlPath + `/${rowData.id}`;
+    deleteForm.id = `delete${index}`;
+
+    const hiddenMethod = document.createElement('input');
+    hiddenMethod.type = 'hidden';
+    hiddenMethod.name = '_method';
+    hiddenMethod.value = 'DELETE';
+    deleteForm.appendChild(hiddenMethod);
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'btn btn-danger';
+    deleteBtn.innerHTML = 'Delete';
+    deleteBtn.type = 'submit';
+    deleteForm.appendChild(deleteBtn);
+
+    deleteForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        // Send an Ajax request to delete the author
+        $.ajax({
+            url: deleteForm.action,
+            type: 'POST',
+            data: $(deleteForm).serialize(),
+            success: function (data) {
+                // Display a success message
+                alert('Author deleted successfully!');
+
+                // Remove the row from the table
+                $(`#author${index}`).modal('hide');
+                $(`#row${index}`).remove();
+
+                wizard(urlPath);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                // Display an error message
+                alert('An error occurred while deleting the author: ' + errorThrown);
+            }
+        });
+    });
+
+    modalFooter.appendChild(deleteForm);
+
+    const closeBtn2 = document.createElement('button');
+    closeBtn2.className = 'btn btn-primary';
+    closeBtn2.innerHTML = 'Close';
+    closeBtn2.setAttribute('data-bs-dismiss', 'modal');
+    modalFooter.appendChild(closeBtn2);
+
+    modalHeader.appendChild(modalTitle);
+    modalHeader.appendChild(closeBtn);
+    modalContent.appendChild(modalHeader);
+    modalContent.appendChild(modalBody);
+    modalContent.appendChild(modalFooter);
+    modalDialog.appendChild(modalContent);
+    modal.appendChild(modalDialog);
+
+    return modal;
 }
 
 const makeRow = (rowData, index) => {
-    let tableRow = document.createElement('tr');
-    let tableData = document.createElement('td');
-    let anchor = document.createElement('a');
-    let label = document.createElement('label');
-    let hiddenId = `hidden-order-data-${index}`;
+    const tableRow = document.createElement('tr');
 
-    tableRow.appendChild(createHiddenBookDiv(hiddenId, rowData));
+    const anchor = document.createElement('a');
+    anchor.setAttribute('data-bs-toggle', 'modal');
+    anchor.setAttribute('data-bs-target', `#author${index}`);
+    anchor.innerHTML = rowData.id;
 
-    anchor.setAttribute('href', '#');
-    anchor.onclick = () => {
-        let div = document.getElementById(hiddenId);
-        div.style.width = '100vw';
-        div.style.height = '100vh';
-        div.style.display = 'flex';
-        div.style.position = 'absolute';
-        div.style.top = "0";
-        div.style.left = "0";
-        div.style.background = 'rgba(3,3,3,0.7)';
-        div.style.zIndex = "2000";
-    }
-
-    label.setAttribute('id', 'view-order-modal-window');
-
-    label.appendChild(document.createTextNode(rowData.id));
-    anchor.appendChild(label);
+    const tableData = document.createElement('td');
     tableData.appendChild(anchor);
     tableRow.appendChild(tableData);
 
-    tableData = document.createElement('td');
-    tableData.appendChild(
-        document
-            .createTextNode(rowData.firstName));
-    tableRow.appendChild(tableData);
+    const modal = createModal(rowData, index, urlPath);
+    tableRow.appendChild(modal);
 
-    tableData = document.createElement('td');
-    tableData.appendChild(
-        document
-            .createTextNode(rowData.lastName));
-    tableRow.appendChild(tableData);
+    const firstName = document.createElement('td');
+    firstName.innerHTML = rowData.firstName;
+    tableRow.appendChild(firstName);
+
+    const middleName = document.createElement('td');
+    middleName.innerHTML = rowData.middleName;
+    tableRow.appendChild(middleName);
+
+    const lastName = document.createElement('td');
+    lastName.innerHTML = rowData.lastName;
+    tableRow.appendChild(lastName);
+
     return tableRow;
 }
 
-function initPopup(hiddenId) {
-    let hiddenRequestDiv = document.createElement('div');
-
-    hiddenRequestDiv.id = hiddenId;
-    hiddenRequestDiv.style.display = 'none';
-
-    let hiddenDesk = document.createElement('div');
-    hiddenDesk.className = 'order-form';
-    hiddenDesk.style.textAlign = "left";
-    hiddenDesk.style.padding = "30px 15px";
-
-    let labelClose = document.createElement('button');
-    labelClose.type = 'button';
-    labelClose.className = 'btn-close';
-    labelClose.ariaLabel = 'Close';
-    labelClose.onclick = () => {
-        let div = document.getElementById(hiddenId);
-        div.style.display = 'none';
-    }
-    hiddenDesk.appendChild(labelClose);
-
-    let fieldHeading = document.createElement('h1');
-    return {hiddenRequestDiv, hiddenDesk, fieldHeading};
-}
-
-const createHiddenBookDiv = (hiddenId, rowData) => {
-    let {hiddenRequestDiv, hiddenDesk, fieldHeading} = initPopup(hiddenId);
-
-    fieldHeading.appendChild(document.createTextNode("Id: " + rowData.id));
-    hiddenDesk.appendChild(fieldHeading);
-
-    fieldHeading = document.createElement('h3');
-    let field = document.createElement('span');
-    field.appendChild(document.createTextNode(rowData.firstName));
-    fieldHeading.appendChild(field);
-    hiddenDesk.appendChild(fieldHeading);
-
-    fieldHeading = document.createElement('h3');
-    field = document.createElement('span');
-    field.appendChild(document.createTextNode(rowData.lastName));
-    fieldHeading.appendChild(field);
-    hiddenDesk.appendChild(fieldHeading);
-
-    field = document.createElement('button');
-    field.className = 'btn btn-primary';
-    field.appendChild(document.createTextNode(document.getElementById('edit_author_button').innerText));
-    field.onclick = () => {
-        let div = document.getElementById(hiddenId);
-        div.style.display = 'none';
-        window.location.href = `/library/admin/author/edit/${rowData.id}`;
-    }
-    fieldHeading.appendChild(document.createElement('br'));
-    hiddenDesk.appendChild(fieldHeading);
-    fieldHeading.appendChild(field);
-    hiddenDesk.appendChild(fieldHeading);
-
-    field = document.createElement('button');
-    field.className = 'btn btn-danger';
-    field.appendChild(document.createTextNode(document.getElementById("delete_author_button").innerText));
-    field.onclick = () => {
-        let div = document.getElementById(hiddenId);
-        div.style.display = 'none';
-        window.location.href = `/library/admin/author/delete/${rowData.id}`;
-    }
-    fieldHeading.appendChild(field);
-    hiddenDesk.appendChild(fieldHeading);
-
-    hiddenRequestDiv.appendChild(hiddenDesk);
-
-    return hiddenRequestDiv;
-}

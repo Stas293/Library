@@ -7,10 +7,12 @@ import ua.org.training.library.form.RegistrationFormValidation;
 import ua.org.training.library.form.ResetValidationError;
 import ua.org.training.library.model.User;
 import ua.org.training.library.security.AuthorityUser;
+import ua.org.training.library.utility.page.Page;
+import ua.org.training.library.utility.page.Pageable;
 
 import java.util.Optional;
 
-public interface UserService extends GenericService<Long, User> {
+public interface UserService {
     RegistrationFormValidation save(UserRegistrationDto user);
 
     boolean login(String login, String password);
@@ -21,11 +23,11 @@ public interface UserService extends GenericService<Long, User> {
 
     Optional<UserDto> getByPhone(String phone);
 
-    void disable(User user);
+    Optional<UserDto> disable(Long user);
 
-    void enable(User user);
+    Optional<UserDto> enable(Long user);
 
-    void updateRolesForUser(User user);
+    Optional<UserDto> updateRolesForUser(UserChangeRolesDto user);
 
     ResetValidationError updatePassword(UserChangePasswordDto userChangePasswordDto);
 
@@ -36,4 +38,10 @@ public interface UserService extends GenericService<Long, User> {
     boolean checkUserByEmail(User user, String email);
 
     boolean checkUserByPhone(User user, String phone);
+
+    Page<UserDto> searchUsers(Pageable pageable, String search);
+
+    Optional<UserManagementDto> getUserManagementDtoById(Long id);
+
+    Optional<UserDto> deleteUserById(Long id);
 }

@@ -286,8 +286,11 @@ public class StatusDaoImpl implements StatusDao {
                 statusQueries.getGetStatusByHistoryOrderIdQuery())) {
             statement.setLong(1, historyId);
             try (var resultSet = statement.executeQuery()) {
-                return Optional.ofNullable(statusCollector.collect(resultSet));
+                if (resultSet.next()) {
+                    return Optional.ofNullable(statusCollector.collect(resultSet));
+                }
             }
+            return Optional.empty();
         } catch (SQLException e) {
             log.error("Error getting status by history order id: {}", e.getMessage());
             throw new DaoException("Error getting status by history order id: " + e.getMessage(), e);

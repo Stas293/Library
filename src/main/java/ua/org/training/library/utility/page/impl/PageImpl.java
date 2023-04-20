@@ -1,11 +1,13 @@
 package ua.org.training.library.utility.page.impl;
 
 
+import lombok.EqualsAndHashCode;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 public class PageImpl<T> extends Chunk<T> implements Page<T> {
     private final long total;
 

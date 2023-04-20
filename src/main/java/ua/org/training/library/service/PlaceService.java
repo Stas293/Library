@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-public interface PlaceService extends GenericService<Long, Place> {
+public interface PlaceService {
     Optional<Place> getByName(String name);
 
     List<PlaceDto> getAllPlaces(Locale locale);

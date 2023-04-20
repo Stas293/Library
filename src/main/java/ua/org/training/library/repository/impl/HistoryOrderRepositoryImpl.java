@@ -8,6 +8,7 @@ import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.dao.HistoryOrderDao;
 import ua.org.training.library.dao.StatusDao;
+import ua.org.training.library.dao.StatusNameDao;
 import ua.org.training.library.dao.UserDao;
 import ua.org.training.library.model.HistoryOrder;
 import ua.org.training.library.model.User;
@@ -18,6 +19,7 @@ import ua.org.training.library.utility.page.impl.Sort;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Component
@@ -26,11 +28,12 @@ import java.util.Optional;
 public class HistoryOrderRepositoryImpl implements HistoryOrderRepository {
     private final TransactionManager transactionManager;
     private final StatusDao statusDao;
+    private final StatusNameDao statusNameDao;
     private final UserDao userDao;
     private final HistoryOrderDao historyOrderDao;
 
     @Override
-    public Page<HistoryOrder> getPageByUser(Pageable page, User user) {
+    public Page<HistoryOrder> getPageByUser(Pageable page, User user, Locale locale) {
         log.info("Getting page of history orders by user: {}", user);
         Connection conn = transactionManager.getConnection();
         Page<HistoryOrder> historyOrders = historyOrderDao.getPageByUserId(conn, page, user.getId());
@@ -38,7 +41,29 @@ public class HistoryOrderRepositoryImpl implements HistoryOrderRepository {
         log.info("Getting status and user for history orders");
         for (HistoryOrder historyOrder : historyOrders.getContent()) {
             historyOrder.setStatus(statusDao.getByHistoryOrderId(conn, historyOrder.getId()).orElse(null));
-            historyOrder.setUser(userDao.getByHistoryOrderId(conn, historyOrder.getId()).orElse(null));
+            historyOrder.getStatus().setNames(
+                    List.of(
+                            statusNameDao.getByStatusId(conn, historyOrder.getStatus().getId(), locale).orElseThrow()
+                    )
+            );
+        }
+        return historyOrders;
+    }
+
+    @Override
+    public Page<HistoryOrder> getPageByUserAndSearch(Pageable page, User user, String search, Locale locale) {
+        log.info("Getting page of history orders by user: {} and search: {}", user, search);
+        Connection conn = transactionManager.getConnection();
+        Page<HistoryOrder> historyOrders = historyOrderDao.getPageByUserIdAndSearch(conn, page, user.getId(), search);
+        log.info("History orders: {}", historyOrders);
+        log.info("Getting status and user for history orders");
+        for (HistoryOrder historyOrder : historyOrders.getContent()) {
+            historyOrder.setStatus(statusDao.getByHistoryOrderId(conn, historyOrder.getId()).orElse(null));
+            historyOrder.getStatus().setNames(
+                    List.of(
+                            statusNameDao.getByStatusId(conn, historyOrder.getStatus().getId(), locale).orElseThrow()
+                    )
+            );
         }
         return historyOrders;
     }

@@ -17,8 +17,10 @@ import ua.org.training.library.utility.page.impl.PageImpl;
 import ua.org.training.library.utility.page.impl.Sort;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -114,8 +116,11 @@ public class UserDaoImpl implements UserDao {
         log.info("Getting page of users with page: {}", page);
         try (var statement = connection.prepareStatement(
                 userQueries.getQueryPage(page))) {
+            statement.setInt(1, page.getPageSize());
+            statement.setLong(2, page.getOffset());
             try (var resultSet = statement.executeQuery()) {
-                return new PageImpl<>(userCollector.collectList(resultSet), page, count(connection));
+                List<User> users = userCollector.collectList(resultSet);
+                return new PageImpl<>(users, page, count(connection));
             }
         } catch (SQLException e) {
             log.error("Error getting page of users with page: {}", page, e);
@@ -354,29 +359,29 @@ public class UserDaoImpl implements UserDao {
     @Override
     public void disable(Connection connection, Long id) {
         log.info("Disabling user by id: {}", id);
-        manipulateEnabledField(connection,
-                userQueries.getQueryDisable(),
-                id, "Error disabling user by id: {}");
-    }
-
-    private void manipulateEnabledField(Connection connection, String queryBuilder,
-                                        Long id, String message) {
         try (var statement = connection.prepareStatement(
-                queryBuilder)) {
-            statement.setLong(1, id);
+                userQueries.getQueryDisable())) {
+            statement.setBoolean(1, false);
+            statement.setLong(2, id);
             statement.executeUpdate();
         } catch (SQLException e) {
-            log.error(message, id, e);
-            throw new DaoException(String.format(message, id), e);
+            log.error("Error disabling user by id: {}", id, e);
+            throw new DaoException("Error disabling user by id: " + id, e);
         }
     }
 
     @Override
     public void enable(Connection connection, Long id) {
         log.info("Enabling user by id: {}", id);
-        manipulateEnabledField(connection,
-                userQueries.getQueryEnable(),
-                id, "Error enabling user by id: {}");
+        try (var statement = connection.prepareStatement(
+                userQueries.getQueryEnable())) {
+            statement.setBoolean(1, true);
+            statement.setLong(2, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            log.error("Error enabling user by id: {}", id, e);
+            throw new DaoException("Error enabling user by id: " + id, e);
+        }
     }
 
     @Override
@@ -384,6 +389,52 @@ public class UserDaoImpl implements UserDao {
         log.info("Updating roles for user by id: {}", id);
         deleteRolesRelation(connection, id);
         insertRolesRelation(connection, id, roles);
+    }
+
+    @Override
+    public Page<User> searchUsers(Connection connection, Pageable pageable, String search) {
+        log.info("Searching users by search: {}", search);
+        try (PreparedStatement statement = connection.prepareStatement(
+                userQueries.getQuerySearchUsers(pageable, search))) {
+            statement.setString(1, "%"+search+"%");
+            statement.setString(2, "%"+search+"%");
+            statement.setString(3, "%"+search+"%");
+            statement.setString(4, "%"+search+"%");
+            statement.setString(5, "%"+search+"%");
+            statement.setLong(6, pageable.getPageSize());
+            statement.setLong(7, pageable.getOffset());
+            try (var resultSet = statement.executeQuery()) {
+                List<User> users = new ArrayList<>();
+                while (resultSet.next()) {
+                    users.add(userCollector.collect(resultSet));
+                }
+                return new PageImpl<>(users, pageable, countUsers(connection, search));
+            }
+        } catch (SQLException e) {
+            log.error("Error searching users by search: {}", search, e);
+            throw new DaoException("Error searching users by search: " + search, e);
+        }
+    }
+
+    private long countUsers(Connection connection, String search) {
+        log.info("Counting users by search: {}", search);
+        try (PreparedStatement statement = connection.prepareStatement(
+                userQueries.getQueryCountUsers(search))) {
+            statement.setString(1, "%"+search+"%");
+            statement.setString(2, "%"+search+"%");
+            statement.setString(3, "%"+search+"%");
+            statement.setString(4, "%"+search+"%");
+            statement.setString(5, "%"+search+"%");
+            try (var resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getLong(1);
+                }
+            }
+            return 0;
+        } catch (SQLException e) {
+            log.error("Error counting users by search: {}", search, e);
+            throw new DaoException("Error counting users by search: " + search, e);
+        }
     }
 
     private void insertRolesRelation(Connection connection, Long id, Collection<Role> roles) {

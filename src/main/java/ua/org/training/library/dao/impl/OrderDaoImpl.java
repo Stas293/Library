@@ -172,7 +172,7 @@ public class OrderDaoImpl implements OrderDao {
         try (PreparedStatement ps = connection.prepareStatement(
                 orderQueries.getUpdateQuery())) {
             ps.setDate(1, Date.valueOf(entity.getDateCreated()));
-            ps.setDate(2, Date.valueOf(entity.getDateExpire()));
+            ps.setDate(2, entity.getDateExpire() != null ? Date.valueOf(entity.getDateExpire()) : null);
             ps.setLong(3, entity.getStatus().getId());
             ps.setLong(4, entity.getUser().getId());
             ps.setLong(5, entity.getBook().getId());
@@ -383,6 +383,99 @@ public class OrderDaoImpl implements OrderDao {
         } catch (SQLException e) {
             log.error("Error getting page of orders by status id: {} and search: {}", e.getMessage());
             throw new DaoException("Error getting page of orders by status id: " + id + " and search: " + search, e);
+        }
+    }
+
+    @Override
+    public Page<Order> getPageByStatusAndPlaceAndSearch(Connection conn, Pageable page, Long statusOrderId, Long placeOrderId, String search) {
+        log.info("Getting page of orders by status id: {} and place id: {} and search: {}", statusOrderId, placeOrderId, search);
+        try (PreparedStatement ps = conn.prepareStatement(
+                orderQueries.getSelectAllByStatusAndPlaceAndSearchQuery(page))) {
+            ps.setLong(1, statusOrderId);
+            ps.setLong(2, placeOrderId);
+            ps.setString(3, "%" + search + "%");
+            ps.setLong(4, page.getPageSize());
+            ps.setLong(5, page.getOffset());
+            try (ResultSet rs = ps.executeQuery()) {
+                return new PageImpl<>(orderCollector.collectList(rs), page, countByStatusAndPlaceAndSearch(conn, statusOrderId, placeOrderId, search));
+            }
+        } catch (SQLException e) {
+            log.error("Error getting page of orders by status id: {} and place id: {} and search: {}", e.getMessage());
+            throw new DaoException("Error getting page of orders by status id: " + statusOrderId + " and place id: " + placeOrderId + " and search: " + search, e);
+        }
+    }
+
+    private long countByStatusAndPlaceAndSearch(Connection conn, Long statusOrderId, Long placeOrderId, String search) {
+        log.info("Counting orders by status id: {} and place id: {} and search: {}", statusOrderId, placeOrderId, search);
+        try (PreparedStatement ps = conn.prepareStatement(
+                orderQueries.getCountByStatusAndPlaceAndSearchQuery())) {
+            ps.setLong(1, statusOrderId);
+            ps.setLong(2, placeOrderId);
+            ps.setString(3, "%" + search + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getLong(1);
+                }
+            }
+            return 0;
+        } catch (SQLException e) {
+            log.error("Error counting orders by status id: {} and place id: {} and search: {}", e.getMessage());
+            throw new DaoException("Error counting orders by status id: " + statusOrderId + " and place id: " + placeOrderId + " and search: " + search, e);
+        }
+    }
+
+    @Override
+    public Page<Order> getPageByStatusAndPlace(Connection conn, Pageable page, Long statusOrderId, Long placeOrderId) {
+        log.info("Getting page of orders by status id: {} and place id: {}", statusOrderId, placeOrderId);
+        try (PreparedStatement ps = conn.prepareStatement(
+                orderQueries.getSelectAllByStatusAndPlaceQuery(page))) {
+            ps.setLong(1, statusOrderId);
+            ps.setLong(2, placeOrderId);
+            ps.setLong(3, page.getPageSize());
+            ps.setLong(4, page.getOffset());
+            try (ResultSet rs = ps.executeQuery()) {
+                return new PageImpl<>(orderCollector.collectList(rs), page, countByStatusAndPlace(conn, statusOrderId, placeOrderId));
+            }
+        } catch (SQLException e) {
+            log.error("Error getting page of orders by status id: {} and place id: {}", e.getMessage());
+            throw new DaoException("Error getting page of orders by status id: " + statusOrderId + " and place id: " + placeOrderId, e);
+        }
+    }
+
+    @Override
+    public Optional<Order> getOrderByUserIdAndBookId(Connection conn, Long authorityUserId, long bookId) {
+        log.info("Getting order by user id: {} and book id: {}", authorityUserId, bookId);
+        try (PreparedStatement ps = conn.prepareStatement(
+                orderQueries.getSelectByUserIdAndBookIdQuery())) {
+            ps.setLong(1, authorityUserId);
+            ps.setLong(2, bookId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(orderCollector.collect(rs));
+                }
+            }
+            return Optional.empty();
+        } catch (SQLException e) {
+            log.error("Error getting order by user id: {} and book id: {}", authorityUserId, bookId, e);
+            throw new DaoException("Error getting order by user id: " + authorityUserId + " and book id: " + bookId, e);
+        }
+    }
+
+    private long countByStatusAndPlace(Connection conn, Long statusOrderId, Long placeOrderId) {
+        log.info("Counting orders by status id: {} and place id: {}", statusOrderId, placeOrderId);
+        try (PreparedStatement ps = conn.prepareStatement(
+                orderQueries.getCountByStatusAndPlaceQuery())) {
+            ps.setLong(1, statusOrderId);
+            ps.setLong(2, placeOrderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getLong(1);
+                }
+            }
+            return 0;
+        } catch (SQLException e) {
+            log.error("Error counting orders by status id: {} and place id: {}", statusOrderId, placeOrderId, e);
+            throw new DaoException("Error counting orders by status id: " + statusOrderId + " and place id: " + placeOrderId, e);
         }
     }
 

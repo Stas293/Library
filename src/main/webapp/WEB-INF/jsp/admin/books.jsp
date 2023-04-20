@@ -22,9 +22,9 @@
         <div id="book_date_published" class="hidden"><fmt:message key="book.publicationDate"/></div>
         <div id="book_fine" class="hidden"><fmt:message key="book.fine"/></div>
         <div id="book_language" class="hidden"><fmt:message key="book.language"/></div>
-        <div id="book_authors" class="hidden"><fmt:message key="book.authors"/></div>
-        <div id="book_edit_button" class="hidden"><fmt:message key="book.edit.button"/></div>
-        <div id="book_delete_button" class="hidden"><fmt:message key="book.delete.button"/></div>
+        <div id="book_location" class="hidden"><fmt:message key="book.location"/></div>
+        <div id="book_authors_label" class="hidden"><fmt:message key="book.authors"/></div>
+        <div id="more_info" class="hidden"><fmt:message key="book.moreInfo"/></div>
         <div class="container main-content">
             <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item active"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
@@ -60,14 +60,14 @@
                 </div>
             </c:if>
             <h1>
-                <fmt:message key="orderList.pageTitle"/>
+                <fmt:message key="admin.pageTitle"/>
             </h1>
             <div class="grid-container">
                 <div class="grid-left-3">
                     <div class="list-group list-group-flush components">
-                        <button class="btn-lg library-create-book" onclick="location.href='/library/admin/add-book'">
+                        <a class="btn-lg library-create-book" href="/library/books/admin/create">
                             <fmt:message key="admin.create.book"/>
-                        </button>
+                        </a>
                         <label class="list-group-item list-group-item-action">
                             <fmt:message key="admin.list.books"/>
                         </label>
@@ -78,11 +78,11 @@
                         <input id="search" class="col-4 rounded border" type="text"
                                placeholder="<fmt:message key="table.search" />">
                         <input id="size" class="col-2 rounded border" type="number" min="2" max="8" value="5">
-                        <input name="sorting" class="hidden" type="radio" id="asc" value="asc" checked><label
+                        <input name="sorting" class="hidden" type="radio" id="asc" value="ASC" checked><label
                             class="col-2"
                             for="asc"><fmt:message
                             key="table.asc"/></label>
-                        <input name="sorting" class="hidden" type="radio" id="desc" value="desc"><label class="col-2"
+                        <input name="sorting" class="hidden" type="radio" id="desc" value="DESC"><label class="col-2"
                                                                                                         for="desc"><fmt:message
                             key="table.desc"/></label>
                         <div id="page-navigation" class="pagination"></div>
@@ -90,11 +90,11 @@
                     <table class="table table-bordered table-active table-hover table-striped">
                         <thead class="table-header table-dark">
                         <tr>
-                            <th id="book_name" scope="col"><fmt:message key="orderList.table.name"/></th>
+                            <th id="book_title" scope="col"><fmt:message key="orderList.table.title"/></th>
                             <th id="isbn" scope="col"><fmt:message key="orderList.table.ISBN"/></th>
                             <th id="date_publication" scope="col"><fmt:message
                                     key="orderList.table.date_publication"/></th>
-                            <th id="author" scope="col"><fmt:message key="orderList.table.authors"/></th>
+                            <th id="book_authors" scope="col"><fmt:message key="orderList.table.authors"/></th>
                         </tr>
                         </thead>
                         <tbody id="pageable-list">

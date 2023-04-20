@@ -8,8 +8,8 @@ import ua.org.training.library.mapping.HttpMappingCommand;
 import ua.org.training.library.web.ControllerFactory;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class ControllerScanner {
@@ -21,7 +21,7 @@ public class ControllerScanner {
     }
 
     public void scanControllers() {
-        Map<String, HttpMapping> mappings = new HashMap<>();
+        Map<String, HttpMapping> mappings = new ConcurrentHashMap<>();
         Map<Class<?>, HttpMappingCommand> httpMappingCommands =
                 applicationContext.getBeansImplementingInterface(HttpMappingCommand.class);
         Map<Class<?>, Object> beans = applicationContext.getBeansWithAnnotation(Controller.class);

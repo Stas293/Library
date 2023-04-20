@@ -12,15 +12,15 @@
 
 <html>
 <head>
-    <jsp:invoke fragment="head"/>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/error.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Serif+Pro:400,600,700">
+    <jsp:invoke fragment="head"/>
 </head>
 <body>
 <header>
@@ -58,12 +58,12 @@
                                     </a>
                                 </li>
                                 <li class="nav-item nav-link">
-                                    <a class="dropdown-item" href="/library/admin/books">
+                                    <a class="dropdown-item" href="/library/books/admin/page">
                                         <fmt:message key="app.pageTitle.manage-books"/>
                                     </a>
                                 </li>
                                 <li class="nav-item nav-link">
-                                    <a class="dropdown-item" href="/library/admin/authors">
+                                    <a class="dropdown-item" href="/library/authors/admin/page">
                                         <fmt:message key="app.pageTitle.manage-authors"/>
                                     </a>
                                 </li>
@@ -79,7 +79,7 @@
                         <a class="nav-item nav-link" href="/library/order/user/page">
                             <fmt:message key="app.pageTitle.user"/>
                         </a>
-                        <a class="nav-item nav-link" href="/library/user/history/page">
+                        <a class="nav-item nav-link" href="/library/history/user/page">
                             <fmt:message key="app.pageTitle.history"/>
                         </a>
                     </authorization-role:authority>

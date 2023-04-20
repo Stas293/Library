@@ -147,4 +147,18 @@ public class AuthorRepositoryImpl implements AuthorRepository {
         Connection conn = transactionManager.getConnection();
         return dao.getPage(conn, pageable);
     }
+
+    @Override
+    public Page<Author> searchAuthors(Pageable page, String search) {
+        log.info("Searching authors by page: {} and search: {}", page, search);
+        Connection conn = transactionManager.getConnection();
+        return dao.searchAuthors(conn, page, search);
+    }
+
+    @Override
+    public List<Author> findAllByNameContainingIgnoreCase(String search) {
+        log.info("Searching authors by search: {}", search);
+        Connection conn = transactionManager.getConnection();
+        return dao.findAllByNameContainingIgnoreCase(conn, search);
+    }
 }

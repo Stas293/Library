@@ -32,7 +32,7 @@
             </h1>
             <div id="label_ISBN" hidden="hidden"><fmt:message key="orderList.table.ISBN"/></div>
             <div id="label_date_publication" hidden="hidden"><fmt:message key="orderList.table.date_publication"/></div>
-            <div id="label_language" hidden="hidden"><fmt:message key="orderList.table.language"/></div>
+            <div id="label_authors" hidden="hidden"><fmt:message key="orderList.table.authors"/></div>
             <div id="label_book_title" hidden="hidden"><fmt:message key="orderList.table.title"/></div>
             <div id="label_date_created" hidden="hidden"><fmt:message key="orderList.table.dateCreated"/></div>
             <div id="label_place" hidden="hidden"><fmt:message key="orderList.table.place"/></div>
@@ -69,8 +69,9 @@
                         <tr>
                             <th id="book_title" scope="col"><fmt:message key="orderList.table.title"/></th>
                             <th id="isbn" scope="col"><fmt:message key="orderList.table.ISBN"/></th>
-                            <th id="date_publication" scope="col"><fmt:message key="orderList.table.date_publication"/></th>
-                            <th id="language" scope="col"><fmt:message key="orderList.table.language"/></th>
+                            <th id="date_publication" scope="col"><fmt:message
+                                    key="orderList.table.date_publication"/></th>
+                            <th id="book_authors" scope="col"><fmt:message key="orderList.table.authors"/></th>
                         </tr>
                         </thead>
                         <tbody id="pageable-list">

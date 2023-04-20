@@ -42,7 +42,7 @@
                     <th id="book_title" scope="col"><fmt:message key="orderList.table.title"/></th>
                     <th id="isbn" scope="col"><fmt:message key="orderList.table.ISBN"/></th>
                     <th id="date_publication" scope="col"><fmt:message key="orderList.table.date_publication"/></th>
-                    <th id="language" scope="col"><fmt:message key="orderList.table.language"/></th>
+                    <th id="book_authors" scope="col"><fmt:message key="orderList.table.authors"/></th>
                 </tr>
                 </thead>
                 <tbody id="pageable-list">

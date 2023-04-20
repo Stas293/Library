@@ -5,19 +5,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.org.training.library.dao.AuthorDao;
-import ua.org.training.library.dao.BookDao;
 import ua.org.training.library.exceptions.DaoException;
-import ua.org.training.library.model.Author;
-import ua.org.training.library.model.Book;
 import ua.org.training.library.utility.Constants;
 import ua.org.training.library.utility.page.Page;
 
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

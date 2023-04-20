@@ -55,6 +55,66 @@ public class AuthorDaoImpl implements AuthorDao {
         saveAuthorsToBook(connection, bookId, authors);
     }
 
+    @Override
+    public Page<Author> searchAuthors(Connection conn, Pageable page, String search) {
+        log.info("Search authors: {}", search);
+        try (PreparedStatement statement = conn.prepareStatement(
+                authorQueries.getSearchAuthors(page.getSort()))) {
+            String searchParam = "%" + search + "%";
+            statement.setString(1, searchParam);
+            statement.setString(2, searchParam);
+            statement.setString(3, searchParam);
+            statement.setInt(4, page.getPageSize());
+            statement.setLong(5, page.getOffset());
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List<Author> authors = authorCollector.collectList(resultSet);
+                return new PageImpl<>(authors, page, getAuthorsCount(conn, search));
+            }
+        } catch (SQLException e) {
+            log.error(String.format("Cannot search authors: %s", search), e);
+            throw new DaoException("Cannot search authors: " + search, e);
+        }
+    }
+
+    @Override
+    public List<Author> findAllByNameContainingIgnoreCase(Connection conn, String search) {
+        log.info("Find all authors by name containing: {}", search);
+        try (PreparedStatement statement = conn.prepareStatement(
+                authorQueries.getFindAllByNameContainingIgnoreCase())) {
+            String searchParam = "%" + search + "%";
+            statement.setString(1, searchParam);
+            statement.setString(2, searchParam);
+            statement.setString(3, searchParam);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return authorCollector.collectList(resultSet);
+            }
+        } catch (SQLException e) {
+            log.error(String.format("Cannot find all authors by name containing: %s", search), e);
+            throw new DaoException("Cannot find all authors by name containing: " + search, e);
+        }
+    }
+
+    private long getAuthorsCount(Connection conn, String search) {
+        log.info("Get authors count: {}", search);
+        try (PreparedStatement statement = conn.prepareStatement(
+                authorQueries.getAuthorsCount())) {
+            String searchParam = "%" + search + "%";
+            statement.setString(1, searchParam);
+            statement.setString(2, searchParam);
+            statement.setString(3, searchParam);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getLong(1);
+                }
+            }
+        } catch (SQLException e) {
+            log.error(String.format("Cannot get authors count: %s", search), e);
+            throw new DaoException("Cannot get authors count: " + search, e);
+        }
+        return 0;
+    }
+
+
     private void saveAuthorsToBook(Connection connection, Long bookId, List<Author> authors) {
         log.info("Save authors to book: {}", bookId);
         try (PreparedStatement statement = connection.prepareStatement(

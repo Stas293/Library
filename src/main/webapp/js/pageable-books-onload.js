@@ -7,12 +7,13 @@ window.onload = function () {
 };
 
 class Book {
-    constructor(id, title, isbn, publicationDate, language) {
+    constructor(id, title, isbn, publicationDate, language, authors) {
         this.id = id;
         this.title = title;
         this.isbn = isbn;
         this.publicationDate = new Date(publicationDate);
         this.language = language;
+        this.authors = authors;
     }
 
     static from = function (rowData) {
@@ -21,7 +22,8 @@ class Book {
             rowData.title,
             rowData.isbn,
             rowData.publicationDate,
-            rowData.language);
+            rowData.language,
+            rowData.authors);
     };
 }
 
@@ -45,7 +47,7 @@ const makeRow = function (rowData) {
     tableRow.appendChild(tableData);
     tableData = document.createElement('td');
     tableData.appendChild(document
-        .createTextNode(book.language));
+        .createTextNode(book.authors));
     tableRow.appendChild(tableData);
     return tableRow;
 };

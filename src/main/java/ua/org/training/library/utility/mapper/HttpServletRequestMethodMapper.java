@@ -7,9 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import ua.org.training.library.constants.Values;
 import ua.org.training.library.context.annotations.Component;
 
+import java.io.Serializable;
+
 @Component
 @Slf4j
-public class HttpServletRequestMethodMapper {
+public class HttpServletRequestMethodMapper implements Serializable {
     public HttpServletRequest mapToOverrideMethod(HttpServletRequest request) {
         log.info("Mapping to override method");
         String method = request.getParameter("_method");

@@ -29,15 +29,9 @@ public class PlaceRepositoryImpl implements PlaceRepository {
     private final PlaceNameDao placeNameDao;
 
     @Override
-    public Optional<Place> getByName(String name) {
-        log.info("Getting place by name: {}", name);
-        Optional<Place> place = placeDao.getByCode(transactionManager.getConnection(), name);
-        place.ifPresent(
-                model -> model.setNames(
-                        placeNameDao.getAllByPlaceId(transactionManager.getConnection(), model.getId())
-                )
-        );
-        return place;
+    public Optional<Place> getByCode(String code) {
+        log.info("Getting place by code: {}", code);
+        return placeDao.getByCode(transactionManager.getConnection(), code);
     }
 
     @Override

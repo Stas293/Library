@@ -297,4 +297,21 @@ public class RoleDaoImpl implements RoleDao {
             throw new DaoException("Error getting roles by user id: " + e.getMessage(), e);
         }
     }
+
+    @Override
+    public List<Role> getAllByCodes(Connection connection, List<String> roles) {
+        log.info("Getting roles by codes: {}", roles);
+        try (PreparedStatement statement = connection.prepareStatement(
+                roleQueries.getGetAllByCodesQuery(roles.size()))) {
+            for (int i = 0; i < roles.size(); i++) {
+                statement.setString(i + 1, roles.get(i));
+            }
+            try (ResultSet rs = statement.executeQuery()) {
+                return roleCollector.collectList(rs);
+            }
+        } catch (SQLException e) {
+            log.error("Error getting roles by codes: {}", e.getMessage());
+            throw new DaoException("Error getting roles by codes: " + e.getMessage(), e);
+        }
+    }
 }

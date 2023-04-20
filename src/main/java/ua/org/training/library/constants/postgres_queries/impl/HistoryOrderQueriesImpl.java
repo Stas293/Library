@@ -170,4 +170,39 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
                         .where("user_id = ?")
                         .build());
     }
+
+    @Override
+    public String getSelectAllByUserIdAndSearchQuery(Pageable page) {
+        if (page.getSort() == null) {
+            return queries.computeIfAbsent("getSelectAllByUserIdAndSearchQueryPage",
+                    key -> queryBuilderImpl.setUp()
+                            .select("*")
+                            .from("history_orders")
+                            .where("user_id = ?")
+                            .and("book_title LIKE ?")
+                            .limit("?")
+                            .offset("?")
+                            .build());
+        }
+        return queryBuilderImpl.setUp()
+                .select("*")
+                .from("history_orders")
+                .where("user_id = ?")
+                .and("book_title LIKE ?")
+                .orderBy(page.getSort())
+                .limit("?")
+                .offset("?")
+                .build();
+    }
+
+    @Override
+    public String getCountByUserIdAndSearchQuery() {
+        return queries.computeIfAbsent("getCountByUserIdAndSearchQuery",
+                key -> queryBuilderImpl.setUp()
+                        .select("count(*)")
+                        .from("history_orders")
+                        .where("user_id = ?")
+                        .and("book_title LIKE ?")
+                        .build());
+    }
 }

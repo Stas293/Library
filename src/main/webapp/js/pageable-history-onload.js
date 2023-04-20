@@ -1,16 +1,39 @@
-const urlPath = `/library/user/order-history`;
+const urlPath = `/library/history/user`;
 
 window.onload = () => {
     wizard(urlPath, null);
 }
 
+class HistoryOrder {
+    constructor(id, bookTitle, dateCreated, dateReturned, status) {
+        this.id = id;
+        this.bookTitle = bookTitle;
+        this.dateCreated = dateCreated;
+        this.dateReturned = dateReturned;
+        this.status = status;
+    }
+
+    static from (json) {
+        return new HistoryOrder(
+            json.id,
+            json.bookTitle,
+            new Date (json.dateCreated).toDateString(),
+            json.dateReturned ? new Date(json.dateReturned).toDateString() : 'Not accepted',
+            json.status
+        );
+    }
+}
+
 const makeRow = (rowData) => {
+    rowData = HistoryOrder.from(rowData);
+    console.log(rowData);
+
     let tableRow = document.createElement('tr');
 
     let tableData = document.createElement('td');
     tableData.appendChild(
         document
-            .createTextNode(rowData.bookName))
+            .createTextNode(rowData.bookTitle))
     tableRow.appendChild(tableData);
 
     tableData = document.createElement('td');
@@ -22,7 +45,7 @@ const makeRow = (rowData) => {
     tableData = document.createElement('td');
     tableData.appendChild(
         document
-            .createTextNode(rowData.dateExpire))
+            .createTextNode(rowData.dateReturned))
     tableRow.appendChild(tableData);
     tableData = document.createElement('td');
 

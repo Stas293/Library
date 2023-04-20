@@ -123,8 +123,11 @@ public class BookQueriesImpl implements BookQueries {
 
     private QueryBuilder selectBooks() {
         return queryBuilderImpl.setUp()
-                .select("*")
-                .from("books");
+                .select("b.*")
+                .from("books b")
+                .join("book_authors ba", "b.id = ba.book_id")
+                .join("authors a", "ba.author_id = a.id")
+                .groupBy("b.id");
     }
 
     @Override
@@ -147,7 +150,9 @@ public class BookQueriesImpl implements BookQueries {
     @Override
     public String getGetBookByIdQuery() {
         return queries.computeIfAbsent("getGetBookByIdQuery",
-                key -> selectBooks()
+                key -> queryBuilderImpl.setUp()
+                        .select("b.*")
+                        .from("books b")
                         .where("id = ?")
                         .build());
     }
@@ -177,7 +182,7 @@ public class BookQueriesImpl implements BookQueries {
                             .build());
         }
         return selectBooks()
-                .orderBy(page.getSort())
+                .orderByMinMax(page.getSort())
                 .limit("?")
                 .offset("?")
                 .build();
@@ -242,7 +247,7 @@ public class BookQueriesImpl implements BookQueries {
         }
         return queries.computeIfAbsent("getSearchBooksQuerySort",
                 key -> selectBooksJoinRelationSearchByFieldsGroupById()
-                        .orderBy(page.getSort())
+                        .orderByMinMax(page.getSort())
                         .limit("?")
                         .offset("?")
                         .build());
@@ -267,15 +272,8 @@ public class BookQueriesImpl implements BookQueries {
 
     @Override
     public String getSearchBooksWhichUserDidNotOrderQuery(Pageable page) {
-        if (page.getSort() == null) {
-            return queries.computeIfAbsent("getSearchBooksWhichUserDidNotOrderQuery",
-                    key -> selectBooksExceptOrderedJoinRelationSearchByFieldsGroupById()
-                            .limit("?")
-                            .offset("?")
-                            .build());
-        }
         return selectBooksExceptOrderedJoinRelationSearchByFieldsGroupById()
-                        .orderBy(page.getSort())
+                        .orderByMinMax(page.getSort())
                         .limit("?")
                         .offset("?")
                         .build();
@@ -367,6 +365,27 @@ public class BookQueriesImpl implements BookQueries {
                         .where("o.user_id = ?")
                         .groupBy("b.id")
                         .as("t")
+                        .build());
+    }
+
+    @Override
+    public String getBookCountQuery() {
+        return queries.computeIfAbsent("getBookCountQuery",
+                key -> queryBuilderImpl.setUp()
+                        .select("b.count")
+                        .from("books b")
+                        .where("b.id = ?")
+                        .build());
+    }
+
+    @Override
+    public String getBooksByAuthorIdQuery() {
+        return queries.computeIfAbsent("getBooksByAuthorIdQuery",
+                key -> queryBuilderImpl.setUp()
+                        .select("b.*")
+                        .from("books b")
+                        .join("book_authors ba", "b.id = ba.book_id")
+                        .where("ba.author_id = ?")
                         .build());
     }
 }

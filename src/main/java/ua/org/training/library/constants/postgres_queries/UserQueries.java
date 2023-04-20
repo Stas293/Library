@@ -46,4 +46,8 @@ public interface UserQueries {
     String getQueryDeleteRolesByUserId();
 
     String getQueryInsertRolesByUserId();
+
+    String getQuerySearchUsers(Pageable pageable, String search);
+
+    String getQueryCountUsers(String search);
 }

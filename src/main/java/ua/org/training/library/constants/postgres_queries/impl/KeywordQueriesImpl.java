@@ -168,4 +168,24 @@ public class KeywordQueriesImpl implements KeywordQueries {
                         .values("?", "?")
                         .build());
     }
+
+    @Override
+    public String getSelectByQueryQuery() {
+        return queries.computeIfAbsent("getSelectByQueryQuery",
+                key -> queryBuilderImpl.setUp()
+                        .select("k.*")
+                        .from("keywords k")
+                        .where("k.keyword LIKE ?")
+                        .build());
+    }
+
+    @Override
+    public String getSelectByDataQuery() {
+        return queries.computeIfAbsent("getSelectByDataQuery",
+                key -> queryBuilderImpl.setUp()
+                        .select("k.*")
+                        .from("keywords k")
+                        .where("k.keyword = ?")
+                        .build());
+    }
 }

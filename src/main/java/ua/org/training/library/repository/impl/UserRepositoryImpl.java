@@ -104,6 +104,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public Page<User> searchUsers(Pageable pageable, String search) {
+        log.info("Searching users by: {}", search);
+        return userDao.searchUsers(transactionManager.getConnection(), pageable, search);
+    }
+
+    @Override
     public User save(User entity) {
         if (entity.getId() == null) {
             throw new UnsupportedOperationException("Cannot save user without password");
@@ -125,8 +131,9 @@ public class UserRepositoryImpl implements UserRepository {
         Optional<User> user = userDao.getById(transactionManager.getConnection(), aLong);
         user.ifPresent(value ->
                 value.setRoles(
-                        roleDao.getRolesByUserId(transactionManager.getConnection(),
-                                value.getId())));
+                        roleDao.getRolesByUserId(transactionManager.getConnection(), value.getId())
+                )
+        );
         return user;
     }
 

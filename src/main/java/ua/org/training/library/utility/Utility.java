@@ -1,21 +1,21 @@
 package ua.org.training.library.utility;
 
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import ua.org.training.library.constants.Values;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.regex.MatchResult;
+import java.util.regex.Pattern;
 
 @Slf4j
 @UtilityClass
 public class Utility {
-    private static final String APP_PROPERTIES_NAME = "application";
+    private static final Pattern numberPattern = Pattern.compile("\\d+");
 
 
     public static double tryParseDouble(String applicationProperty, int defaultValue) {
@@ -87,17 +87,9 @@ public class Utility {
     }
 
     public static long getIdFromUri(HttpServletRequest request) {
-        String[] uriParts = request.getRequestURI().split("/");
-        return parseLongOrDefault(uriParts[uriParts.length - 1], Values.DEFAULT_ID);
-    }
+        return Long.parseLong(numberPattern.matcher(request.getRequestURI()).results()
+                .map(MatchResult::group)
+                .findFirst().orElse("-1"));
 
-    public static Date parseDateOrDefault(String parameter, Date defaultValue) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        try {
-            return format.parse(parameter);
-        } catch (ParseException | NullPointerException e) {
-            log.error( String.format("Date format exception %s", parameter), e);
-        }
-        return defaultValue;
     }
 }

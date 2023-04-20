@@ -164,4 +164,48 @@ public class AuthorQueriesImpl implements AuthorQueries {
                         .values("?", "?")
                         .build());
     }
+
+    @Override
+    public String getSearchAuthors(Sort sort) {
+        if (sort == null) {
+            return queries.computeIfAbsent("getSearchAuthors",
+                    key -> selectAuthors()
+                            .where("first_name LIKE ?")
+                            .or("middle_name LIKE ?")
+                            .or("last_name LIKE ?")
+                            .limit("?")
+                            .offset("?")
+                            .build());
+        }
+        return selectAuthors()
+                .where("first_name LIKE ?")
+                .or("middle_name LIKE ?")
+                .or("last_name LIKE ?")
+                .orderBy(sort)
+                .limit("?")
+                .offset("?")
+                .build();
+    }
+
+    @Override
+    public String getAuthorsCount() {
+        return queries.computeIfAbsent("getAuthorsCount",
+                key -> queryBuilderImpl.setUp()
+                        .select("count(*)")
+                        .from("authors")
+                        .where("first_name LIKE ?")
+                        .or("middle_name LIKE ?")
+                        .or("last_name LIKE ?")
+                        .build());
+    }
+
+    @Override
+    public String getFindAllByNameContainingIgnoreCase() {
+        return queries.computeIfAbsent("getFindAllByNameContainingIgnoreCase",
+                key -> selectAuthors()
+                        .where("first_name LIKE ?")
+                        .or("middle_name LIKE ?")
+                        .or("last_name LIKE ?")
+                        .build());
+    }
 }

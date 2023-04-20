@@ -19,8 +19,8 @@
             <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
                 <li class="breadcrumb-item active">
-                    <a href="/library/user/page">
-                        <fmt:message key="home.pageTitle"/>
+                    <a href="/library/order/user/page">
+                        <fmt:message key="order.created.title"/>
                     </a>
                 </li>
             </ol>

@@ -15,12 +15,12 @@ import ua.org.training.library.utility.page.Pageable;
 import java.util.Locale;
 import java.util.Optional;
 
-public interface OrderService extends GenericService<Long, Order> {
+public interface OrderService {
     Page<Order> getPageByBook(Pageable page, Book book);
 
     Page<OrderDto> getPageByStatusAndUser(Pageable page, String status, User user, String search, Locale locale);
 
-    Page<OrderDto> getPageByStatus(Pageable page, String status, String search);
+    Page<OrderDto> getPageByStatus(Pageable page, String status, String search, String place);
 
     HistoryOrder save(Order order);
 
@@ -28,7 +28,7 @@ public interface OrderService extends GenericService<Long, Order> {
 
     Optional<OrderDto> getOrderById(long id, Locale locale);
 
-    Optional<OrderDto> updateModel(OrderUpdateDto orderUpdateDto);
+    Optional<OrderDto> updateModel(OrderUpdateDto orderUpdateDto, Locale locale);
 
     Optional<OrderDto> getOrderForEdit(long id, Locale locale);
 }

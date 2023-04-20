@@ -10,17 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.org.training.library.model.Role;
-import ua.org.training.library.model.User;
-import ua.org.training.library.security.AuthorityUser;
 import ua.org.training.library.utility.Constants;
-import ua.org.training.library.utility.Utility;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 

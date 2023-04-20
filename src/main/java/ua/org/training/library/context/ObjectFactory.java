@@ -112,7 +112,7 @@ public class ObjectFactory {
                 .map(parameter -> getObjectForConstructorInvocation(qualifiedObjects, objects, parameter))
                 .toArray();
         log.info("Args: {}", Arrays.toString(args));
-        return (T) constructor.newInstance(args);
+        return implClass.cast(constructor.newInstance(args));
     }
 
     @Nullable
@@ -141,7 +141,7 @@ public class ObjectFactory {
         Set<Object> objects = Arrays.stream(constructor.getParameters())
                 .filter(parameter -> !parameter.isAnnotationPresent(Qualifier.class))
                 .map(Parameter::getType)
-                .map(t -> context.getObject(t))
+                .map(context::getObject)
                 .collect(Collectors.toSet());
         log.info("Objects: {}", objects);
         return objects;

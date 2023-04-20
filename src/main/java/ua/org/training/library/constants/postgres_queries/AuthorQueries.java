@@ -31,4 +31,10 @@ public interface AuthorQueries {
     String getDeleteAuthorsByBookId();
 
     String getSaveAuthorsToBook();
+
+    String getSearchAuthors(Sort sort);
+
+    String getAuthorsCount();
+
+    String getFindAllByNameContainingIgnoreCase();
 }

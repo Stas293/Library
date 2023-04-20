@@ -9,7 +9,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 public interface PlaceRepository extends JRepository<Place, Long> {
-    Optional<Place> getByName(String name);
+    Optional<Place> getByCode(String name);
 
     List<Place> findAll(Locale locale);
 }

@@ -121,7 +121,7 @@ function setBookListeners(url) {
     const book_title = document.querySelector("#book_title");
     const isbn = document.querySelector("#isbn");
     const date_publication = document.querySelector("#date_publication");
-    const language = document.querySelector("#language");
+    const book_authors = document.querySelector("#book_authors");
     book_title.onclick = function () {
         sortBy = "title";
         func(url);
@@ -134,8 +134,8 @@ function setBookListeners(url) {
         sortBy = "date_publication";
         func(url);
     };
-    language.onclick = function () {
-        sortBy = "language";
+    book_authors.onclick = function () {
+        sortBy = "last_name";
         func(url);
     };
     sortBy = "title";

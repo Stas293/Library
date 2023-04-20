@@ -19,14 +19,15 @@
             <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
                 <li class="breadcrumb-item active">
-                    <a href="/library/user/page">
-                        <fmt:message key="home.pageTitle"/>
+                    <a href="/library/order/librarian/page">
+                        <fmt:message key="librarian.changeOrderStatus.pageTitle"/>
                     </a>
                 </li>
             </ol>
             <h1><fmt:message key="orderBook.pageTitle"/></h1>
             <form id="add-book-form" data-toggle="validator" action="/library/order/librarian/edit-order"
                   method="post">
+                <input type="hidden" name="_method" value="PATCH"/>
                 <input type="hidden" name="orderId" id="orderId" value="${order.id}"/>
                 <h2><span class="text-primary">${order.book.title}</span></h2>
                 <h3>${order.book.description}</h3>
@@ -35,6 +36,9 @@
                 <h3><fmt:message key="orderBook.label.place"/> ${order.place.name}</h3>
                 <h3><fmt:message key="newRequest.label.status"/> ${order.status.value}</h3>
                 <h3><fmt:message key="newRequest.label.date"/> ${order.dateCreated}</h3>
+                <c:if test="${order.dateExpire != null}">
+                    <h3><fmt:message key="newRequest.label.dateExpire"/> ${order.dateExpire}</h3>
+                </c:if>
                 <h3><fmt:message key="newRequest.label.user"/> ${order.user.login}</h3>
 
                 <div class="form-group" id="statusSelect">
@@ -67,7 +71,7 @@
                     </button>
                 </div>
                 <div class="form-group">
-                    <a class="btn btn-danger" href='/library/order/user/page'>
+                    <a class="btn btn-danger" href='/library/order/librarian/page'>
                         <fmt:message key="newRequest.label.cancel"/>
                     </a>
                 </div>
@@ -76,9 +80,13 @@
 
         <script>
             $(document).ready(function () {
-                const select = $('#status');
-                select.change(function () {
-                    if (select.find('option:selected').attr('closed') === 'true') {
+                $('#dateExpire').attr('min', new Date().toISOString().split('T')[0]);
+                if ($('#status option:selected').attr('closed') === 'true') {
+                    $('#chooseDateExpiration').hide();
+                }
+
+                $('#status').change(function () {
+                    if ($('#status option:selected').attr('closed') === 'true') {
                         $('#chooseDateExpiration').hide();
                     } else {
                         $('#chooseDateExpiration').show();

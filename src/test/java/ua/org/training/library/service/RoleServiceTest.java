@@ -7,18 +7,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.org.training.library.dao.DaoFactory;
-import ua.org.training.library.dao.PlaceDao;
-import ua.org.training.library.dao.RoleDao;
 import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.DaoException;
 import ua.org.training.library.exceptions.JDBCException;
 import ua.org.training.library.exceptions.ServiceException;
-import ua.org.training.library.model.Role;
 import ua.org.training.library.utility.page.Page;
 
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -242,4 +242,47 @@ public class UserQueriesImpl implements UserQueries {
                         .values("?", "?")
                         .build());
     }
+
+    @Override
+    public String getQuerySearchUsers(Pageable pageable, String search) {
+        if (pageable.getSort() == null) {
+            return queries.computeIfAbsent("getQuerySearchUsers",
+                    key -> queryBuilderImpl.setUp()
+                            .select("*")
+                            .from("users")
+                            .where("login LIKE ?")
+                            .or("first_name LIKE ?")
+                            .or("last_name LIKE ?")
+                            .or("email LIKE ?")
+                            .or("phone LIKE ?")
+                            .limit("?")
+                            .offset("?")
+                            .build());
+        }
+        return queryBuilderImpl.setUp()
+                .select("*")
+                .from("users")
+                .where("login LIKE ?")
+                .or("first_name LIKE ?")
+                .or("last_name LIKE ?")
+                .or("email LIKE ?")
+                .or("phone LIKE ?")
+                .orderBy(pageable.getSort())
+                .limit("?")
+                .offset("?")
+                .build();
+    }
+
+    @Override
+    public String getQueryCountUsers(String search) {
+        return queryBuilderImpl.setUp()
+                .select("count(*)")
+                .from("users")
+                .where("login LIKE ?")
+                .or("first_name LIKE ?")
+                .or("last_name LIKE ?")
+                .or("email LIKE ?")
+                .or("phone LIKE ?")
+                .build();
+    }
 }

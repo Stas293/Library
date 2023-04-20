@@ -48,20 +48,6 @@ public class SecurityService {
     }
 
     @SuppressWarnings("unchecked")
-    public void updateUserDataInContext(HttpServletRequest request,
-                                               AuthorityUser newAuthorityUser,
-                                               AuthorityUser initialAuthorityUser) {
-        Set<String> loggedUserLogins = Optional.ofNullable(
-                        (Set<String>) request.getServletContext()
-                                .getAttribute(Values.LOGGED_USERS_SET_CONTEXT))
-                .orElse(new HashSet<>());
-        loggedUserLogins.remove(initialAuthorityUser.getLogin());
-        loggedUserLogins.add(newAuthorityUser.getLogin());
-        request.getSession().setAttribute(Values.USER_ATTRIBUTE, newAuthorityUser);
-        request.getServletContext().setAttribute(Values.LOGGED_USERS_SET_CONTEXT, loggedUserLogins);
-    }
-
-    @SuppressWarnings("unchecked")
     public void removeLoggedUserFromSession(HttpServletRequest request, String login) {
         Set<String> loggedUserLogins = Optional.ofNullable(
                         (Set<String>) request.getServletContext()

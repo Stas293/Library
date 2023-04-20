@@ -11,7 +11,6 @@ import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.DaoException;
 import ua.org.training.library.exceptions.JDBCException;
 import ua.org.training.library.exceptions.ServiceException;
-import ua.org.training.library.model.Place;
 import ua.org.training.library.utility.page.Page;
 
 import java.sql.SQLException;

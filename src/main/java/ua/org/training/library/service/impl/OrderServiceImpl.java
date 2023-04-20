@@ -18,8 +18,6 @@ import ua.org.training.library.service.OrderService;
 import ua.org.training.library.utility.mapper.ObjectMapper;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
-import ua.org.training.library.utility.page.impl.PageRequest;
-import ua.org.training.library.utility.page.impl.Sort;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -38,122 +36,6 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final PlaceRepository placeRepository;
-
-    @Override
-    @Transactional
-    public Order createModel(Order model) {
-        log.info("Creating order: {}", model);
-        Status status = statusRepository.findByCode(Values.REGISTERED).orElseThrow();
-        User user = userRepository.getByLogin(model.getUser().getLogin()).orElseThrow();
-        model.setStatus(status);
-        model.setUser(user);
-        Book book = model.getBook();
-        if (bookRepository.findById(book.getId()).orElseThrow().getCount() == 0) {
-            return null;
-        }
-        Order savedOrder = orderRepository.save(model);
-        log.info("Saved order: {}", savedOrder);
-        book.setCount(book.getCount() - 1);
-        bookRepository.save(book);
-        return savedOrder;
-    }
-
-    @Override
-    @Transactional
-    public void updateModel(Order model) {
-        log.info("Updating order: {}", model);
-        orderRepository.save(model);
-    }
-
-    @Override
-    @Transactional
-    public void deleteModel(Order author) {
-        log.info("Deleting order: {}", author);
-        orderRepository.delete(author);
-    }
-
-    @Override
-    @Transactional
-    public void createModels(List<Order> models) {
-        log.info("Creating orders: {}", models);
-        orderRepository.saveAll(models);
-    }
-
-    @Override
-    @Transactional
-    public void updateModels(List<Order> models) {
-        log.info("Updating orders: {}", models);
-        orderRepository.saveAll(models);
-    }
-
-    @Override
-    @Transactional
-    public void deleteModels(List<Order> models) {
-        log.info("Deleting orders: {}", models);
-        orderRepository.deleteAll(models);
-    }
-
-    @Override
-    public List<Order> getAllModels() {
-        log.info("Getting all orders");
-        return orderRepository.findAll();
-    }
-
-    @Override
-    public List<Order> getModelsByIds(List<Long> ids) {
-        log.info("Getting orders by ids: {}", ids);
-        return orderRepository.findAllById(ids);
-    }
-
-    @Override
-    public long countModels() {
-        log.info("Counting orders");
-        return orderRepository.count();
-    }
-
-    @Override
-    public void deleteAllModels() {
-        log.info("Deleting all orders");
-        orderRepository.deleteAll();
-    }
-
-    @Override
-    public boolean checkIfExists(Order model) {
-        log.info("Checking if order exists: {}", model);
-        return orderRepository.existsById(model.getId());
-    }
-
-    @Override
-    public Page<Order> getModelsByPage(int pageNumber, int pageSize) {
-        log.info("Getting orders by page: {}, {}", pageNumber, pageSize);
-        return orderRepository.findAll(PageRequest.of(pageNumber, pageSize));
-    }
-
-    @Override
-    @Transactional
-    public void deleteModelById(Long id) {
-        log.info("Deleting order by id: {}", id);
-        orderRepository.deleteById(id);
-    }
-
-    @Override
-    @Transactional
-    public void deleteModelsByIds(List<Long> ids) {
-        log.info("Deleting orders by ids: {}", ids);
-        orderRepository.deleteAllById(ids);
-    }
-
-    @Override
-    public List<Order> getAllModels(String sortField, String sortOrder) {
-        log.info("Getting all orders by sort: {}, {}", sortField, sortOrder);
-        return orderRepository.findAll(Sort.by(Sort.Direction.fromString(sortOrder), sortField));
-    }
-
-    @Override
-    public Page<Order> getModelsByPage(int pageNumber, int pageSize, Sort.Direction direction, String... sortField) {
-        log.info("Getting orders by page: {}, {}, {}, {}", pageNumber, pageSize, direction, sortField);
-        return orderRepository.findAll(PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortField)));
-    }
 
     @Override
     public Page<Order> getPageByBook(Pageable page, Book book) {
@@ -175,8 +57,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderDto> getPageByStatus(Pageable page, String status, String search) {
+    public Page<OrderDto> getPageByStatus(Pageable page, String status, String search, String place) {
         log.info("Getting orders by status: {}, {}", page, status);
+        if (place != null) {
+            return getPageByStatusAndPlace(page, status, search, place);
+        }
         Status statusOrder = statusRepository.findByCode(status).orElseThrow();
         if (search != null && !search.isEmpty()) {
             Page<Order> orderPage = orderRepository.getPageByStatusAndSearch(page, statusOrder, search);
@@ -184,6 +69,17 @@ public class OrderServiceImpl implements OrderService {
         }
         Page<Order> pageByStatus = orderRepository.getPageByStatus(page, statusOrder);
         return objectMapper.mapOrderLibrarianToOrderDto(pageByStatus);
+    }
+
+    private Page<OrderDto> getPageByStatusAndPlace(Pageable page, String status, String search, String place) {
+        Status statusOrder = statusRepository.findByCode(status).orElseThrow();
+        Place placeOrder = placeRepository.getByCode(place).orElseThrow();
+        if (search != null && !search.isEmpty()) {
+            Page<Order> orderPage = orderRepository.getPageByStatusAndPlaceAndSearch(page, statusOrder, placeOrder, search);
+            return objectMapper.mapOrderLibrarianToOrderDto(orderPage);
+        }
+        Page<Order> pageByStatusAndPlace = orderRepository.getPageByStatusAndPlace(page, statusOrder, placeOrder);
+        return objectMapper.mapOrderLibrarianToOrderDto(pageByStatusAndPlace);
     }
 
     @Override
@@ -216,7 +112,11 @@ public class OrderServiceImpl implements OrderService {
                 .dateCreated(LocalDate.now())
                 .build();
         book.setCount(book.getCount() - 1);
-        bookRepository.save(book);
+        long count = bookRepository.getBookCount(book.getId());
+        if (count == 0) {
+            return Optional.empty();
+        }
+        bookRepository.updateBookCount(book);
         orderRepository.save(order);
         log.info("Saved order: {}", order);
         return Optional.of(objectMapper.mapOrderSimpleToOrderDto(order));
@@ -229,8 +129,39 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Optional<OrderDto> updateModel(OrderUpdateDto orderUpdateDto) {
-        return Optional.empty();
+    @Transactional
+    public Optional<OrderDto>  updateModel(OrderUpdateDto orderUpdateDto, Locale locale) {
+        log.info("Updating order: {}", orderUpdateDto);
+        Order order = orderRepository.findById(orderUpdateDto.getId(), locale).orElseThrow();
+        log.info("Order: {}", order);
+        Status previousStatus = order.getStatus();
+        log.info("Previous status: {}", previousStatus);
+        Status status = statusRepository.findByCode(orderUpdateDto.getStatus()).orElseThrow();
+        log.info("New status: {}", status);
+        order.setStatus(status);
+        if (Boolean.TRUE.equals(status.getClosed())) {
+            log.info("Order is closed");
+            LocalDate dateExpiration = orderUpdateDto.getDateExpire();
+            order.setDateExpire(dateExpiration);
+            log.info("Date expiration: {}", dateExpiration);
+            orderRepository.delete(order);
+            log.info("Order deleted");
+            Book book = order.getBook();
+            book.setCount(book.getCount() + 1);
+            bookRepository.updateBookCount(book);
+            log.info("Book count updated");
+            HistoryOrder historyOrder = objectMapper.mapOrderToHistoryOrder(order);
+            log.info("History order: {}", historyOrder);
+            if (previousStatus.getCode().equals(Values.REGISTERED)) {
+                historyOrder.setDateReturned(null);
+            }
+            historyOrderRepository.save(historyOrder);
+        } else {
+            log.info("Order is not closed");
+            order.setDateExpire(orderUpdateDto.getDateExpire());
+            orderRepository.save(order);
+        }
+        return Optional.of(objectMapper.mapOrderSimpleToOrderDto(order));
     }
 
     @Override
@@ -239,7 +170,7 @@ public class OrderServiceImpl implements OrderService {
         Optional<Order> order = orderRepository.findById(id, locale);
         if (order.isPresent()) {
             Status status = order.get().getStatus();
-            List<Status> nextStatuses = statusRepository.getNextStatusesForStatusById(status.getId());
+            List<Status> nextStatuses = statusRepository.getNextStatusesForStatusById(status.getId(), locale);
             status.setNextStatuses(nextStatuses);
             return Optional.of(objectMapper.mapOrderToOrderDto(order.get()));
         }

@@ -3,6 +3,8 @@ package ua.org.training.library.dao;
 
 import ua.org.training.library.model.Role;
 import ua.org.training.library.model.User;
+import ua.org.training.library.utility.page.Page;
+import ua.org.training.library.utility.page.Pageable;
 
 import java.sql.Connection;
 import java.util.Collection;
@@ -39,4 +41,6 @@ public interface UserDao extends GenericDao<User> {
     void updateRolesByUserId(Connection connection,
                              Long id,
                              Collection<Role> roles);
+
+    Page<User> searchUsers(Connection connection, Pageable pageable, String search);
 }

@@ -13,7 +13,7 @@
         <title>
             Library
         </title>
-      <script src="${pageContext.request.contextPath}/js/pagination.js" type="text/javascript"></script>
+      <script src="${pageContext.request.contextPath}/js/pagination.js"></script>
       <script src="${pageContext.request.contextPath}/js/pageable-admin-users.js"></script>
     </jsp:attribute>
     <jsp:body>

@@ -9,8 +9,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.org.training.library.exceptions.ServiceException;
-import ua.org.training.library.model.Role;
-import ua.org.training.library.model.User;
 import ua.org.training.library.utility.Constants;
 
 import java.util.HashSet;

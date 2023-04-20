@@ -3,7 +3,7 @@ package ua.org.training.library.mapping;
 
 import ua.org.training.library.context.HttpMapping;
 import ua.org.training.library.context.annotations.Component;
-import ua.org.training.library.context.annotations.Post;
+import ua.org.training.library.context.annotations.mapping.Post;
 import ua.org.training.library.enums.RequestMethod;
 
 import java.lang.reflect.Method;

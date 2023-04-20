@@ -1,6 +1,5 @@
 package ua.org.training.library.utility.page;
 
-
 import ua.org.training.library.utility.page.impl.PageRequest;
 import ua.org.training.library.utility.page.impl.Sort;
 

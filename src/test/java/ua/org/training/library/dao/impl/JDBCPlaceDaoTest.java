@@ -5,9 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.org.training.library.dao.PlaceDao;
 import ua.org.training.library.exceptions.DaoException;
-import ua.org.training.library.model.Place;
 import ua.org.training.library.utility.page.Page;
 
 import java.sql.*;

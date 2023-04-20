@@ -36,6 +36,12 @@ public class RoleRepositoryImpl implements RoleRepository {
     }
 
     @Override
+    public List<Role> findAllByCodes(List<String> roles) {
+        log.info("Getting roles by codes: {}", roles);
+        return roleDao.getAllByCodes(transactionManager.getConnection(), roles);
+    }
+
+    @Override
     public Role save(Role entity) {
         log.info("Saving role: {}", entity);
         if (entity.getId() == null) {

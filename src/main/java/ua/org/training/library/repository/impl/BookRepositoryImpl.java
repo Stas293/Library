@@ -9,10 +9,7 @@ import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.dao.AuthorDao;
 import ua.org.training.library.dao.BookDao;
 import ua.org.training.library.dao.KeywordDao;
-import ua.org.training.library.model.Author;
-import ua.org.training.library.model.Book;
-import ua.org.training.library.model.Order;
-import ua.org.training.library.model.User;
+import ua.org.training.library.model.*;
 import ua.org.training.library.repository.BookRepository;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
@@ -36,6 +33,8 @@ public class BookRepositoryImpl implements BookRepository {
     public Book save(Book entity) {
         log.info("Saving book: {}", entity);
         Connection conn = transactionManager.getConnection();
+        List<Author> authors = entity.getAuthors();
+        List<Keyword> keywords = entity.getKeywords();
         if (entity.getId() == null) {
             log.info("Creating book: {}", entity);
             entity = bookDao.create(conn, entity);
@@ -44,8 +43,8 @@ public class BookRepositoryImpl implements BookRepository {
             bookDao.update(conn, entity);
         }
         log.info("Setting authors and keywords to book: {}", entity);
-        authorDao.setAuthorsToBook(conn, entity.getId(), entity.getAuthors());
-        keywordDao.setKeywordsToBook(conn, entity.getId(), entity.getKeywords());
+        authorDao.setAuthorsToBook(conn, entity.getId(), authors);
+        keywordDao.setKeywordsToBook(conn, entity.getId(), keywords);
         return entity;
     }
 
@@ -165,7 +164,12 @@ public class BookRepositoryImpl implements BookRepository {
     public Page<Book> findAll(Pageable pageable) {
         log.info("Getting all books by page: {}", pageable);
         Connection conn = transactionManager.getConnection();
-        return bookDao.getPage(conn, pageable);
+        Page<Book> page = bookDao.getPage(conn, pageable);
+        log.info("Setting authors to books: {}", page);
+        for (Book book : page.getContent()) {
+            book.setAuthors(authorDao.getAuthorsByBookId(conn, book.getId()));
+        }
+        return page;
     }
 
     @Override
@@ -204,16 +208,26 @@ public class BookRepositoryImpl implements BookRepository {
     public Page<Book> getBooksExceptUserOrders(Pageable page, User user) {
         log.info("Getting books except user orders: {}", user);
         Connection conn = transactionManager.getConnection();
-        return bookDao.getBooksWhichUserDidNotOrder(
+        Page<Book> booksWhichUserDidNotOrder = bookDao.getBooksWhichUserDidNotOrder(
                 conn, page, user.getId());
+        log.info("Setting authors to books: {}", booksWhichUserDidNotOrder);
+        for (Book book : booksWhichUserDidNotOrder.getContent()) {
+            book.setAuthors(authorDao.getAuthorsByBookId(conn, book.getId()));
+        }
+        return booksWhichUserDidNotOrder;
     }
 
     @Override
     public Page<Book> searchBooksExceptUserOrders(Pageable page, User user, String search) {
         log.info("Searching books except user orders: {}", user);
         Connection conn = transactionManager.getConnection();
-        return bookDao.searchBooksWhichUserDidNotOrder(
+        Page<Book> bookPage = bookDao.searchBooksWhichUserDidNotOrder(
                 conn, page, user.getId(), search);
+        log.info("Setting authors to books: {}", bookPage);
+        for (Book book : bookPage.getContent()) {
+            book.setAuthors(authorDao.getAuthorsByBookId(conn, book.getId()));
+        }
+        return bookPage;
     }
 
     @Override
@@ -233,6 +247,32 @@ public class BookRepositoryImpl implements BookRepository {
     public Page<Book> searchBooks(Pageable page, String search) {
         log.info("Searching books by page: {}", page);
         Connection connection = transactionManager.getConnection();
-        return bookDao.searchBooks(connection, page, search);
+        Page<Book> bookPage = bookDao.searchBooks(connection, page, search);
+        log.info("Setting authors to books: {}", bookPage);
+        for (Book book : bookPage.getContent()) {
+            book.setAuthors(authorDao.getAuthorsByBookId(connection, book.getId()));
+        }
+        return bookPage;
+    }
+
+    @Override
+    public long getBookCount(Long id) {
+        log.info("Getting book count by id: {}", id);
+        Connection conn = transactionManager.getConnection();
+        return bookDao.getBookCount(conn, id);
+    }
+
+    @Override
+    public void updateBookCount(Book book) {
+        log.info("Updating book count: {}", book);
+        Connection conn = transactionManager.getConnection();
+        bookDao.update(conn, book);
+    }
+
+    @Override
+    public List<Book> findAllByAuthors(Author author) {
+        log.info("Getting all books by author: {}", author);
+        Connection conn = transactionManager.getConnection();
+        return (List<Book>) bookDao.getBooksByAuthorId(conn, author.getId());
     }
 }

@@ -3,6 +3,8 @@ package ua.org.training.library.repository;
 
 import ua.org.training.library.model.User;
 import ua.org.training.library.repository.base.JRepository;
+import ua.org.training.library.utility.page.Page;
+import ua.org.training.library.utility.page.Pageable;
 
 import java.util.Optional;
 
@@ -23,4 +25,6 @@ public interface UserRepository extends JRepository<User, Long> {
     void updatePassword(User user, String password);
 
     String getPasswordForUser(User user);
+
+    Page<User> searchUsers(Pageable pageable, String search);
 }

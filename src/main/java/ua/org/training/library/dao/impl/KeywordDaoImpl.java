@@ -272,6 +272,39 @@ public class KeywordDaoImpl implements KeywordDao {
         reSetKeywordsToBook(connection, bookId, keywords);
     }
 
+    @Override
+    public List<Keyword> getKeywordsByQuery(Connection conn, String query) {
+        log.info("Getting keywords by query: {}", query);
+        try (PreparedStatement statement = conn.prepareStatement(
+                keywordQueries.getSelectByQueryQuery())) {
+            statement.setString(1, "%" + query + "%");
+            try (ResultSet rs = statement.executeQuery()) {
+                return keywordCollector.collectList(rs);
+            }
+        } catch (SQLException ex) {
+            log.error("Error getting keywords by query: {}", ex.getMessage());
+            throw new DaoException("Error getting keywords by query: " + ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public Optional<Keyword> getByData(Connection conn, String keyword) {
+        log.info("Getting keyword by data: {}", keyword);
+        try (PreparedStatement statement = conn.prepareStatement(
+                keywordQueries.getSelectByDataQuery())) {
+            statement.setString(1, keyword);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(keywordCollector.collect(rs));
+                }
+            }
+            return Optional.empty();
+        } catch (SQLException ex) {
+            log.error("Error getting keyword by data: {}", ex.getMessage());
+            throw new DaoException("Error getting keyword by data: " + ex.getMessage(), ex);
+        }
+    }
+
     private void reSetKeywordsToBook(Connection connection, Long bookId, List<Keyword> keywords) {
         log.info("Re-setting keywords to book: {}", keywords);
         try (PreparedStatement statement = connection.prepareStatement(

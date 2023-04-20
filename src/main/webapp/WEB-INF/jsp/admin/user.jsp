@@ -4,18 +4,14 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="tag" tagdir="/WEB-INF/tags" %>
 
-<c:set var="email" value="${account.email}" />
-<c:set var="userPath" value="/library/admin/users/${account.id}" />
-<c:url var="userUrl" value="/${userPath}" />
 
 <fmt:requestEncoding value="UTF-8" />
 <fmt:setLocale value="${sessionScope.lang}" />
 <fmt:setBundle basename="interface"/>
 
-<c:url var="editUserUrl" value="${userPath}/edit" />
-<c:url var="deleteUserUrl" value="/library/admin/delete-user" />
-<c:url var="disableUserUrl" value="/library/admin/disable-user" />
-<c:url var="enableUserUrl" value="/library/admin/enable-user" />
+<c:url var="deleteUserUrl" value="/library/admin/manage" />
+<c:url var="disableUserUrl" value="/library/admin/manage" />
+<c:url var="enableUserUrl" value="/library/admin/manage" />
 
 <tag:authorization>
     <jsp:attribute name="head">
@@ -27,20 +23,24 @@
         	<li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle" /></a></li>
         	<li class="breadcrumb-item active"><a href="/library/admin/page"><fmt:message key="usersList.pageTitle" /></a></li>
         </ol>
+		<c:if test="${param.success == true}">
+			<div class="info alert"><fmt:message key="editUser.user.save"/></div>
+		</c:if>
+
         <h1><c:out value="${account.fullName}" /></h1>
-        <form action="${deleteUserUrl}" method="post">
-		    <input type="text" name=id class="hidden" value=${account.id}>
+        <form action="${deleteUserUrl}/${account.id}" method="post">
+			<input type="hidden" name="_method" value="DELETE"/>
 		    <input type="submit" class="btn btn-danger" value=<fmt:message key="user.delete" /> >
 		</form>
 		<c:if test="${account.enabled == true}">
-		    <form action="${disableUserUrl}" method="post">
-			    <input type="text" name=id class="hidden" value=${account.id}>
+		    <form action="${disableUserUrl}/${account.id}/disable" method="post">
+				<input type="hidden" name="_method" value="PATCH"/>
 			    <input type="submit" class="btn btn-warning" value=<fmt:message key="user.disable" /> >
 			</form>
 		</c:if>
 		<c:if test="${account.enabled == false}">
-		    <form action="${enableUserUrl}" method="post">
-			    <input type="text" name=id class="hidden" value=${account.id}>
+		    <form action="${enableUserUrl}/${account.id}/enable" method="post">
+				<input type="hidden" name="_method" value="PATCH"/>
 			    <input type="submit" class="btn btn-success" value=<fmt:message key="user.enable" /> >
 			</form>
 		</c:if>
@@ -63,7 +63,7 @@
 				<div class="form-group row">
 					<div class="col-sm-2"><fmt:message key="user.email" /></div>
 					<div class="col-sm-6">
-						<a href="mailto:${email}">${email}</a>
+						<a href="mailto:${account.email}">${account.email}</a>
 					</div>
 				</div>
 				<div class="form-group row">
@@ -82,13 +82,13 @@
 					<div class="col-sm-2"><fmt:message key="user.roles" /></div>
 					<div class="col-sm-6">
 						<c:forEach var="role" items="${account.roles}">
-							<c:out value="${role}" /><br />
+							<c:out value="${role.code}" /><br />
 						</c:forEach>
 					</div>
 				</div>
 			</div>
 		</div>
-		<a href="${editUserUrl}" class="btn btn-primary"><fmt:message key="user.edit" /></a>
+		<a href="/library/admin/manage/${account.id}/edit" class="btn btn-primary"><fmt:message key="user.edit" /></a>
     </div>
     </jsp:body>
 </tag:authorization>

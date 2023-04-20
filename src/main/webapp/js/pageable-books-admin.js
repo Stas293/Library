@@ -1,147 +1,94 @@
-const urlPath = `/library/books-page`;
+const urlPath = `/library/books/page`;
+const moreInfoUrl = `/library/books/admin`;
 
 window.onload = () => {
     setBookListeners(urlPath);
-    wizard(urlPath, null);
+    wizard(urlPath);
 }
 
 const makeRow = (rowData, index) => {
+    console.log(rowData);
+    console.log(index);
     let tableRow = document.createElement('tr');
     let tableData = document.createElement('td');
     let anchor = document.createElement('a');
-    let label = document.createElement('label');
-    let hiddenId = `hidden-order-data-${index}`;
 
-    tableRow.appendChild(createHiddenBookDiv(hiddenId, rowData));
+    let modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.id = `book${index}`;
+    let modalDialog = document.createElement('div');
+    modalDialog.className = 'modal-dialog modal-dialog-centered';
+    let modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+    let modalHeader = document.createElement('div');
+    modalHeader.className = 'modal-header';
+    let modalTitle = document.createElement('h5');
+    modalTitle.className = 'modal-title';
+    modalTitle.innerHTML = rowData.title;
+    let closeBtn = document.createElement('button');
+    closeBtn.className = 'btn-close';
+    closeBtn.setAttribute('data-bs-dismiss', 'modal');
+    let modalBody = document.createElement('div');
+    modalBody.className = 'modal-body';
+    let modalFooter = document.createElement('div');
+    modalFooter.className = 'modal-footer';
 
-    anchor.setAttribute('href', '#');
-    anchor.onclick = () => {
-        let div = document.getElementById(hiddenId);
-        div.style.width = '100vw';
-        div.style.height = '100vh';
-        div.style.display = 'flex';
-        div.style.position = 'absolute';
-        div.style.top = "0";
-        div.style.left = "0";
-        div.style.background = 'rgba(3,3,3,0.7)';
-        div.style.zIndex = "2000";
-    }
+    let moreInfoBtn = document.createElement('a');
+    moreInfoBtn.className = 'btn btn-primary';
+    moreInfoBtn.innerHTML = document.getElementById("more_info").innerHTML;
+    moreInfoBtn.href = moreInfoUrl + `/${rowData.id}`;
 
-    label.setAttribute('id', 'view-order-modal-window');
-
-    label.appendChild(document.createTextNode(rowData.name));
-    anchor.appendChild(label);
+    modalFooter.appendChild(moreInfoBtn);
+    // add description, isbn, publication date, and author to modal body
+    let description = document.createElement('p');
+    description.innerHTML = rowData.description;
+    modalBody.appendChild(description);
+    let isbn = document.createElement('p');
+    isbn.innerHTML = document.getElementById("book_ISBN").innerHTML + `${rowData.isbn}`;
+    modalBody.appendChild(isbn);
+    let publicationDate = document.createElement('p');
+    publicationDate.innerHTML = document.getElementById("book_date_published").innerHTML + `${rowData.publicationDate}`;
+    modalBody.appendChild(publicationDate);
+    let author = document.createElement('p');
+    author.innerHTML = document.getElementById("book_authors_label").innerHTML + `${rowData.authors}`;
+    modalBody.appendChild(author);
+    let count = document.createElement('p');
+    count.innerHTML = document.getElementById("book_count").innerHTML + `${rowData.count}`;
+    modalBody.appendChild(count);
+    let fine = document.createElement('p');
+    fine.innerHTML = document.getElementById("book_fine").innerHTML +  `${rowData.fine}`;
+    modalBody.appendChild(fine);
+    let language = document.createElement('p');
+    language.innerHTML = document.getElementById("book_language").innerHTML + `${rowData.language}`;
+    modalBody.appendChild(language);
+    let location = document.createElement('p');
+    location.innerHTML = document.getElementById("book_location").innerHTML + `${rowData.location}`;
+    modalBody.appendChild(location);
+    modalHeader.appendChild(modalTitle);
+    modalHeader.appendChild(closeBtn);
+    modalContent.appendChild(modalHeader);
+    modalContent.appendChild(modalBody);
+    modalContent.appendChild(modalFooter);
+    modalDialog.appendChild(modalContent);
+    modal.appendChild(modalDialog);
+    anchor.setAttribute('data-bs-toggle', 'modal');
+    anchor.setAttribute('data-bs-target', `#book${index}`);
+    anchor.innerHTML = rowData.title;
     tableData.appendChild(anchor);
     tableRow.appendChild(tableData);
+    tableRow.appendChild(modal);
 
-    tableData = document.createElement('td');
-    tableData.appendChild(
-        document
-            .createTextNode(rowData.isbn))
-    tableRow.appendChild(tableData);
+    isbn = document.createElement('td');
+    isbn.innerHTML = rowData.isbn;
+    tableRow.appendChild(isbn);
 
-    tableData = document.createElement('td');
-    tableData.appendChild(
-        document
-            .createTextNode(rowData.publicationDate))
-    tableRow.appendChild(tableData);
-    tableData = document.createElement('td');
-    tableData.style.width = '25%';
-    let authorsString = rowData.authors.map(author => `${author.firstName} ${author.lastName}`).join(', ');
-    tableData.appendChild(
-        document
-            .createTextNode(
-                authorsString))
-    tableRow.appendChild(tableData);
+    publicationDate = document.createElement('td');
+    publicationDate.innerHTML = rowData.publicationDate;
+    tableRow.appendChild(publicationDate);
+
+    author = document.createElement('td');
+    author.innerHTML = rowData.authors;
+    tableRow.appendChild(author);
+
     return tableRow;
-}
-
-function initPopup(hiddenId) {
-    let hiddenRequestDiv = document.createElement('div');
-
-    hiddenRequestDiv.id = hiddenId;
-    hiddenRequestDiv.style.display = 'none';
-
-    let hiddenDesk = document.createElement('div');
-    hiddenDesk.className = 'order-form';
-    hiddenDesk.style.textAlign = "left";
-    hiddenDesk.style.padding = "30px 15px";
-
-    let labelClose = document.createElement('button');
-    labelClose.type = 'button';
-    labelClose.className = 'btn-close';
-    labelClose.ariaLabel = 'Close';
-    labelClose.onclick = () => {
-        let div = document.getElementById(hiddenId);
-        div.style.display = 'none';
-    }
-    hiddenDesk.appendChild(labelClose);
-
-    let fieldHeading = document.createElement('h1');
-    return {hiddenRequestDiv, hiddenDesk, fieldHeading};
-}
-
-const createHiddenBookDiv = (hiddenId, rowData) => {
-    let {hiddenRequestDiv, hiddenDesk, fieldHeading} = initPopup(hiddenId);
-
-    fieldHeading.appendChild(document.createTextNode("Id: " + rowData.id));
-    hiddenDesk.appendChild(fieldHeading);
-
-    fieldHeading = document.createElement('h2');
-    let field = document.createElement('span');
-    field.appendChild(document.createTextNode(document.getElementById("book_name").innerText + ": " + rowData.name));
-    fieldHeading.appendChild(field);
-    hiddenDesk.appendChild(fieldHeading);
-
-    fieldHeading = document.createElement('h2');
-    field = document.createElement('span');
-    field.appendChild(document.createTextNode(document.getElementById("book_count").innerText + ": " + rowData.count));
-    fieldHeading.appendChild(field);
-    hiddenDesk.appendChild(fieldHeading);
-
-    fieldHeading = document.createElement('h2');
-    field = document.createElement('span');
-    field.appendChild(document.createTextNode(document.getElementById("book_ISBN").innerText + ": " + rowData.isbn));
-    fieldHeading.appendChild(field);
-    hiddenDesk.appendChild(fieldHeading);
-
-    field = document.createElement('h2');
-    field.appendChild(document.createTextNode(document.getElementById("book_date_published").innerText + ": " + rowData.publicationDate));
-    fieldHeading.appendChild(field);
-
-    field = document.createElement('h2');
-    field.appendChild(document.createTextNode(document.getElementById("book_fine").innerText + ": " + rowData.fine));
-    fieldHeading.appendChild(field);
-
-    field = document.createElement('h2');
-    field.appendChild(document.createTextNode(document.getElementById("book_language").innerText + ": " + rowData.language));
-    fieldHeading.appendChild(field);
-
-    field = document.createElement('h2');
-    field.appendChild(document.createTextNode(document.getElementById("book_authors").innerText + ": " + rowData.authors.map(author => `${author.firstName} ${author.lastName}`).join(', ')));
-    fieldHeading.appendChild(field);
-
-    field = document.createElement('button');
-    field.className = 'btn btn-primary';
-    field.appendChild(document.createTextNode(document.getElementById("book_edit_button").innerText));
-    field.onclick = () => {
-        let div = document.getElementById(hiddenId);
-        div.style.display = 'none';
-        window.location.href = `/library/admin/book/edit/${rowData.id}`;
-    }
-    fieldHeading.appendChild(field);
-
-    field = document.createElement('button');
-    field.className = 'btn btn-danger';
-    field.appendChild(document.createTextNode(document.getElementById("book_delete_button").innerText));
-    field.onclick = () => {
-        let div = document.getElementById(hiddenId);
-        div.style.display = 'none';
-        window.location.href = `/library/admin/book/delete/${rowData.id}`;
-    }
-    fieldHeading.appendChild(field);
-
-    hiddenRequestDiv.appendChild(hiddenDesk);
-
-    return hiddenRequestDiv;
 }

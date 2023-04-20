@@ -23,36 +23,6 @@
             <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item active"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
             </ol>
-            <c:if test="${param.created == 'true'}">
-                <div class="alert alert-success" role="alert">
-                    <fmt:message key="author.created"/>
-                </div>
-            </c:if>
-            <c:if test="${param.created == 'false'}">
-                <div class="alert alert-danger" role="alert">
-                    <fmt:message key="author.notCreated"/>
-                </div>
-            </c:if>
-            <c:if test="${param.updated == 'true'}">
-                <div class="alert alert-success" role="alert">
-                    <fmt:message key="author.updated"/>
-                </div>
-            </c:if>
-            <c:if test="${param.updated == 'false'}">
-                <div class="alert alert-danger" role="alert">
-                    <fmt:message key="author.notUpdated"/>
-                </div>
-            </c:if>
-            <c:if test="${param.deleted == 'true'}">
-                <div class="alert alert-success" role="alert">
-                    <fmt:message key="author.deleted"/>
-                </div>
-            </c:if>
-            <c:if test="${param.deleted == 'false'}">
-                <div class="alert alert-danger" role="alert">
-                    <fmt:message key="author.notDeleted"/>
-                </div>
-            </c:if>
             <c:set var="firstNameErrors">${authorValidationError.firstName}</c:set>
             <c:if test="${not empty firstNameErrors}">
                 <div class="alert alert-danger"><fmt:message key="${authorValidationError.firstName}"/></div>
@@ -61,41 +31,48 @@
             <c:if test="${not empty firstNameErrors}">
                 <div class="alert alert-danger"><fmt:message key="${authorValidationError.lastName}"/></div>
             </c:if>
-            <input type="checkbox" class="input-modal-window" id="new-book-window">
-            <div class="modal hidden-new-book-window">
-                <div class="center">
-                    <div class="book-create-form">
-                        <form id="requestForm" data-toggle="validator" novalidate action="/library/admin/new-author" method="post">
-                            <h1><fmt:message key="newAuthor.pageTitle"/></h1>
-                            <div class="form-group">
-                                <input type="text" class="form-control caps" name="firstName"
-                                       placeholder="<fmt:message key="newAuthor.first_name" />" required>
-                            </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control caps" name="lastName"
-                                       placeholder="<fmt:message key="newAuthor.last_name" />" required>
-                            </div>
-                            <div class="form-group">
-                                <button type="submit" id="form-submit" class="btn btn-primary">
-                                    <span><fmt:message key="newRequest.label.submit"/></span>
-                                </button>
-                            </div>
-                            <div class="form-group">
-                                <label class="btn btn-danger" for="new-book-window">
-                                    <fmt:message key="newRequest.label.close"/>
-                                </label>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
             <h1>
                 <fmt:message key="authorList.pageTitle"/>
             </h1>
+            <div class="modal fade" id="create-author-modal" tabindex="-1" aria-labelledby="create-author-modal-label"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="create-author-modal-label">Create Author</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="create-author-form" method="POST" action="/authors">
+                                <div class="mb-3">
+                                    <label for="first-name" class="form-label"><fmt:message
+                                            key="author.firstName"/></label>
+                                    <input type="text" class="form-control" id="first-name" name="firstName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="middle-name" class="form-label"><fmt:message
+                                            key="author.middleName"/></label>
+                                    <input type="text" class="form-control" id="middle-name" name="middleName">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="last-name" class="form-label"><fmt:message
+                                            key="author.lastName"/></label>
+                                    <input type="text" class="form-control" id="last-name" name="lastName" required>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" form="create-author-form" class="btn btn-primary">Create</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="grid-container">
                 <div class="grid-left-3">
                     <div class="list-group list-group-flush components">
-                        <label class="library-create-book btn-lg" for="new-book-window">
+                        <label class="library-create-book btn-lg" id="new-book-window" data-bs-toggle="modal"
+                               data-bs-target="#create-author-modal">
                             <fmt:message key="admin.create.author"/>
                         </label>
                         <label class="list-group-item list-group-item-action">
@@ -120,9 +97,11 @@
                     <table class="table table-active table-hover table-active table-hover table-striped">
                         <thead class="table-header table-dark">
                         <tr>
-                            <th id="author_id" scope="col"><fmt:message key="newBook.label.author"/></th>
+                            <th id="author_id" scope="col"><fmt:message key="newBook.table.author_id"/></th>
                             <th id="author_first_name" scope="col"><fmt:message
                                     key="newBook.table.first_name"/></th>
+                            <th id="author_middle_name" scope="col"><fmt:message
+                                    key="newBook.table.middle_name"/></th>
                             <th id="author_last_name" scope="col"><fmt:message
                                     key="newBook.table.last_name"/></th>
                         </tr>
@@ -133,5 +112,47 @@
                 </div>
             </div>
         </div>
+        <script>
+            $(document).ready(function () {
+                $('#create-author-modal form').submit(function (event) {
+                    // Prevent the form from submitting normally
+                    event.preventDefault();
+
+                    // Get the form data
+                    const firstName = $('#first-name').val().trim();
+                    let middleName = $('#middle-name').val().trim();
+                    const lastName = $('#last-name').val().trim();
+
+                    middleName = middleName === '' ? null : middleName;
+
+                    // Send an AJAX request to create the author
+                    $.ajax({
+                        url: '/library/authors/admin',
+                        type: 'POST',
+                        data: {
+                            firstName: firstName,
+                            middleName: middleName,
+                            lastName: lastName,
+                        },
+                        success: function (data) {
+                            // Display a success message
+                            alert('Author created successfully!');
+
+                            // Close the modal
+                            $('#create-author-modal').modal('hide');
+
+                            // Clear the form
+                            $('#create-author-modal form')[0].reset();
+
+                            wizard(urlPath);
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            // Display an error message
+                            alert('An error occurred while creating the author: ' + errorThrown);
+                        }
+                    });
+                });
+            });
+        </script>
     </jsp:body>
 </tag:authorization>

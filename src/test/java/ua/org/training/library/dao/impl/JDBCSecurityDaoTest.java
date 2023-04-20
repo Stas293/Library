@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.org.training.library.dao.SecurityDao;
 import ua.org.training.library.exceptions.DaoException;
 
 import java.sql.Connection;

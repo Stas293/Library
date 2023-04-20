@@ -9,6 +9,7 @@ import ua.org.training.library.repository.base.JRepository;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -27,4 +28,10 @@ public interface BookRepository extends JRepository<Book, Long> {
     Optional<Book> getBookByISBN(String isbn);
 
     Page<Book> searchBooks(Pageable page, String search);
+
+    long getBookCount(Long id);
+
+    void updateBookCount(Book book);
+
+    List<Book> findAllByAuthors(Author author);
 }

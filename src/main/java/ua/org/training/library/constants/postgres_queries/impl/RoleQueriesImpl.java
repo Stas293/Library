@@ -170,4 +170,14 @@ public class RoleQueriesImpl implements RoleQueries {
                         .where("ur.user_id = ?")
                         .build());
     }
+
+    @Override
+    public String getGetAllByCodesQuery(int size) {
+        return queryBuilderImpl.setUp()
+                .select("*")
+                .from("roles")
+                .where("code")
+                .in(size)
+                .build();
+    }
 }

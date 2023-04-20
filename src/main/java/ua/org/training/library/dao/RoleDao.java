@@ -16,4 +16,6 @@ public interface RoleDao extends GenericDao<Role> {
 
     List<Role> getRolesByUserId(Connection connection,
                                 Long id);
+
+    List<Role> getAllByCodes(Connection connection, List<String> roles);
 }

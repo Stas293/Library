@@ -27,12 +27,12 @@ create table book_authors
 (
     author_id bigint not null
         constraint fk_book_authors_author_id
-        references authors
-        on delete cascade,
+            references authors
+            on delete cascade,
     book_id   bigint not null
         constraint fk_book_authors_book_id
-        references books
-        on delete cascade,
+            references books
+            on delete cascade,
     constraint book_authors_pk
         primary key (author_id, book_id)
 );
@@ -49,14 +49,22 @@ create table book_keywords
 (
     book_id    bigint not null
         constraint fk_book_keywords_book_id
-        references books
-        on delete cascade,
+            references books
+            on delete cascade,
     keyword_id bigint not null
         constraint fk_book_keywords_keyword_id
-        references keywords
-        on delete cascade,
+            references keywords
+            on delete cascade,
     constraint book_keywords_pk
         primary key (book_id, keyword_id)
+);
+
+create table revision
+(
+    id        bigint generated always as identity
+        primary key,
+    timestamp bigint,
+    username  varchar(255)
 );
 
 create table roles
@@ -82,12 +90,12 @@ create table next_statuses
 (
     next_status bigint not null
         constraint fk_next_statuses_next_status
-        references statuses
-        on delete cascade,
+            references statuses
+            on delete cascade,
     status      bigint not null
         constraint fk_next_statuses_status
-        references statuses
-        on delete cascade,
+            references statuses
+            on delete cascade,
     constraint next_statuses_pk
         primary key (status, next_status)
 );
@@ -119,24 +127,24 @@ create table history_orders
     date_returned date         not null,
     status_id     bigint       not null
         constraint fk_history_orders_status_id
-        references statuses
-        on delete restrict,
+            references statuses
+            on delete restrict,
     user_id       bigint
         constraint fk_history_orders_user_id
-        references users
-        on delete cascade
+            references users
+            on delete cascade
 );
 
 create table user_role
 (
     role_id bigint not null
         constraint fk_user_role_role_id
-        references roles
-        on delete restrict,
+            references roles
+            on delete restrict,
     user_id bigint not null
         constraint fk_user_role_user_id
-        references users
-        on delete cascade,
+            references users
+            on delete cascade,
     constraint user_role_pk
         primary key (role_id, user_id)
 );
@@ -146,7 +154,8 @@ create table places
     id           bigint generated always as identity
         primary key,
     code         varchar(255)          not null
-        unique,
+        constraint places_name_key
+            unique,
     default_days integer default 0     not null,
     choosable    boolean default false not null
 );
@@ -175,13 +184,13 @@ create table status_name
 (
     id        bigint generated always as identity
         constraint status_name_pk
-        primary key,
+            primary key,
     name      varchar(255) not null,
     lang      varchar(255) not null,
     status_id bigint       not null
         constraint fk_status_name_status_id
-        references statuses
-        on delete cascade,
+            references statuses
+            on delete cascade,
     unique (lang, status_id)
 );
 
@@ -189,13 +198,13 @@ create table place_names
 (
     id       bigint generated always as identity
         constraint place_names_pk
-        primary key,
+            primary key,
     lang     varchar(255) not null,
     name     varchar(255) not null,
     place_id bigint       not null
         constraint fk_place_names_place
-        references places
-        on delete cascade,
+            references places
+            on delete cascade,
     unique (lang, place_id)
 );
 

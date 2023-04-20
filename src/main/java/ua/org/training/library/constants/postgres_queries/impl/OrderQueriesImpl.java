@@ -83,7 +83,7 @@ public class OrderQueriesImpl implements OrderQueries {
         }
         return queries.computeIfAbsent("getSelectAllQuery",
                 key -> selectFromOrders()
-                        .orderBy(page.getSort())
+                        .orderByMinMax(page.getSort())
                         .limit("?")
                         .offset("?")
                         .build());
@@ -94,8 +94,8 @@ public class OrderQueriesImpl implements OrderQueries {
         return queries.computeIfAbsent("getUpdateQuery",
                 key -> queryBuilderImpl.setUp()
                         .update("orders")
-                        .set("date_created", "date_expire",
-                                "book_id", "user_id", "status_id")
+                        .set("date_created", "date_expire", "status_id",
+                                "user_id", "book_id")
                         .where("id = ?")
                         .build());
     }
@@ -293,6 +293,86 @@ public class OrderQueriesImpl implements OrderQueries {
                         .join("books b", "o.book_id = b.id")
                         .where("o.status_id = ?")
                         .and("b.title like ?")
+                        .build());
+    }
+
+    @Override
+    public String getSelectAllByStatusAndPlaceAndSearchQuery(Pageable page) {
+        if (page == null) {
+            return queries.computeIfAbsent("getSelectAllByStatusAndPlaceAndSearchQuery",
+                    key -> selectFromOrders()
+                            .join("books b", "o.book_id = b.id")
+                            .where("o.status_id = ?")
+                            .and("o.place_id = ?")
+                            .and("b.title like ?")
+                            .limit("?")
+                            .offset("?")
+                            .build());
+        }
+        return selectFromOrders()
+                .join("books b", "o.book_id = b.id")
+                .where("o.status_id = ?")
+                .and("o.place_id = ?")
+                .and("b.title like ?")
+                .orderBy(page.getSort())
+                .limit("?")
+                .offset("?")
+                .build();
+    }
+
+    @Override
+    public String getCountByStatusAndPlaceAndSearchQuery() {
+        return queries.computeIfAbsent("getCountByStatusAndPlaceAndSearchQuery",
+                key -> queryBuilderImpl.setUp()
+                        .select("count(*)")
+                        .from("orders o")
+                        .join("books b", "o.book_id = b.id")
+                        .where("o.status_id = ?")
+                        .and("o.place_id = ?")
+                        .and("b.title like ?")
+                        .build());
+    }
+
+    @Override
+    public String getSelectAllByStatusAndPlaceQuery(Pageable page) {
+        if (page == null) {
+            return queries.computeIfAbsent("getSelectAllByStatusAndPlaceQuery",
+                    key -> selectFromOrders()
+                            .where("status_id = ?")
+                            .and("place_id = ?")
+                            .limit("?")
+                            .offset("?")
+                            .build());
+        }
+        return queries.computeIfAbsent("getSelectAllByStatusAndPlaceQuerySort",
+                key -> selectFromOrders()
+                        .where("status_id = ?")
+                        .and("place_id = ?")
+                        .orderBy(page.getSort())
+                        .limit("?")
+                        .offset("?")
+                        .build());
+    }
+
+    @Override
+    public String getCountByStatusAndPlaceQuery() {
+        return queries.computeIfAbsent("getCountByStatusAndPlaceQuery",
+                key -> queryBuilderImpl.setUp()
+                        .select("count(*)")
+                        .from("orders")
+                        .where("status_id = ?")
+                        .and("place_id = ?")
+                        .build());
+    }
+
+    @Override
+    public String getSelectByUserIdAndBookIdQuery() {
+        return queries.computeIfAbsent("getSelectByUserIdAndBookIdQuery",
+                key -> queryBuilderImpl.setUp()
+                        .select("*")
+                        .from("orders")
+                        .where("user_id = ?")
+                        .and("book_id = ?")
                         .build());
     }
 }

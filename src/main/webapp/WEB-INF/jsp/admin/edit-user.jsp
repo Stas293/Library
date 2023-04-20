@@ -23,12 +23,9 @@
             </ol>
             <h1><fmt:message key="editUser.pageTitle"/>: ${account.login} </h1>
 
-            <c:if test="${param.saved == true}">
-                <div class="info alert"><fmt:message key="editUser.user.save"/><a href="${userUrl}"><fmt:message
-                        key="editUser.user.view"/></a></div>
-            </c:if>
-
             <form class="main" method="post">
+                <input type="hidden" name="_method" value="PUT"/>
+                <input type="hidden" name="id" value="${account.id}"/>
                 <div class="form-group">
                     <label>
                             ${account.firstName} ${account.lastName}
@@ -52,8 +49,8 @@
                     <select required multiple name="role" class="form-control" id="role">
                         <c:forEach items="${rolesList}" var="rolesList">
                             <c:set var="isPresent" value="false"/>
-                            <c:forEach items="${roles}" var="role">
-                                <c:if test="${role eq rolesList.code}">
+                            <c:forEach items="${account.roles}" var="role">
+                                <c:if test="${role.code eq rolesList.code}">
                                     <option value="${rolesList.code}" selected>${rolesList.code}</option>
                                     <c:set var="isPresent" value="true"/>
                                 </c:if>

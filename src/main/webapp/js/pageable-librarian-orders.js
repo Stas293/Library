@@ -22,7 +22,7 @@ function showUsersOrders() {
 function showAcceptedOrdersOnSubscription() {
     document.getElementById('date_expire').setAttribute('style','display');
     document.getElementById('date_created').setAttribute('style','display:none');
-    urlPath = urlAcceptedOrders + '&placeName=On a subscription';
+    urlPath = urlAcceptedOrders + '&placeName=SUBSCRIPTION';
     setOrderListeners(urlPath);
     wizard(urlPath, null);
 }
@@ -30,7 +30,7 @@ function showAcceptedOrdersOnSubscription() {
 function showAcceptedOrdersReadingRoom() {
     document.getElementById('date_expire').setAttribute('style','display');
     document.getElementById('date_created').setAttribute('style','display:none');
-    urlPath = urlAcceptedOrders + '&placeName=To the reading room';
+    urlPath = urlAcceptedOrders + '&placeName=READING_ROOM';
     setOrderListeners(urlPath);
     wizard(urlPath, null);
 }
@@ -65,8 +65,8 @@ function setOrderListeners(url) {
 
 class Order {
     constructor(dateCreated, dateExpire, book, status, user, place) {
-        this.dateCreated = new Date(dateCreated);
-        this.dateExpire = new Date(dateExpire);
+        this.dateCreated = dateCreated;
+        this.dateExpire = dateExpire;
         this.book = book;
         this.status = status;
         this.user = user;
@@ -104,9 +104,11 @@ const makeRow = (rowData) => {
     tableRow.appendChild(tableData);
 
     tableData = document.createElement('td');
+    let dateToShow = order.dateExpire == null ?
+        new Date(order.dateCreated) : new Date(order.dateExpire);
     tableData.appendChild(
         document
-            .createTextNode(order.dateCreated.toDateString()));
+            .createTextNode(dateToShow.toDateString()));
     tableRow.appendChild(tableData);
     tableData = document.createElement('td');
 

@@ -5,14 +5,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.org.training.library.dao.AuthorDao;
-import ua.org.training.library.dao.BookDao;
 import ua.org.training.library.dao.DaoFactory;
 import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.DaoException;
 import ua.org.training.library.exceptions.JDBCException;
 import ua.org.training.library.exceptions.ServiceException;
-import ua.org.training.library.model.Author;
 import ua.org.training.library.utility.page.Page;
 
 import java.sql.SQLException;

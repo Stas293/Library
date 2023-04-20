@@ -8,7 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import ua.org.training.library.constants.Values;
-import ua.org.training.library.context.annotations.*;
+import ua.org.training.library.context.annotations.Autowired;
+import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.context.annotations.Controller;
+import ua.org.training.library.context.annotations.mapping.Get;
+import ua.org.training.library.context.annotations.mapping.Post;
 import ua.org.training.library.dto.UserChangePasswordDto;
 import ua.org.training.library.dto.UserLoginDto;
 import ua.org.training.library.dto.UserRegistrationDto;
@@ -19,10 +23,7 @@ import ua.org.training.library.security.AuthorityUser;
 import ua.org.training.library.security.SecurityService;
 import ua.org.training.library.service.UserService;
 import ua.org.training.library.utility.mail.MailService;
-import ua.org.training.library.utility.mapper.ObjectMapper;
 import ua.org.training.library.utility.mapper.RequestParamsObjectMapper;
-import ua.org.training.library.validator.ResetPasswordValidator;
-import ua.org.training.library.validator.UserRegistrationValidator;
 
 import java.util.Optional;
 
@@ -33,11 +34,8 @@ import java.util.Optional;
 public class AuthController {
     private final UserService userService;
     private final SecurityService securityService;
-    private final UserRegistrationValidator userRegistrationValidator;
     private final RequestParamsObjectMapper requestParamsObjectMapper;
-    private final ObjectMapper objectMapper;
     private final MailService mailService;
-    private final ResetPasswordValidator resetPasswordValidator;
 
     @Get("/login")
     public String getLogin(HttpServletRequest request, HttpServletResponse response) {

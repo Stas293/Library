@@ -29,4 +29,8 @@ public interface HistoryOrderQueries {
     String getSelectAllByUserIdQuery(Pageable page);
 
     String getCountByUserIdQuery();
+
+    String getSelectAllByUserIdAndSearchQuery(Pageable page);
+
+    String getCountByUserIdAndSearchQuery();
 }

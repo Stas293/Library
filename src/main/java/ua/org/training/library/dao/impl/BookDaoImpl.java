@@ -184,6 +184,40 @@ public class BookDaoImpl implements BookDao {
         }
     }
 
+    @Override
+    public long getBookCount(Connection conn, Long id) {
+        log.info("Getting book count: {}", id);
+        try (PreparedStatement statement = conn.prepareStatement(
+                bookQueries.getBookCountQuery())) {
+            statement.setLong(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getLong(1);
+                } else {
+                    return 0;
+                }
+            }
+        } catch (SQLException e) {
+            log.error("Error getting book count: {}", id, e);
+            throw new DaoException("Error getting book count: " + id, e);
+        }
+    }
+
+    @Override
+    public List<Book> getBooksByAuthorId(Connection conn, Long id) {
+        log.info("Getting books by author id: {}", id);
+        try (PreparedStatement statement = conn.prepareStatement(
+                bookQueries.getBooksByAuthorIdQuery())) {
+            statement.setLong(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return collector.collectList(resultSet);
+            }
+        } catch (SQLException e) {
+            log.error("Error getting books by author id: {}", id, e);
+            throw new DaoException("Error getting books by author id: " + id, e);
+        }
+    }
+
     private long countSearch(Connection connection, String search) {
         log.info("Counting books by search: {}", search);
         try (PreparedStatement statement = connection.prepareStatement(
@@ -211,7 +245,7 @@ public class BookDaoImpl implements BookDao {
     public Book create(Connection connection, Book model) {
         log.info("Creating book: {}", model);
         try (PreparedStatement statement = connection.prepareStatement(
-                bookQueries.getCreateBookQuery())) {
+                bookQueries.getCreateBookQuery(), Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, model.getTitle());
             statement.setString(2, model.getDescription());
             statement.setString(3, model.getIsbn());
@@ -221,9 +255,9 @@ public class BookDaoImpl implements BookDao {
             statement.setString(7, model.getLanguage());
             statement.setString(8, model.getLocation());
             statement.executeUpdate();
-            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    model.setId(generatedKeys.getLong(1));
+            try (ResultSet rs = statement.getGeneratedKeys()) {
+                if (rs.next()) {
+                    model.setId(rs.getLong(1));
                     return model;
                 } else {
                     throw new SQLException("Creating book failed, no ID obtained.");

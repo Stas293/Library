@@ -26,6 +26,29 @@ public class QueryBuilderImpl implements QueryBuilder {
         return this;
     }
 
+    @Override
+    public QueryBuilder orderByMinMax(Sort sort) {
+        StringBuilder stringBuilder = this.query.get();
+        Iterator<Sort.Order> sortIterator = sort.iterator();
+        stringBuilder.append(" ORDER BY ");
+        while (sortIterator.hasNext()) {
+            Sort.Order order = sortIterator.next();
+            if (order.getDirection().equals(Sort.Direction.ASC)) {
+                stringBuilder.append("MIN(");
+            } else {
+                stringBuilder.append("MAX(");
+            }
+            stringBuilder.append(order.getProperty()).append(")");
+            if (order.getDirection().equals(Sort.Direction.DESC)) {
+                stringBuilder.append(" DESC");
+            }
+            if (sortIterator.hasNext()) {
+                stringBuilder.append(", ");
+            }
+        }
+        return this;
+    }
+
     public QueryBuilder select(String... columns) {
         StringBuilder stringBuilder = this.query.get();
         stringBuilder.append("SELECT ");

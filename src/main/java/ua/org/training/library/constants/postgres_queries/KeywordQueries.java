@@ -32,4 +32,8 @@ public interface KeywordQueries {
     String getDeleteByBookIdQuery();
 
     String getInserKeywordToBookQuery();
+
+    String getSelectByQueryQuery();
+
+    String getSelectByDataQuery();
 }

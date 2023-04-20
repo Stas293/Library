@@ -73,7 +73,7 @@ public class ObjectMapper {
                 .build();
     }
 
-    private AuthorDto mapAuthorToAuthorDto(Author author) {
+    public AuthorDto mapAuthorToAuthorDto(Author author) {
         return AuthorDto.builder()
                 .firstName(author.getFirstName())
                 .middleName(author.getMiddleName())
@@ -91,6 +91,11 @@ public class ObjectMapper {
     }
 
     private BookDto mapBookPage(Book book) {
+        String authors = book.getAuthors() == null ? "" : book.getAuthors()
+                .stream()
+                .map(Author::getFullName)
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("");
         return BookDto.builder()
                 .id(book.getId())
                 .title(book.getTitle())
@@ -101,6 +106,7 @@ public class ObjectMapper {
                 .fine(book.getFine())
                 .language(book.getLanguage())
                 .location(book.getLocation())
+                .authors(authors)
                 .build();
     }
 
@@ -138,6 +144,7 @@ public class ObjectMapper {
 
     public UserDto mapUserToUserDto(User user) {
         return UserDto.builder()
+                .id(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .fullName(user.getFullName())
@@ -148,6 +155,7 @@ public class ObjectMapper {
     }
 
     public StatusDto mapStatusToStatusDto(Status status) {
+        log.info("Map status to status dto");
         Map<String, StatusDto> nextStatuses = status.getNextStatuses() == null ?
                 Map.of() :
                 status.getNextStatuses()
@@ -156,6 +164,7 @@ public class ObjectMapper {
                                 Status::getCode,
                                 this::mapStatusToStatusDto
                         ));
+        log.info("Next statuses: {}", nextStatuses);
         return StatusDto.builder()
                 .code(status.getCode())
                 .value(status.getNames().get(0).getName())
@@ -227,6 +236,139 @@ public class ObjectMapper {
                 .dateCreated(order.getDateCreated())
                 .dateExpire(order.getDateExpire())
                 .user(mapUserToUserDto(order.getUser()))
+                .build();
+    }
+
+    public Page<HistoryOrderDto> mapHistoryOrderPage(Page<HistoryOrder> historyOrderPage) {
+        List<HistoryOrderDto> historyOrderDtoList = historyOrderPage.getContent()
+                .parallelStream()
+                .map(this::mapHistoryOrderToHistoryOrderDto)
+                .toList();
+        Pageable pageable = historyOrderPage.getPageable();
+        return new PageImpl<>(historyOrderDtoList, pageable, historyOrderPage.getTotalElements());
+    }
+
+    private HistoryOrderDto mapHistoryOrderToHistoryOrderDto(HistoryOrder historyOrder) {
+        return HistoryOrderDto.builder()
+                .id(historyOrder.getId())
+                .bookTitle(historyOrder.getBookTitle())
+                .dateCreated(historyOrder.getDateCreated())
+                .dateReturned(historyOrder.getDateReturned())
+                .status(mapStatusToStatusDto(historyOrder.getStatus()))
+                .build();
+    }
+
+    public Page<UserDto> mapUserPageToUserDtoPage(Page<User> userPage) {
+        List<UserDto> userDtoList = userPage.getContent()
+                .parallelStream()
+                .map(this::mapUserToUserDto)
+                .toList();
+        Pageable pageable = userPage.getPageable();
+        return new PageImpl<>(userDtoList, pageable, userPage.getTotalElements());
+    }
+
+    public UserManagementDto mapUserToUserManagementDto(User user) {
+        return UserManagementDto.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .login(user.getLogin())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .enabled(user.isEnabled())
+                .roles(user.getRoles()
+                        .parallelStream()
+                        .map(this::mapRoleToRoleDto)
+                        .toList())
+                .build();
+    }
+
+    public RoleDto mapRoleToRoleDto(Role role) {
+        return RoleDto.builder()
+                .code(role.getCode())
+                .build();
+    }
+
+    public BookChangeDto mapBookToBookChangeDto(Book book) {
+        return BookChangeDto.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .description(book.getDescription())
+                .authors(book.getAuthors()
+                        .parallelStream()
+                        .map(this::mapAuthorToAuthorChangeDto)
+                        .toList())
+                .keywords(book.getKeywords()
+                        .parallelStream()
+                        .map(this::mapKeywordToKeywordChangeDto)
+                        .toList())
+                .isbn(book.getIsbn())
+                .count(book.getCount())
+                .publicationDate(book.getPublicationDate())
+                .fine(book.getFine())
+                .language(book.getLanguage())
+                .location(book.getLocation())
+                .build();
+
+    }
+
+    public KeywordManagementDto mapKeywordToKeywordChangeDto(Keyword keyword) {
+        return KeywordManagementDto.builder()
+                .id(keyword.getId())
+                .data(keyword.getData())
+                .build();
+    }
+
+    public AuthorManagementDto mapAuthorToAuthorChangeDto(Author author) {
+        return AuthorManagementDto.builder()
+                .id(author.getId())
+                .firstName(author.getFirstName())
+                .middleName(author.getMiddleName())
+                .lastName(author.getLastName())
+                .build();
+    }
+
+    public Keyword mapKeywordDtoToKeyword(KeywordDto keyword) {
+        return Keyword.builder()
+                .data(keyword.getData())
+                .build();
+    }
+
+    public Book mapBookChangeDtoToBook(BookChangeDto bookChangeDto) {
+        return Book.builder()
+                .id(bookChangeDto.getId())
+                .title(bookChangeDto.getTitle())
+                .description(bookChangeDto.getDescription())
+                .authors(bookChangeDto.getAuthors()
+                        .parallelStream()
+                        .map(this::mapAuthorChangeDtoToAuthor)
+                        .toList())
+                .keywords(bookChangeDto.getKeywords()
+                        .parallelStream()
+                        .map(this::mapKeywordChangeDtoToKeyword)
+                        .toList())
+                .isbn(bookChangeDto.getIsbn())
+                .count(bookChangeDto.getCount())
+                .publicationDate(bookChangeDto.getPublicationDate())
+                .fine(bookChangeDto.getFine())
+                .language(bookChangeDto.getLanguage())
+                .location(bookChangeDto.getLocation())
+                .build();
+    }
+
+    private Keyword mapKeywordChangeDtoToKeyword(KeywordManagementDto keywordManagementDto) {
+        return Keyword.builder()
+                .id(keywordManagementDto.getId())
+                .data(keywordManagementDto.getData())
+                .build();
+    }
+
+    public Author mapAuthorChangeDtoToAuthor(AuthorManagementDto authorManagementDto) {
+        return Author.builder()
+                .id(authorManagementDto.getId())
+                .firstName(authorManagementDto.getFirstName())
+                .middleName(authorManagementDto.getMiddleName())
+                .lastName(authorManagementDto.getLastName())
                 .build();
     }
 }

@@ -7,23 +7,21 @@ import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.context.annotations.Service;
 import ua.org.training.library.context.annotations.Transactional;
+import ua.org.training.library.dto.BookChangeDto;
 import ua.org.training.library.dto.BookDto;
 import ua.org.training.library.model.Author;
 import ua.org.training.library.model.Book;
+import ua.org.training.library.model.Order;
 import ua.org.training.library.model.User;
-import ua.org.training.library.repository.AuthorRepository;
-import ua.org.training.library.repository.BookRepository;
-import ua.org.training.library.repository.KeywordRepository;
-import ua.org.training.library.repository.UserRepository;
+import ua.org.training.library.repository.*;
+import ua.org.training.library.security.AuthorityUser;
 import ua.org.training.library.service.BookService;
 import ua.org.training.library.utility.mapper.ObjectMapper;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.PageRequest;
 import ua.org.training.library.utility.page.impl.Sort;
-import ua.org.training.library.model.Keyword;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -37,51 +35,7 @@ public class BookServiceImpl implements BookService {
     private final KeywordRepository keywordRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
-
-    @Override
-    @Transactional
-    public Book createModel(Book model) {
-        log.info("Creating book: {}", model);
-        List<Author> newAuthors = model.getAuthors().stream()
-                .filter(author -> author.getId() == null)
-                .toList();
-        List<Keyword> newKeywords = model.getKeywords().stream()
-                .filter(keyword -> keyword.getId() == null)
-                .toList();
-        if (!newAuthors.isEmpty()) {
-            model.setAuthors(authorRepository.saveAll(model.getAuthors()));
-        }
-        if (!newKeywords.isEmpty()) {
-            model.setKeywords(keywordRepository.saveAll(model.getKeywords()));
-        }
-        return bookRepository.save(model);
-    }
-
-    @Override
-    @Transactional
-    public void updateModel(Book model) {
-        log.info("Updating book: {}", model);
-        List<Author> newAuthors = model.getAuthors().stream()
-                .filter(author -> author.getId() == null)
-                .toList();
-        List<Keyword> newKeywords = model.getKeywords().stream()
-                .filter(keyword -> keyword.getId() == null)
-                .toList();
-        if (!newAuthors.isEmpty()) {
-            model.setAuthors(authorRepository.saveAll(model.getAuthors()));
-        }
-        if (!newKeywords.isEmpty()) {
-            model.setKeywords(keywordRepository.saveAll(model.getKeywords()));
-        }
-        bookRepository.save(model);
-    }
-
-    @Override
-    @Transactional
-    public void deleteModel(Book book) {
-        log.info("Deleting book: {}", book);
-        bookRepository.delete(book);
-    }
+    private final OrderRepository orderRepository;
 
     @Override
     public Optional<BookDto> getBookById(long id) {
@@ -91,114 +45,59 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @Transactional
-    public void createModels(List<Book> models) {
-        log.info("Creating books: {}", models);
-        for (Book book : models) {
-            List<Author> newAuthors = book.getAuthors().stream()
-                    .filter(author -> author.getId() == null)
-                    .toList();
-            List<Keyword> newKeywords = book.getKeywords().stream()
-                    .filter(keyword -> keyword.getId() == null)
-                    .toList();
-            if (!newAuthors.isEmpty()) {
-                book.setAuthors(authorRepository.saveAll(book.getAuthors()));
-            }
-            if (!newKeywords.isEmpty()) {
-                book.setKeywords(keywordRepository.saveAll(book.getKeywords()));
-            }
-        }
-        bookRepository.saveAll(models);
-    }
-
-    @Override
-    @Transactional
-    public void updateModels(List<Book> models) {
-        log.info("Updating books: {}", models);
-        for (Book book : models) {
-            List<Author> newAuthors = book.getAuthors().stream()
-                    .filter(author -> author.getId() == null)
-                    .toList();
-            List<Keyword> newKeywords = book.getKeywords().stream()
-                    .filter(keyword -> keyword.getId() == null)
-                    .toList();
-            if (!newAuthors.isEmpty()) {
-                book.setAuthors(authorRepository.saveAll(book.getAuthors()));
-            }
-            if (!newKeywords.isEmpty()) {
-                book.setKeywords(keywordRepository.saveAll(book.getKeywords()));
-            }
-        }
-        bookRepository.saveAll(models);
-    }
-
-    @Override
-    @Transactional
-    public void deleteModels(List<Book> models) {
-        log.info("Deleting books: {}", models);
-        bookRepository.deleteAll(models);
-    }
-
-    @Override
-    public List<Book> getAllModels() {
-        log.info("Getting all books");
-        return bookRepository.findAll();
-    }
-
-    @Override
-    public List<Book> getModelsByIds(List<Long> ids) {
-        log.info("Getting books by ids: {}", ids);
-        return bookRepository.findAllById(ids);
-    }
-
-    @Override
-    public long countModels() {
-        log.info("Counting books");
-        return bookRepository.count();
-    }
-
-    @Override
-    public void deleteAllModels() {
-        log.info("Deleting all books");
-        bookRepository.deleteAll();
-    }
-
-    @Override
-    public boolean checkIfExists(Book model) {
-        log.info("Checking if book exists: {}", model);
-        return bookRepository.existsById(model.getId());
-    }
-
-    @Override
-    public Page<Book> getModelsByPage(int pageNumber, int pageSize) {
-        log.info("Getting books by page: {} {}", pageNumber, pageSize);
-        return bookRepository.findAll(PageRequest.of(pageNumber, pageSize));
-    }
-
-    @Override
-    @Transactional
-    public void deleteModelById(Long id) {
+    public Optional<BookDto> deleteBookById(long id) {
         log.info("Deleting book by id: {}", id);
-        bookRepository.deleteById(id);
+        return bookRepository.findById(id)
+                .map(book -> {
+                    bookRepository.delete(book);
+                    return book;
+                })
+                .map(objectMapper::mapBookToBookDto);
+    }
+
+    @Override
+    public Optional<BookChangeDto> getBookChangeById(long id) {
+        log.info("Getting book change by id: {}", id);
+        return bookRepository.findById(id)
+                .map(objectMapper::mapBookToBookChangeDto);
     }
 
     @Override
     @Transactional
-    public void deleteModelsByIds(List<Long> ids) {
-        log.info("Deleting books by ids: {}", ids);
-        bookRepository.deleteAllById(ids);
+    public Optional<BookDto> saveBook(BookChangeDto bookDto) {
+        log.info("Saving book: {}", bookDto);
+        return Optional.of(bookDto)
+                .map(objectMapper::mapBookChangeDtoToBook)
+                .map(bookRepository::save)
+                .map(book1 -> {
+                    book1.setAuthors(null);
+                    book1.setKeywords(null);
+                    return book1;
+                })
+                .map(objectMapper::mapBookToBookDto);
     }
 
     @Override
-    public List<Book> getAllModels(String sortField, String sortOrder) {
-        log.info("Getting all books sorted by: {} {}", sortField, sortOrder);
-        return bookRepository.findAll(Sort.by(Sort.Direction.valueOf(sortOrder.toUpperCase()), sortField));
+    public Optional<BookDto> deleteBook(long id) {
+        log.info("Deleting book by id: {}", id);
+        return bookRepository.findById(id)
+                .map(book -> {
+                    bookRepository.delete(book);
+                    return book;
+                })
+                .map(objectMapper::mapBookToBookDto);
     }
 
     @Override
-    public Page<Book> getModelsByPage(int pageNumber, int pageSize, Sort.Direction direction, String... sortField) {
-        log.info("Getting books by page: {} {} {} {}", pageNumber, pageSize, direction, sortField);
-        return bookRepository.findAll(PageRequest.of(pageNumber, pageSize, direction, sortField));
+    public Optional<BookDto> getBookById(long bookId, AuthorityUser authorityUser) {
+        log.info("Getting book by bookId: {}", bookId);
+        User user = userRepository.getByLogin(authorityUser.getLogin()).orElseThrow();
+        Optional<Order> userOrder = orderRepository.findOrderByUserIdAndBookId(user.getId(), bookId);
+        if (userOrder.isPresent()) {
+            return Optional.empty();
+        }
+        return bookRepository.findById(bookId)
+                .map(objectMapper::mapBookToBookDto);
     }
 
     @Override

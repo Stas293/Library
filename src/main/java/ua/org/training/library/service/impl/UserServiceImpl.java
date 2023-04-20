@@ -22,8 +22,7 @@ import ua.org.training.library.security.AuthorityUser;
 import ua.org.training.library.service.UserService;
 import ua.org.training.library.utility.mapper.ObjectMapper;
 import ua.org.training.library.utility.page.Page;
-import ua.org.training.library.utility.page.impl.PageRequest;
-import ua.org.training.library.utility.page.impl.Sort;
+import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.validator.ResetPasswordValidator;
 import ua.org.training.library.validator.UserEditPersonalValidator;
 import ua.org.training.library.validator.UserRegistrationValidator;
@@ -43,108 +42,6 @@ public class UserServiceImpl implements UserService {
     private final UserEditPersonalValidator userEditPersonalValidator;
     private final UserRegistrationValidator userRegistrationValidator;
     private final ResetPasswordValidator resetPasswordValidator;
-
-    @Override
-    public User createModel(User model) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    @Transactional
-    public void updateModel(User model) {
-        log.info("Updating user: {}", model);
-        User userFromDb = userRepository.getByLogin(model.getLogin()).orElseThrow();
-        model.setId(userFromDb.getId());
-        userRepository.save(model);
-    }
-
-    @Override
-    @Transactional
-    public void deleteModel(User author) {
-        log.info("Deleting user: {}", author);
-        userRepository.delete(author);
-    }
-
-    @Override
-    public void createModels(List<User> models) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    @Transactional
-    public void updateModels(List<User> models) {
-        log.info("Updating users: {}", models);
-        userRepository.saveAll(models);
-    }
-
-    @Override
-    @Transactional
-    public void deleteModels(List<User> models) {
-        log.info("Deleting users: {}", models);
-        userRepository.deleteAll(models);
-    }
-
-    @Override
-    public List<User> getAllModels() {
-        log.info("Getting all users");
-        return userRepository.findAll();
-    }
-
-    @Override
-    public List<User> getModelsByIds(List<Long> ids) {
-        log.info("Getting users by ids: {}", ids);
-        return userRepository.findAllById(ids);
-    }
-
-    @Override
-    public long countModels() {
-        log.info("Counting users");
-        return userRepository.count();
-    }
-
-    @Override
-    public void deleteAllModels() {
-        log.info("Deleting all users");
-        userRepository.deleteAll();
-    }
-
-    @Override
-    public boolean checkIfExists(User model) {
-        log.info("Checking if user exists: {}", model);
-        return userRepository.existsById(model.getId());
-    }
-
-    @Override
-    public Page<User> getModelsByPage(int pageNumber, int pageSize) {
-        log.info("Getting users by page: {}, {}", pageNumber, pageSize);
-        return userRepository.findAll(PageRequest.of(pageNumber, pageSize));
-    }
-
-    @Override
-    @Transactional
-    public void deleteModelById(Long id) {
-        log.info("Deleting user by id: {}", id);
-        userRepository.deleteById(id);
-    }
-
-    @Override
-    @Transactional
-    public void deleteModelsByIds(List<Long> ids) {
-        log.info("Deleting users by ids: {}", ids);
-        userRepository.deleteAllById(ids);
-    }
-
-    @Override
-    public List<User> getAllModels(String sortField, String sortOrder) {
-        log.info("Getting all users by sort: {}, {}", sortField, sortOrder);
-        return userRepository.findAll(Sort.by(Sort.Direction.fromString(sortOrder), sortField));
-    }
-
-    @Override
-    public Page<User> getModelsByPage(int pageNumber, int pageSize, Sort.Direction direction, String... sortField) {
-        log.info("Getting users by page: {}, {}, {}, {}", pageNumber, pageSize, direction, sortField);
-        return userRepository.findAll(PageRequest.of(pageNumber, pageSize, direction, sortField));
-    }
 
     @Override
     @Transactional
@@ -224,23 +121,33 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void disable(User user) {
+    public Optional<UserDto> disable(Long user) {
         log.info("Disabling user: {}", user);
-        userRepository.disable(user);
+        User userFromDb = userRepository.findById(user).orElseThrow();
+        userFromDb.setEnabled(false);
+        userRepository.disable(userFromDb);
+        return Optional.of(objectMapper.mapUserToUserDto(userFromDb));
     }
 
     @Override
     @Transactional
-    public void enable(User user) {
+    public Optional<UserDto> enable(Long user) {
         log.info("Enabling user: {}", user);
-        userRepository.enable(user);
+        User userFromDb = userRepository.findById(user).orElseThrow();
+        userFromDb.setEnabled(true);
+        userRepository.enable(userFromDb);
+        return Optional.of(objectMapper.mapUserToUserDto(userFromDb));
     }
 
     @Override
     @Transactional
-    public void updateRolesForUser(User user) {
+    public Optional<UserDto> updateRolesForUser(UserChangeRolesDto user) {
         log.info("Updating roles for user: {}", user);
-        userRepository.updateRolesForUser(user);
+        User userFromDb = userRepository.findById(user.getId()).orElseThrow();
+        List<Role> roles = roleRepository.findAllByCodes(user.getRoles());
+        userFromDb.setRoles(roles);
+        userRepository.updateRolesForUser(userFromDb);
+        return Optional.of(objectMapper.mapUserToUserDto(userFromDb));
     }
 
     @Override
@@ -310,5 +217,34 @@ public class UserServiceImpl implements UserService {
         log.info("Checking user by phone: {}", phone);
         Optional<User> userByPhone = userRepository.getByPhone(phone);
         return userByPhone.isEmpty() || userByPhone.get().getId().equals(user.getId());
+    }
+
+    @Override
+    public Page<UserDto> searchUsers(Pageable pageable, String search) {
+        log.info("Searching users by: {}", search);
+        if (search != null && !search.isEmpty()) {
+            Page<User> userPage = userRepository.searchUsers(pageable, search);
+            return objectMapper.mapUserPageToUserDtoPage(userPage);
+        }
+        Page<User> userPage = userRepository.findAll(pageable);
+        return objectMapper.mapUserPageToUserDtoPage(userPage);
+    }
+
+    @Override
+    public Optional<UserManagementDto> getUserManagementDtoById(Long id) {
+        log.info("Getting user management dto by id: {}", id);
+        Optional<User> user = userRepository.findById(id);
+        return user.map(objectMapper::mapUserToUserManagementDto);
+    }
+
+    @Override
+    public Optional<UserDto> deleteUserById(Long id) {
+        log.info("Deleting user by id: {}", id);
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            return Optional.empty();
+        }
+        userRepository.delete(user.get());
+        return Optional.of(objectMapper.mapUserToUserDto(user.get()));
     }
 }

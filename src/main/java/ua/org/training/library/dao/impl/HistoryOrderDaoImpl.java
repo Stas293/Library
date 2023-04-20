@@ -39,7 +39,7 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
                 historyOrderQueries.getCreateQuery(), Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, model.getBookTitle());
             statement.setDate(2, Date.valueOf(model.getDateCreated()));
-            statement.setDate(3, Date.valueOf(model.getDateReturned()));
+            statement.setDate(3, model.getDateReturned() == null ? null : Date.valueOf(model.getDateReturned()));
             statement.setLong(4, model.getUser().getId());
             statement.setLong(5, model.getStatus().getId());
             statement.executeUpdate();
@@ -277,6 +277,42 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
         } catch (SQLException e) {
             log.error("Error getting page of history orders by user id: {}", e.getMessage());
             throw new DaoException("Error getting page of history orders by user id: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Page<HistoryOrder> getPageByUserIdAndSearch(Connection conn, Pageable page, Long id, String search) {
+        log.info("Getting page of history orders by user id: {} and search: {}", id, search);
+        try (PreparedStatement statement = conn.prepareStatement(
+                historyOrderQueries.getSelectAllByUserIdAndSearchQuery(page))) {
+            statement.setLong(1, id);
+            statement.setString(2, "%" + search + "%");
+            statement.setInt(3, page.getPageSize());
+            statement.setLong(4, page.getOffset());
+            try (ResultSet rs = statement.executeQuery()) {
+                return new PageImpl<>(historyOrderCollector.collectList(rs), page, countByUserIdAndSearch(conn, id, search));
+            }
+        } catch (SQLException e) {
+            log.error("Error getting page of history orders by user id: {} and search: {}", e.getMessage());
+            throw new DaoException("Error getting page of history orders by user id: " + e.getMessage(), e);
+        }
+    }
+
+    private long countByUserIdAndSearch(Connection conn, Long id, String search) {
+        log.info("Counting history orders by user id: {} and search: {}", id, search);
+        try (PreparedStatement statement = conn.prepareStatement(
+                historyOrderQueries.getCountByUserIdAndSearchQuery())) {
+            statement.setLong(1, id);
+            statement.setString(2, "%" + search + "%");
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getLong(1);
+                }
+            }
+            return 0;
+        } catch (SQLException e) {
+            log.error("Error counting history orders by user id: {} and search: {}", e.getMessage());
+            throw new DaoException("Error counting history orders by user id: " + e.getMessage(), e);
         }
     }
 

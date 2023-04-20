@@ -6,12 +6,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.org.training.library.dao.DaoFactory;
-import ua.org.training.library.dao.StatusDao;
 import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.DaoException;
 import ua.org.training.library.exceptions.JDBCException;
 import ua.org.training.library.exceptions.ServiceException;
-import ua.org.training.library.model.Status;
 
 import java.sql.SQLException;
 import java.util.List;

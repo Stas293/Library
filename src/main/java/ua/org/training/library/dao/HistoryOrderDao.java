@@ -10,4 +10,6 @@ import java.sql.Connection;
 public interface HistoryOrderDao extends GenericDao<HistoryOrder> {
     Page<HistoryOrder> getPageByUserId(Connection conn,
                                        Pageable page, Long userId);
+
+    Page<HistoryOrder> getPageByUserIdAndSearch(Connection conn, Pageable page, Long id, String search);
 }

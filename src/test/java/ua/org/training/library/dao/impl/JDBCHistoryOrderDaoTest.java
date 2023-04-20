@@ -5,12 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.org.training.library.dao.BookDao;
-import ua.org.training.library.dao.HistoryOrderDao;
 import ua.org.training.library.exceptions.DaoException;
-import ua.org.training.library.model.HistoryOrder;
-import ua.org.training.library.model.Status;
-import ua.org.training.library.model.User;
 import ua.org.training.library.utility.page.Page;
 
 import java.sql.*;

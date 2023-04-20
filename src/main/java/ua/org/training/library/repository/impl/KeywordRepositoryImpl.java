@@ -147,4 +147,18 @@ public class KeywordRepositoryImpl implements KeywordRepository {
         Connection conn = transactionManager.getConnection();
         return keywordDao.getPage(conn, pageable);
     }
+
+    @Override
+    public List<Keyword> getKeywordsByQuery(String query) {
+        log.info("Finding keywords by query: {}", query);
+        Connection conn = transactionManager.getConnection();
+        return keywordDao.getKeywordsByQuery(conn, query);
+    }
+
+    @Override
+    public Optional<Keyword> findByData(String keyword) {
+        log.info("Finding keyword by data: {}", keyword);
+        Connection conn = transactionManager.getConnection();
+        return keywordDao.getByData(conn, keyword);
+    }
 }

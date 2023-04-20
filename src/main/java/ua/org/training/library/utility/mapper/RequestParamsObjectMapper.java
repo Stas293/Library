@@ -14,6 +14,8 @@ import ua.org.training.library.utility.page.impl.PageRequest;
 import ua.org.training.library.utility.page.impl.Sort;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -41,7 +43,7 @@ public class RequestParamsObjectMapper {
                 .build();
     }
 
-    public Pageable getBookPageable(HttpServletRequest request) {
+    public Pageable getPageable(HttpServletRequest request) {
         int pageNumber = Integer.parseInt(
                 request.getParameter("page") == null ? "0" : request.getParameter("page")
         );
@@ -91,9 +93,59 @@ public class RequestParamsObjectMapper {
 
     public OrderUpdateDto getOrderUpdateDto(HttpServletRequest request) {
         return OrderUpdateDto.builder()
-                .id(Long.parseLong(request.getParameter("id")))
+                .id(Long.parseLong(request.getParameter("orderId")))
                 .dateExpire(request.getParameter("dateExpire") == null ? null : LocalDate.parse(request.getParameter("dateExpire")))
                 .status(request.getParameter("status"))
+                .build();
+    }
+
+    public UserChangeRolesDto collectFromEditUserForm(HttpServletRequest request) {
+        String[] roles = request.getParameterValues("role");
+        log.info("Roles: " + Arrays.toString(roles));
+        return UserChangeRolesDto.builder()
+                .id(Long.parseLong(request.getParameter("id")))
+                .roles(Arrays.stream(roles).toList())
+                .build();
+    }
+
+    public KeywordDto mapKeyword(HttpServletRequest request) {
+        return KeywordDto.builder()
+                .data(request.getParameter("keyword"))
+                .build();
+    }
+
+    public BookChangeDto getBookChangeDto(HttpServletRequest request) {
+        List<KeywordManagementDto> keywords = Arrays.stream(request.getParameter("keywords")
+                .split(","))
+                .map(id -> KeywordManagementDto.builder()
+                        .id(Long.parseLong(id))
+                        .build())
+                .toList();
+        List<AuthorManagementDto> authors = Arrays.stream(request.getParameter("authors")
+                .split(","))
+                .map(id -> AuthorManagementDto.builder()
+                        .id(Long.parseLong(id))
+                        .build())
+                .toList();
+        return BookChangeDto.builder()
+                .title(request.getParameter("title"))
+                .count(Integer.parseInt(request.getParameter("count")))
+                .isbn(request.getParameter("isbn"))
+                .publicationDate(LocalDate.parse(request.getParameter("publicationDate")))
+                .fine(Double.parseDouble(request.getParameter("fine")))
+                .language(request.getParameter("language"))
+                .description(request.getParameter("description"))
+                .location(request.getParameter("location"))
+                .keywords(keywords)
+                .authors(authors)
+                .build();
+    }
+
+    public AuthorManagementDto getAuthorDto(HttpServletRequest request) {
+        return AuthorManagementDto.builder()
+                .firstName(request.getParameter("firstName"))
+                .middleName(request.getParameter("middleName"))
+                .lastName(request.getParameter("lastName"))
                 .build();
     }
 }

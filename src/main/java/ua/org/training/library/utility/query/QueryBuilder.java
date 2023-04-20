@@ -49,5 +49,7 @@ public interface QueryBuilder {
     QueryBuilder setUp();
 
     QueryBuilder as(String alias);
+
+    QueryBuilder orderByMinMax(Sort sort);
 }
 

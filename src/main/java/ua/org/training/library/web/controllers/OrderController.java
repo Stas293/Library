@@ -6,14 +6,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.context.annotations.*;
+import ua.org.training.library.context.annotations.Autowired;
+import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.context.annotations.Controller;
+import ua.org.training.library.context.annotations.mapping.Get;
+import ua.org.training.library.context.annotations.mapping.Patch;
+import ua.org.training.library.context.annotations.mapping.Post;
 import ua.org.training.library.dto.*;
 import ua.org.training.library.security.AuthorityUser;
 import ua.org.training.library.security.SecurityService;
 import ua.org.training.library.service.BookService;
 import ua.org.training.library.service.OrderService;
 import ua.org.training.library.service.PlaceService;
-import ua.org.training.library.service.StatusService;
 import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.mapper.JSONMapper;
 import ua.org.training.library.utility.mapper.RequestParamsObjectMapper;
@@ -35,7 +39,6 @@ public class OrderController {
     private final SecurityService securityService;
     private final OrderService orderService;
     private final PlaceService placeService;
-    private final StatusService statusService;
 
     @Get("/user/page")
     public String getUser(HttpServletRequest request, HttpServletResponse response) {
@@ -47,7 +50,7 @@ public class OrderController {
     @SneakyThrows
     public String getBooksToOrder(HttpServletRequest request, HttpServletResponse response) {
         log.info("Get books to order");
-        Pageable pageable = requestParamsObjectMapper.getBookPageable(request);
+        Pageable pageable = requestParamsObjectMapper.getPageable(request);
         String search = request.getParameter("search");
         Page<BookDto> bookPage = bookService.searchBooksExceptUserOrders(
                 pageable,
@@ -62,7 +65,7 @@ public class OrderController {
     @SneakyThrows
     public String orderBook(HttpServletRequest request, HttpServletResponse response) {
         log.info("Order book");
-        Pageable pageable = requestParamsObjectMapper.getBookPageable(request);
+        Pageable pageable = requestParamsObjectMapper.getPageable(request);
         String search = request.getParameter("search");
         String statusCode = request.getParameter("statusCode");
         Locale locale = Utility.getLocale(request);
@@ -82,14 +85,15 @@ public class OrderController {
         log.info("New order");
         Locale locale = Utility.getLocale(request);
         long id = Utility.getIdFromUri(request);
-        Optional<BookDto> bookDto = bookService.getBookById(id);
+        AuthorityUser authorityUser = securityService.getAuthorityUser(request);
+        Optional<BookDto> bookDto = bookService.getBookById(id, authorityUser);
         if (bookDto.isPresent()) {
             request.setAttribute("book", bookDto.get());
             List<PlaceDto> placeDtos = placeService.getAllPlaces(locale);
             request.setAttribute("places", placeDtos);
             return "/WEB-INF/jsp/user/new-order.jsp";
         }
-        return "/WEB-INF/jsp/user/page.jsp";
+        return "redirect:library/order/user/page";
     }
 
     @Post("/user/{id}")
@@ -99,9 +103,9 @@ public class OrderController {
         AuthorityUser authorityUser = securityService.getAuthorityUser(request);
         Optional<OrderDto> order = orderService.createModel(orderCreationDto, authorityUser);
         if (order.isEmpty()) {
-            return "redirect:library/user/page?created=false";
+            return "redirect:library/order/user/page?created=false";
         }
-        return "redirect:library/user/page?created=true";
+        return "redirect:library/order/user/page?created=true";
     }
 
     @Get("/user/view/{id}")
@@ -127,13 +131,16 @@ public class OrderController {
     @SneakyThrows
     public String librarian(HttpServletRequest request, HttpServletResponse response) {
         log.info("Librarian");
-        Pageable pageable = requestParamsObjectMapper.getBookPageable(request);
+        Pageable pageable = requestParamsObjectMapper.getPageable(request);
         String search = request.getParameter("search");
         String statusCode = request.getParameter("statusCode");
+        String place = request.getParameter("placeName");
+        log.info("Place: {}", place);
         Page<OrderDto> orderDtoPage = orderService.getPageByStatus(
                 pageable,
                 statusCode,
-                search
+                search,
+                place
         );
         jsonMapper.toJson(response.getWriter(), orderDtoPage);
         return "";
@@ -152,14 +159,15 @@ public class OrderController {
         return "/WEB-INF/jsp/librarian/page.jsp";
     }
 
-    @Post("/librarian/edit-order")
+    @Patch("/librarian/edit-order")
     public String updateOrder(HttpServletRequest request, HttpServletResponse response) {
         log.info("Update order");
+        Locale locale = Utility.getLocale(request);
         OrderUpdateDto orderUpdateDto = requestParamsObjectMapper.getOrderUpdateDto(request);
-        Optional<OrderDto> orderDto = orderService.updateModel(orderUpdateDto);
+        Optional<OrderDto> orderDto = orderService.updateModel(orderUpdateDto, locale);
         if (orderDto.isEmpty()) {
-            return "redirect:library/librarian/page?updated=false";
+            return "redirect:library/order/librarian/page?updated=false";
         }
-        return "redirect:library/librarian/page?updated=true";
+        return "redirect:library/order/librarian/page?updated=true";
     }
 }

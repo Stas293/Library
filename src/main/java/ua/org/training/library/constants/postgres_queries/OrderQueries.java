@@ -46,4 +46,14 @@ public interface OrderQueries {
     String getSelectAllByStatusAndSearchQuery(Pageable page);
 
     String getCountByStatusAndSearchQuery();
+
+    String getSelectAllByStatusAndPlaceAndSearchQuery(Pageable page);
+
+    String getCountByStatusAndPlaceAndSearchQuery();
+
+    String getSelectAllByStatusAndPlaceQuery(Pageable page);
+
+    String getCountByStatusAndPlaceQuery();
+
+    String getSelectByUserIdAndBookIdQuery();
 }

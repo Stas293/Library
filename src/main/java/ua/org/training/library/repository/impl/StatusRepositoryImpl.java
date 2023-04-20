@@ -16,6 +16,7 @@ import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.Sort;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Component
@@ -37,11 +38,14 @@ public class StatusRepositoryImpl implements StatusRepository {
     }
 
     @Override
-    public List<Status> getNextStatusesForStatusById(Long id) {
+    public List<Status> getNextStatusesForStatusById(Long id, Locale locale) {
         log.info("Getting next statuses for status by id: {}", id);
         List<Status> statuses = statusDao.getNextStatusesForStatusById(transactionManager.getConnection(), id);
         statuses.forEach(status -> status.setNames(
-                statusNameDao.getByStatusId(transactionManager.getConnection(), status.getId()))
+                        List.of(
+                                statusNameDao.getByStatusId(transactionManager.getConnection(), status.getId(), locale).orElseThrow()
+                        )
+                )
         );
         return statuses;
     }

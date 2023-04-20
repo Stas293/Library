@@ -15,34 +15,132 @@
         </title>
       <script src="${pageContext.request.contextPath}/js/pageable-authors-book.js"></script>
         <script src="${pageContext.request.contextPath}/js/pagination.js"></script>
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+        <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     </jsp:attribute>
     <jsp:body>
         <div class="container main-content">
             <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
-                <li class="breadcrumb-item active"><a href="/library/admin/books"><fmt:message
+                <li class="breadcrumb-item active"><a href="/library/books/admin/page"><fmt:message
                         key="bookList.pageTitle"/></a></li>
             </ol>
             <h1><fmt:message key="editBook.pageTitle"/></h1>
-            <form id="add-book-form" data-toggle="validator"
-                  method="post">
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-success" id="success-alert" style="display: none">
+                        <button type="button" class="btn btn-close" data-dismiss="alert"></button>
+                        <strong>Success!</strong>
+                        <span id="success-message"></span>
+                    </div>
+                    <div class="alert alert-danger" id="error-alert" style="display: none">
+                        <button type="button" class="btn btn-close" data-dismiss="alert"></button>
+                        <strong>Error!</strong>
+                        <span id="error-message"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="createKeywordModal" tabindex="-1" aria-labelledby="createKeywordModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form id="createKeywordForm">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="createKeywordModalLabel"><fmt:message
+                                        key="newBook.label.createKeyword"/></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="newKeywordInput" class="form-label"><fmt:message
+                                            key="newBook.label.keyword"/></label>
+                                    <input type="text" class="form-control" id="newKeywordInput" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><fmt:message
+                                        key="newBook.label.close"/></button>
+                                <button type="submit" class="btn btn-primary"><fmt:message
+                                        key="newBook.label.save"/></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="createAuthorModal" tabindex="-1" aria-labelledby="createKeywordModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form id="createAuthorForm">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="createAuthorModalLabel"><fmt:message
+                                        key="newBook.label.createAuthor"/></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="newAuthorFirstNameInput" class="form-label"><fmt:message
+                                            key="newBook.label.firstName"/></label>
+                                    <input type="text" class="form-control" id="newAuthorFirstNameInput" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newAuthorMiddleNameInput" class="form-label"><fmt:message
+                                            key="newBook.label.middleName"/></label>
+                                    <input type="text" class="form-control" id="newAuthorMiddleNameInput">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="newAuthorLastNameInput" class="form-label"><fmt:message
+                                            key="newBook.label.lastName"/></label>
+                                    <input type="text" class="form-control" id="newAuthorLastNameInput" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><fmt:message
+                                        key="newBook.label.close"/></button>
+                                <button type="submit" class="btn btn-primary"><fmt:message
+                                        key="newBook.label.save"/></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <form id="add-book-form" data-toggle="validator" method="post">
+                <input type="hidden" name="_method" value="PUT"/>
                 <div class="mb-3">
-                    <label for="bookName">
-                        <fmt:message key="newBook.label.name"/>
+                    <label for="title">
+                        <fmt:message key="editBook.label.name"/>
                     </label>
-                    <c:set var="bookName">${book.name}</c:set>
-                    <c:if test="${not empty bookName}">
-                        <c:set var="bookTitle">${book.name}</c:set>
+                    <c:set var="title">${book.title}</c:set>
+                    <c:if test="${not empty title}">
+                        <c:set var="title">${book.title}</c:set>
                     </c:if>
-                    <input name="bookName" id="bookName" class="form-control" value=${bookTitle}>
-                    <c:set var="bookNameErrors">${bookValidationError.name}</c:set>
+                    <input name="title" id="title" class="form-control" required value=${title}>
+                    <c:set var="bookNameErrors">${bookValidationError.title}</c:set>
                     <c:if test="${not empty bookNameErrors}">
-                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.name}"/></div>
+                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.title}"/></div>
+                    </c:if>
+                </div>
+                <div class="mb-3">
+                    <label for="description">
+                        <fmt:message key="editBook.label.description"/>
+                    </label>
+                    <c:set var="description">${book.description}</c:set>
+                    <c:if test="${not empty description}">
+                        <c:set var="description">${book.description}</c:set>
+                    </c:if>
+                    <textarea name="description"  id="description" class="form-control">${description}</textarea>
+                    <c:set var="bookNameErrors">${bookValidationError.description}</c:set>
+                    <c:if test="${not empty bookNameErrors}">
+                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.description}"/></div>
                     </c:if>
                 </div>
                 <div class="mb-3">
                     <label for="bookCount">
-                        <fmt:message key="newBook.label.count"/>
+                        <fmt:message key="editBook.label.count"/>
                     </label>
                     <c:set var="bookCount">${book.count}</c:set>
                     <c:if test="${not empty bookCount}">
@@ -57,22 +155,22 @@
                 </div>
                 <div class="mb-3">
                     <label for="bookISBN">
-                        <fmt:message key="newBook.label.ISBN"/>
+                        <fmt:message key="editBook.label.ISBN"/>
                     </label>
-                    <c:set var="bookISBN">${book.ISBN}</c:set>
+                    <c:set var="bookISBN">${book.isbn}</c:set>
                     <c:if test="${not empty bookISBN}">
-                        <c:set var="bookISBNNumber">${book.ISBN}</c:set>
+                        <c:set var="bookISBNNumber">${book.isbn}</c:set>
                     </c:if>
-                    <input class="col-2 rounded border" id="bookISBN" type="number" min="0000000000000" minlength="13"
-                           maxlength="13" placeholder="0000000000000" required name="ISBN" value=${bookISBNNumber}>
-                    <c:set var="bookNameErrors">${bookValidationError.ISBN}</c:set>
+                    <input class="col-2 rounded border" id="bookISBN" type="text" min="0000000000000"
+                           placeholder="0000000000000" required name="isbn" pattern="\d{13}" value=${bookISBNNumber}>
+                    <c:set var="bookNameErrors">${bookValidationError.isbn}</c:set>
                     <c:if test="${not empty bookNameErrors}">
-                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.ISBN}"/></div>
+                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.isbn}"/></div>
                     </c:if>
                 </div>
                 <div class="mb-3">
                     <label for="publicationDate">
-                        <fmt:message key="newBook.label.publicationDate"/>
+                        <fmt:message key="editBook.label.publicationDate"/>
                     </label>
                     <c:set var="bookPublicationDate">${book.publicationDate}</c:set>
                     <c:if test="${not empty bookPublicationDate}">
@@ -88,7 +186,7 @@
                 </div>
                 <div class="mb-3">
                     <label for="bookFine">
-                        <fmt:message key="newBook.label.fine"/>
+                        <fmt:message key="editBook.label.fine"/>
                     </label>
                     <c:set var="bookFine">${book.fine}</c:set>
                     <c:if test="${not empty bookFine}">
@@ -102,67 +200,75 @@
                     </c:if>
                 </div>
                 <div class="mb-3">
-                    <label class="control-label"><fmt:message key="newBook.label.language"/></label>
-                    <input type="radio" name="language" value="ENGLISH" required checked><fmt:message
-                        key="newBook.label.english"/>
-                    <input type="radio" name="language" value="UKRAINIAN" required><fmt:message
-                        key="newBook.label.ukrainian"/>
+                    <label class="control-label"><fmt:message key="editBook.label.language"/></label>
+                    <c:set var="bookLanguage" value="${book.language}"/>
+                    <input type="radio" name="language" value="English"
+                           <c:if test="${bookLanguage == 'English'}">checked</c:if> required>
+                    <fmt:message key="editBook.label.english"/>
+                    <input type="radio" name="language" value="Українська"
+                           <c:if test="${bookLanguage == 'Українська'}">checked</c:if> required>
+                    <fmt:message key="editBook.label.ukrainian"/>
+                </div>
+                <div class="mb-3">
+                    <label for="location">
+                        <fmt:message key="editBook.label.location"/>
+                    </label>
+                    <c:set var="location">${book.location}</c:set>
+                    <c:if test="${not empty location}">
+                        <c:set var="location">${book.location}</c:set>
+                    </c:if>
+                    <input name="location" id="location" class="form-control" required value="${location}">
+                    <c:set var="bookNameErrors">${bookValidationError.location}</c:set>
+                    <c:if test="${not empty bookNameErrors}">
+                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.location}"/></div>
+                    </c:if>
                 </div>
                 <c:set var="bookAuthorsErrors">${bookValidationError.authors}</c:set>
                 <c:if test="${not empty bookAuthorsErrors}">
                     <div class="alert alert-danger"><fmt:message key="${bookValidationError.authors}"/></div>
                 </c:if>
-                <div class="grid-container">
-                    <div class="grid-left-3">
-                        <div class="form-group">
-                            <label class="control-label"><fmt:message key="newBook.label.authors"/></label>
-                            <ol id="authors-list">
-                                <c:forEach items="${book.authors}" var="author">
-                                    <li id="${author.id}">
-                                            ${author.firstName} ${author.lastName}
-                                    </li>
-                                </c:forEach>
-                            </ol>
-                        </div>
-                    </div>
-
-                    <div class="grid-right-9">
-                        <input id="search" class="col-4 rounded border" type="text"
-                               placeholder="<fmt:message key="table.search" />">
-                        <input id="size" class="col-2 rounded border" type="number" min="2" max="8" value="5">
-                        <input name="sorting" class="hidden" type="radio" id="asc" value="asc" checked><label
-                            class="col-2"
-                            for="asc"><fmt:message
-                            key="table.asc"/></label>
-                        <input name="sorting" class="hidden" type="radio" id="desc" value="desc"><label
-                            class="col-2"
-                            for="desc"><fmt:message
-                            key="table.desc"/></label>
-                        <div id="page-navigation" class="pagination"></div>
-                        <table class="table table-active table-hover table-active table-hover table-striped">
-                            <thead class="table-header table-dark">
-                            <tr>
-                                <th id="author_id" scope="col"><fmt:message key="newBook.label.author"/></th>
-                                <th id="author_first_name" scope="col"><fmt:message
-                                        key="newBook.table.first_name"/></th>
-                                <th id="author_last_name" scope="col"><fmt:message
-                                        key="newBook.table.last_name"/></th>
-                            </tr>
-                            </thead>
-                            <tbody id="pageable-list">
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="mb-3">
+                    <label for="author-choices" class="form-label"><fmt:message key="newBook.label.authors"/></label>
+                    <input type="text" class="form-control" id="author-choices" placeholder="<fmt:message
+                            key="newBook.label.enter_authors"/>">
+                    <ul id="author-list">
+                        <c:forEach items="${book.authors}" var="author">
+                            <li data-id="${author.id}">
+                                <c:if test="${not empty author.middleName}">
+                                    ${author.firstName} ${author.middleName} ${author.lastName}
+                                </c:if>
+                                <c:if test="${empty author.middleName}">
+                                    ${author.firstName} ${author.lastName}
+                                </c:if>
+                                <button class='btn btn-close btn-sm' aria-label='Close'></button>
+                            </li>
+                        </c:forEach>
+                    </ul>
+                    <input type="hidden" name="authors" id="authors-input">
+                </div>
+                <div class="mb-3">
+                    <label for="keyword-choices" class="form-label"><fmt:message key="newBook.label.keywords"/></label>
+                    <input type="text" class="form-control" id="keyword-choices" placeholder="<fmt:message
+                            key="newBook.label.enter_keywords"/>">
+                    <ul id="keyword-list">
+                        <c:forEach items="${book.keywords}" var="keyword">
+                            <li data-id="${keyword.id}">
+                                    ${keyword.data}
+                                <button class='btn btn-close btn-sm' aria-label='Close'></button>
+                            </li>
+                        </c:forEach>
+                    </ul>
+                    <input type="hidden" name="keywords" id="keywords-input">
                 </div>
                 <div class="form-group">
-                    <button type="submit" id="form-submit" class="btn btn-primary" onclick="addAuthors()">
+                    <button type="submit" id="form-submit" class="btn btn-primary" onclick="addAuthorsAndKeywords()">
                         <span><fmt:message key="newRequest.label.submit"/></span>
                     </button>
                 </div>
                 <div class="form-group">
-                    <label class="btn btn-danger" onclick="location.href='/library/admin/books'">
+                    <a class="btn btn-danger" href='/library/books/admin/page'>
                         <fmt:message key="newRequest.label.close"/>
-                    </label>
+                    </a>
                 </div>
             </form>
             <script>
@@ -170,7 +276,7 @@
                     $('#add-book-form').submit(function (e) {
                         var authors = $('#authors-list').children();
                         if (authors.length === 0) {
-                            alert("<fmt:message key="newBook.alert.authors"/>");
+                            alert("<fmt:message key="editBook.alert.authors"/>");
                             e.preventDefault();
                         }
                     });
@@ -179,7 +285,6 @@
                     document.getElementById("publicationDate").max = new Date().toISOString().split("T")[0];
                 });
             </script>
-
         </div>
 
     </jsp:body>

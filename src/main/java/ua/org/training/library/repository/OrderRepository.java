@@ -1,10 +1,7 @@
 package ua.org.training.library.repository;
 
 
-import ua.org.training.library.model.Book;
-import ua.org.training.library.model.Order;
-import ua.org.training.library.model.Status;
-import ua.org.training.library.model.User;
+import ua.org.training.library.model.*;
 import ua.org.training.library.repository.base.JRepository;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
@@ -24,4 +21,10 @@ public interface OrderRepository extends JRepository<Order, Long> {
     Optional<Order> findById(Long aLong, Locale locale);
 
     Page<Order> getPageByStatusAndSearch(Pageable page, Status statusOrder, String search);
+
+    Page<Order> getPageByStatusAndPlaceAndSearch(Pageable page, Status statusOrder, Place placeOrder, String search);
+
+    Page<Order> getPageByStatusAndPlace(Pageable page, Status statusOrder, Place placeOrder);
+
+    Optional<Order> findOrderByUserIdAndBookId(Long authorityUserId, long bookId);
 }

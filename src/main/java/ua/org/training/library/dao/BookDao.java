@@ -6,6 +6,7 @@ import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
 
 import java.sql.Connection;
+import java.util.List;
 import java.util.Optional;
 
 public interface BookDao extends GenericDao<Book> {
@@ -28,5 +29,9 @@ public interface BookDao extends GenericDao<Book> {
                                  String isbn);
 
     Page<Book> searchBooks(Connection connection,
-                              Pageable page, String search);
+                           Pageable page, String search);
+
+    long getBookCount(Connection conn, Long id);
+
+    List<Book> getBooksByAuthorId(Connection conn, Long id);
 }

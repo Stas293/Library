@@ -1,5 +1,6 @@
 package ua.org.training.library.utility.mapper;
 
+
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.SneakyThrows;
 import ua.org.training.library.context.annotations.Component;

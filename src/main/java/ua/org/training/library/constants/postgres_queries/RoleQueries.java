@@ -1,6 +1,5 @@
 package ua.org.training.library.constants.postgres_queries;
 
-
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.Sort;
 
@@ -33,5 +32,5 @@ public interface RoleQueries {
 
     String getGetRolesByUserIdQuery();
 
-
+    String getGetAllByCodesQuery(int size);
 }

@@ -8,16 +8,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.org.training.library.dao.DaoFactory;
-import ua.org.training.library.dao.RoleDao;
-import ua.org.training.library.dao.StatusDao;
-import ua.org.training.library.dao.UserDao;
 import ua.org.training.library.exceptions.ConnectionDBException;
 import ua.org.training.library.exceptions.DaoException;
 import ua.org.training.library.exceptions.JDBCException;
 import ua.org.training.library.exceptions.ServiceException;
-import ua.org.training.library.model.Role;
-import ua.org.training.library.model.Status;
-import ua.org.training.library.model.User;
 import ua.org.training.library.utility.Constants;
 import ua.org.training.library.utility.page.Page;
 

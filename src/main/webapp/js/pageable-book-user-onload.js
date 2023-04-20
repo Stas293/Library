@@ -14,11 +14,11 @@ window.onload = () => {
 function setTableHeadersDefault() {
     let isbn = document.querySelector(`#isbn`);
     let date_publication = document.querySelector(`#date_publication`);
-    let language = document.querySelector(`#language`);
+    let authors = document.querySelector(`#book_authors`);
 
     isbn.innerHTML = document.querySelector(`#label_ISBN`).innerHTML;
     date_publication.innerHTML = document.querySelector(`#label_date_publication`).innerHTML;
-    language.innerHTML = document.querySelector(`#label_language`).innerHTML;
+    authors.innerHTML = document.querySelector(`#label_authors`).innerHTML;
 }
 
 const listOrderToChoose = () => {
@@ -33,11 +33,11 @@ const listOrderToChoose = () => {
 function setTableHeadersGetOrder() {
     let isbn = document.querySelector(`#isbn`);
     let date_publication = document.querySelector(`#date_publication`);
-    let language = document.querySelector(`#language`);
+    let authors = document.querySelector(`#book_authors`);
 
     isbn.innerHTML = document.querySelector(`#label_date_created`).innerHTML;
     date_publication.innerHTML = document.querySelector(`#label_place`).innerHTML;
-    language.innerHTML = document.querySelector(`#label_fine`).innerHTML;
+    authors.innerHTML = document.querySelector(`#label_fine`).innerHTML;
 }
 
 const listRegisteredOrders = () => {
@@ -58,13 +58,14 @@ const listAcceptedOrder = () => {
 }
 
 class Book {
-    constructor(id, title, isbn, publicationDate, language, fine) {
+    constructor(id, title, isbn, publicationDate, language, fine, authors) {
         this.id = id;
         this.title = title;
         this.isbn = isbn;
         this.publicationDate = new Date(publicationDate);
         this.language = language;
         this.fine = fine;
+        this.authors = authors;
     }
 
     static from = function (rowData) {
@@ -74,7 +75,8 @@ class Book {
             rowData.isbn,
             rowData.publicationDate,
             rowData.language,
-            rowData.fine);
+            rowData.fine,
+            rowData.authors);
     };
 }
 
@@ -140,7 +142,8 @@ function makeRowOrder(rowData) {
 }
 
 const makeRow = (rowData, index) => {
-    if (urlPath === urlRegisteredOrders) {
+    console.log(rowData);
+    if (urlPath === urlRegisteredOrders || urlPath === urlAcceptedOrders) {
         return makeRowOrder(rowData);
     }
     rowData = Book.from(rowData);
@@ -164,7 +167,7 @@ const makeRow = (rowData, index) => {
     tableRow.appendChild(tableData);
     tableData = document.createElement('td');
     tableData.appendChild(document
-        .createTextNode(rowData.language));
+        .createTextNode(rowData.authors));
     tableRow.appendChild(tableData);
     return tableRow;
 }
