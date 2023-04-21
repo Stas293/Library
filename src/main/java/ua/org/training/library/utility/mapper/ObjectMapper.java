@@ -112,21 +112,23 @@ public class ObjectMapper {
                 .build();
     }
 
-    public Page<OrderDto> mapOrderPageToOrderDtoPage(Page<Order> orderPage) {
+    public Page<OrderDto> mapOrderPageToOrderDtoPage(Locale locale, Page<Order> orderPage) {
         List<OrderDto> orderDtoList = orderPage.getContent()
                 .parallelStream()
-                .map(this::mapOrderToDto)
+                .map(order -> mapOrderToDto(locale, order))
                 .toList();
         Pageable pageable = orderPage.getPageable();
         return new PageImpl<>(orderDtoList, pageable, orderPage.getTotalElements());
     }
 
-    private OrderDto mapOrderToDto(Order order) {
+    private OrderDto mapOrderToDto(Locale locale, Order order) {
+        order.getBook().setFine(Utility.getLocaleFine(locale, order.getBook().getFine()));
+        Book book = Utility.mapBookFine(order);
         return OrderDto.builder()
                 .id(order.getId())
                 .dateCreated(order.getDateCreated())
                 .dateExpire(order.getDateExpire())
-                .book(mapBookToBookDto(order.getBook(), Locale.getDefault()))
+                .book(mapBookToBookDto(book, Locale.getDefault()))
                 .place(mapPlaceToPlaceDto(order.getPlace()))
                 .build();
     }
@@ -200,10 +202,12 @@ public class ObjectMapper {
                 .build();
     }
 
-    public OrderDto mapOrderToOrderDto(Order order) {
+    public OrderDto mapOrderToOrderDto(Locale locale, Order order) {
+        order.getBook().setFine(Utility.getLocaleFine(locale, order.getBook().getFine()));
+        Book book = Utility.mapBookFine(order);
         return OrderDto.builder()
                 .id(order.getId())
-                .book(mapBookToBookDto(order.getBook(), Locale.getDefault()))
+                .book(mapBookToBookDto(book, Locale.getDefault()))
                 .dateCreated(order.getDateCreated())
                 .dateExpire(order.getDateExpire())
                 .place(mapPlaceToPlaceDto(order.getPlace()))
@@ -291,7 +295,7 @@ public class ObjectMapper {
                 .build();
     }
 
-    public BookChangeDto mapBookToBookChangeDto(Book book) {
+    public BookChangeDto mapBookToBookChangeDto(Locale locale, Book book) {
         return BookChangeDto.builder()
                 .id(book.getId())
                 .title(book.getTitle())
@@ -307,7 +311,7 @@ public class ObjectMapper {
                 .isbn(book.getIsbn())
                 .count(book.getCount())
                 .publicationDate(book.getPublicationDate())
-                .fine(book.getFine())
+                .fine(Utility.getLocaleFine(locale, book.getFine()))
                 .language(book.getLanguage())
                 .location(book.getLocation())
                 .build();
@@ -336,7 +340,7 @@ public class ObjectMapper {
                 .build();
     }
 
-    public Book mapBookChangeDtoToBook(BookChangeDto bookChangeDto) {
+    public Book mapBookChangeDtoToBook(Locale locale, BookChangeDto bookChangeDto) {
         return Book.builder()
                 .id(bookChangeDto.getId())
                 .title(bookChangeDto.getTitle())
@@ -352,7 +356,7 @@ public class ObjectMapper {
                 .isbn(bookChangeDto.getIsbn())
                 .count(bookChangeDto.getCount())
                 .publicationDate(bookChangeDto.getPublicationDate())
-                .fine(bookChangeDto.getFine())
+                .fine(Utility.delocalizeFine(locale, bookChangeDto.getFine()))
                 .language(bookChangeDto.getLanguage())
                 .location(bookChangeDto.getLocation())
                 .build();

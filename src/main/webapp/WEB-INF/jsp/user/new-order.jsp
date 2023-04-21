@@ -16,51 +16,62 @@
     </jsp:attribute>
     <jsp:body>
         <div class="container main-content">
-            <ol class="breadcrumb list-group-item-dark rounded">
-                <li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
-                <li class="breadcrumb-item active">
-                    <a href="/library/order/user/page">
-                        <fmt:message key="orderList.pageTitle"/>
-                    </a>
-                </li>
-            </ol>
-            <h1><fmt:message key="orderBook.pageTitle"/></h1>
-            <form id="add-book-form" data-toggle="validator" action="/library/order/user/${book.id}"
-                  method="post">
-                <input type="hidden" name="bookId" value="${book.id}"/>
-                <h2><span class="text-primary">${book.title}</span> </h2>
-                <h3>${book.description}</h3>
-                <h3><fmt:message key="newRequest.label.isbn"/> ${book.isbn}</h3>
-                <h3><fmt:message key="newRequest.label.count"/> ${book.count}</h3>
-                <h3><fmt:message key="newRequest.label.publicationDate"/> ${book.publicationDate}</h3>
-                <h3><fmt:message key="newRequest.label.fine"/> ${book.fine}</h3>
-                <h3>${book.language}</h3>
-                <h3>${book.location}</h3>
-                <h3><fmt:message key="newRequest.label.authors"/> ${book.authors}</h3>
-                <h3><fmt:message key="newRequest.label.keywords"/> ${book.keywords}</h3>
-
-                <div class="form-group">
-                    <label for="place" class="col-form-label-lg">
-                        <fmt:message key="newRequest.label.place"/>
-                    </label>
-                    <select required name="place" class="form-control" id="place">
-                        <c:forEach items="${places}" var="places">
-                            <option value="${places.id}">${places.name}</option>
-                        </c:forEach>
-                    </select>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb bg-dark rounded">
+                    <li class="breadcrumb-item"><a href="/" class="text-white"><fmt:message key="home.pageTitle"/></a>
+                    </li>
+                    <li class="breadcrumb-item active">
+                        <a href="/library/order/user/page" class="text-white"><fmt:message key="orderList.pageTitle"/></a>
+                </ol>
+            </nav>
+            <h1 class="my-4"><fmt:message key="orderBook.pageTitle"/></h1>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h2 class="card-title"><span class="text-primary">${book.title}</span></h2>
+                            <h3>${book.description}</h3>
+                            <ul class="list-unstyled">
+                                <li><strong><fmt:message key="newRequest.label.isbn"/>:</strong> ${book.isbn}</li>
+                                <li><strong><fmt:message key="newRequest.label.count"/>:</strong> ${book.count}</li>
+                                <li><strong><fmt:message
+                                        key="newRequest.label.publicationDate"/>:</strong> ${book.publicationDate}</li>
+                                <li><strong><fmt:message key="newRequest.label.fine"/>:</strong> ${book.fine}</li>
+                                <li><strong><fmt:message key="newRequest.label.authors"/>:</strong> ${book.authors}</li>
+                                <li><strong><fmt:message key="newRequest.label.keywords"/>:</strong> ${book.keywords}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <button type="submit" id="form-submit" class="btn btn-primary" name="submit">
-                        <fmt:message key="newRequest.label.submit"/>
-                    </button>
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="card-title"><fmt:message key="newRequest.label.place"/></h3>
+                            <form id="add-book-form" data-toggle="validator" action="/library/order/user/${book.id}"
+                                  method="post">
+                                <div class="form-group mb-3">
+                                    <select required name="place" class="form-select">
+                                        <c:forEach items="${places}" var="place">
+                                            <option value="${place.id}">${place.name}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" id="form-submit" class="btn btn-primary" name="submit">
+                                        <fmt:message key="newRequest.label.submit"/>
+                                    </button>
+                                    <a class="btn btn-danger" href='/library/order/user/page'>
+                                        <fmt:message key="newRequest.label.cancel"/>
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <a class="btn btn-danger" href='/library/order/user/page'>
-                        <fmt:message key="newRequest.label.cancel"/>
-                    </a>
-                </div>
-            </form>
+            </div>
         </div>
+
 
     </jsp:body>
 </tag:authorization>

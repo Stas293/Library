@@ -9,6 +9,7 @@ import ua.org.training.library.context.annotations.Service;
 import ua.org.training.library.context.annotations.Transactional;
 import ua.org.training.library.dto.AuthorDto;
 import ua.org.training.library.dto.AuthorManagementDto;
+import ua.org.training.library.form.AuthorSaveFormValidationError;
 import ua.org.training.library.model.Author;
 import ua.org.training.library.model.Book;
 import ua.org.training.library.repository.AuthorRepository;
@@ -18,6 +19,7 @@ import ua.org.training.library.utility.mapper.ObjectMapper;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.PageImpl;
+import ua.org.training.library.validator.AuthorSaveValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +32,7 @@ public class AuthorServiceImpl implements AuthorService {
     private final AuthorRepository repository;
     private final ObjectMapper mapper;
     private final BookRepository bookRepository;
+    private final AuthorSaveValidator validator;
 
     @Override
     public List<AuthorManagementDto> getAllAuthors() {
@@ -51,11 +54,16 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @Transactional
-    public Optional<AuthorDto> createAuthor(AuthorManagementDto authorDto) {
+    public AuthorSaveFormValidationError createAuthor(AuthorManagementDto authorDto) {
         log.info("Creating author: {}", authorDto);
+        AuthorSaveFormValidationError validationError = validator.validate(authorDto);
+        if (validationError.isContainsErrors()) {
+            return validationError;
+        }
         Author author = mapper.mapAuthorChangeDtoToAuthor(authorDto);
         Author savedAuthor = repository.save(author);
-        return Optional.of(mapper.mapAuthorToAuthorDto(savedAuthor));
+        authorDto.setId(savedAuthor.getId());
+        return validationError;
     }
 
     @Override
@@ -86,5 +94,25 @@ public class AuthorServiceImpl implements AuthorService {
         return new PageImpl<>(authors.getContent().parallelStream()
                 .map(mapper::mapAuthorToAuthorChangeDto)
                 .toList(), pageable, authors.getTotalElements());
+    }
+
+    @Override
+    public Optional<AuthorManagementDto> getAuthor(long id) {
+        log.info("Getting author by id: {}", id);
+        return repository.findById(id)
+                .map(mapper::mapAuthorToAuthorChangeDto);
+    }
+
+    @Override
+    public AuthorSaveFormValidationError updateAuthor(AuthorManagementDto authorDto) {
+        log.info("Updating author: {}", authorDto);
+        AuthorSaveFormValidationError validationError = validator.validate(authorDto);
+        if (validationError.isContainsErrors()) {
+            return validationError;
+        }
+        Author author = mapper.mapAuthorChangeDtoToAuthor(authorDto);
+        Author savedAuthor = repository.save(author);
+        authorDto.setId(savedAuthor.getId());
+        return validationError;
     }
 }

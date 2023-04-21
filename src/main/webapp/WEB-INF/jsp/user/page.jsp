@@ -17,6 +17,14 @@
         <script src="${pageContext.request.contextPath}/js/pagination.js"></script>
     </jsp:attribute>
     <jsp:body>
+        <div id="label_ISBN" hidden="hidden"><fmt:message key="orderList.table.ISBN"/></div>
+        <div id="label_date_publication" hidden="hidden"><fmt:message key="orderList.table.date_publication"/></div>
+        <div id="label_authors" hidden="hidden"><fmt:message key="orderList.table.authors"/></div>
+        <div id="label_book_title" hidden="hidden"><fmt:message key="orderList.table.title"/></div>
+        <div id="label_date_created" hidden="hidden"><fmt:message key="orderList.table.dateCreated"/></div>
+        <div id="label_date_expire" hidden="hidden"><fmt:message key="orderList.table.dateExpire"/></div>
+        <div id="label_place" hidden="hidden"><fmt:message key="orderList.table.place"/></div>
+        <div id="label_fine" hidden="hidden"><fmt:message key="orderList.table.fine"/></div>
         <div class="container main-content">
             <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item active"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
@@ -30,13 +38,7 @@
             <h1>
                 <fmt:message key="orderList.pageTitle"/>
             </h1>
-            <div id="label_ISBN" hidden="hidden"><fmt:message key="orderList.table.ISBN"/></div>
-            <div id="label_date_publication" hidden="hidden"><fmt:message key="orderList.table.date_publication"/></div>
-            <div id="label_authors" hidden="hidden"><fmt:message key="orderList.table.authors"/></div>
-            <div id="label_book_title" hidden="hidden"><fmt:message key="orderList.table.title"/></div>
-            <div id="label_date_created" hidden="hidden"><fmt:message key="orderList.table.dateCreated"/></div>
-            <div id="label_place" hidden="hidden"><fmt:message key="orderList.table.place"/></div>
-            <div id="label_fine" hidden="hidden"><fmt:message key="orderList.table.fine"/></div>
+
             <div class="grid-container">
                 <div class="grid-left-3">
                     <div class="list-group list-group-flush components">

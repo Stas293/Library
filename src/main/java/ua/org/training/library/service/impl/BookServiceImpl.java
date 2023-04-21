@@ -7,12 +7,13 @@ import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.context.annotations.Service;
 import ua.org.training.library.context.annotations.Transactional;
+import ua.org.training.library.dto.AuthorManagementDto;
 import ua.org.training.library.dto.BookChangeDto;
 import ua.org.training.library.dto.BookDto;
-import ua.org.training.library.model.Author;
-import ua.org.training.library.model.Book;
-import ua.org.training.library.model.Order;
-import ua.org.training.library.model.User;
+import ua.org.training.library.dto.KeywordManagementDto;
+import ua.org.training.library.enums.Validation;
+import ua.org.training.library.form.BookChangeFormValidationError;
+import ua.org.training.library.model.*;
 import ua.org.training.library.repository.*;
 import ua.org.training.library.security.AuthorityUser;
 import ua.org.training.library.service.BookService;
@@ -21,6 +22,7 @@ import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.PageRequest;
 import ua.org.training.library.utility.page.impl.Sort;
+import ua.org.training.library.validator.BookChangeValidator;
 
 import java.util.List;
 import java.util.Locale;
@@ -37,6 +39,7 @@ public class BookServiceImpl implements BookService {
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
     private final OrderRepository orderRepository;
+    private final BookChangeValidator bookChangeValidator;
 
     @Override
     public Optional<BookDto> getBookById(long id, Locale locale) {
@@ -57,25 +60,41 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Optional<BookChangeDto> getBookChangeById(long id) {
+    public Optional<BookChangeDto> getBookChangeById(Locale locale, long id) {
         log.info("Getting book change by id: {}", id);
         return bookRepository.findById(id)
-                .map(objectMapper::mapBookToBookChangeDto);
+                .map(book -> objectMapper.mapBookToBookChangeDto(locale, book));
     }
 
     @Override
     @Transactional
-    public Optional<BookDto> saveBook(BookChangeDto bookDto) {
+    public BookChangeFormValidationError saveBook(Locale locale, BookChangeDto bookDto) {
         log.info("Saving book: {}", bookDto);
-        return Optional.of(bookDto)
-                .map(objectMapper::mapBookChangeDtoToBook)
-                .map(bookRepository::save)
-                .map(book1 -> {
-                    book1.setAuthors(null);
-                    book1.setKeywords(null);
-                    return book1;
-                })
-                .map(book -> objectMapper.mapBookToBookDto(book, Locale.getDefault()));
+        BookChangeFormValidationError errors = bookChangeValidator.validate(bookDto);
+        checkBookIsbn(bookDto, errors);
+        if (errors.isContainsErrors()) {
+            return errors;
+        }
+        Optional<Book> bookOptional = Optional.of(bookDto)
+                .map(bookChangeDto -> objectMapper.mapBookChangeDtoToBook(locale, bookChangeDto))
+                .map(bookRepository::save);
+        log.info("Book saved: {}", bookOptional);
+        return errors;
+    }
+
+    private void checkBookIsbn(BookChangeDto bookDto, BookChangeFormValidationError errors) {
+        if (bookDto.getId() == null) {
+            if (bookRepository.existsByIsbn(bookDto.getIsbn())) {
+                errors.setIsbn(Validation.ISBN_EXISTS.getMessage());
+            }
+        } else {
+            Optional<Book> book = bookRepository.findById(bookDto.getId());
+            if (book.isPresent()
+                    && !book.get().getIsbn().equals(bookDto.getIsbn())
+                    && (bookRepository.existsByIsbn(bookDto.getIsbn()))) {
+                errors.setIsbn(Validation.ISBN_EXISTS.getMessage());
+            }
+        }
     }
 
     @Override
@@ -88,6 +107,50 @@ public class BookServiceImpl implements BookService {
             return book.map(book1 -> objectMapper.mapBookToBookDto(book1, Locale.getDefault()));
         }
         return Optional.empty();
+    }
+
+    @Override
+    public BookChangeFormValidationError updateBook(Locale locale, BookChangeDto bookDto) {
+        log.info("Updating book: {}", bookDto);
+        BookChangeFormValidationError errors = bookChangeValidator.validate(bookDto);
+        checkBookIsbn(bookDto, errors);
+        if (errors.isContainsErrors()) {
+            return errors;
+        }
+        Optional<Book> bookOptional = Optional.of(bookDto)
+                .map(bookChangeDto -> objectMapper.mapBookChangeDtoToBook(locale, bookChangeDto))
+                .map(bookRepository::save);
+        log.info("Book updated: {}", bookOptional);
+        return errors;
+    }
+
+    @Override
+    public Optional<BookChangeDto> getBookChangeByBookChangeDto(Locale locale, BookChangeDto bookDto) {
+        log.info("Getting book change by book change dto: {}", bookDto);
+        if (bookDto.getAuthors() == null || bookDto.getKeywords() == null) {
+            return Optional.of(bookDto);
+        }
+        List<AuthorManagementDto> authors = bookDto.getAuthors().stream()
+                .map(authorManagementDto -> {
+                    Optional<Author> author = authorRepository.findById(authorManagementDto.getId());
+                    if (author.isPresent()) {
+                        return objectMapper.mapAuthorToAuthorChangeDto(author.get());
+                    }
+                    return authorManagementDto;
+                })
+                .toList();
+        List<KeywordManagementDto> keywords = bookDto.getKeywords().stream()
+                .map(keywordManagementDto -> {
+                    Optional<Keyword> keyword = keywordRepository.findById(keywordManagementDto.getId());
+                    if (keyword.isPresent()) {
+                        return objectMapper.mapKeywordToKeywordChangeDto(keyword.get());
+                    }
+                    return keywordManagementDto;
+                })
+                .toList();
+        bookDto.setAuthors(authors);
+        bookDto.setKeywords(keywords);
+        return Optional.of(bookDto);
     }
 
     @Override

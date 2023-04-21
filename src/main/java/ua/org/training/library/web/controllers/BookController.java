@@ -12,8 +12,10 @@ import ua.org.training.library.context.annotations.Controller;
 import ua.org.training.library.context.annotations.mapping.Delete;
 import ua.org.training.library.context.annotations.mapping.Get;
 import ua.org.training.library.context.annotations.mapping.Post;
+import ua.org.training.library.context.annotations.mapping.Put;
 import ua.org.training.library.dto.BookChangeDto;
 import ua.org.training.library.dto.BookDto;
+import ua.org.training.library.form.BookChangeFormValidationError;
 import ua.org.training.library.service.BookService;
 import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.mapper.JSONMapper;
@@ -93,7 +95,8 @@ public class BookController {
     public String editBook(HttpServletRequest request, HttpServletResponse response) {
         log.info("Edit book");
         long id = Utility.getIdFromUri(request);
-        Optional<BookChangeDto> bookDto = bookService.getBookChangeById(id);
+        Locale locale = Utility.getLocale(request);
+        Optional<BookChangeDto> bookDto = bookService.getBookChangeById(locale, id);
         if (bookDto.isPresent()) {
             request.setAttribute("book", bookDto.get());
             return "/WEB-INF/jsp/admin/edit-book.jsp";
@@ -105,11 +108,28 @@ public class BookController {
     public String saveBook(HttpServletRequest request, HttpServletResponse response) {
         log.info("Save book");
         BookChangeDto bookDto = requestParamsObjectMapper.getBookChangeDto(request);
-        Optional<BookDto> book = bookService.saveBook(bookDto);
-        if (book.isPresent()) {
-            return "redirect:library/books/admin/" + book.get().getId();
+        Locale locale = Utility.getLocale(request);
+        BookChangeFormValidationError bookChangeFormValidationError = bookService.saveBook(locale, bookDto);
+        if (bookChangeFormValidationError.isContainsErrors()) {
+            request.setAttribute("book", bookService.getBookChangeByBookChangeDto(locale, bookDto));
+            request.setAttribute("bookValidationError", bookChangeFormValidationError);
+            return "/WEB-INF/jsp/admin/add-book.jsp";
         }
-        return "/WEB-INF/jsp/admin/add-book.jsp";
+        return "redirect:library/books/admin/page";
+    }
+
+    @Put("/admin/{id}/edit")
+    public String updateBook(HttpServletRequest request, HttpServletResponse response) {
+        log.info("Update book");
+        BookChangeDto bookDto = requestParamsObjectMapper.getBookChangeDto(request);
+        Locale locale = Utility.getLocale(request);
+        BookChangeFormValidationError bookChangeFormValidationError = bookService.updateBook(locale, bookDto);
+        if (bookChangeFormValidationError.isContainsErrors()) {
+            request.setAttribute("book", bookService.getBookChangeByBookChangeDto(locale, bookDto));
+            request.setAttribute("bookValidationError", bookChangeFormValidationError);
+            return "/WEB-INF/jsp/admin/edit-book.jsp";
+        }
+        return "redirect:library/books/admin/page";
     }
 
     @Delete("/admin/{id}")
@@ -117,9 +137,7 @@ public class BookController {
         log.info("Delete book");
         long id = Utility.getIdFromUri(request);
         Optional<BookDto> bookDto = bookService.deleteBook(id);
-        if (bookDto.isPresent()) {
-            return "redirect:library/books/admin/page";
-        }
-        return "redirect:library/books/admin/" + id;
+        return bookDto.map(dto -> "redirect:library/books/admin/page")
+                .orElseGet(() -> "redirect:library/books/admin/" + id);
     }
 }

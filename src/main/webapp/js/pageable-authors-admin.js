@@ -46,7 +46,7 @@ const createModal = (rowData, index, urlPath) => {
 
     const editBtn = document.createElement('a');
     editBtn.className = 'btn btn-warning';
-    editBtn.innerHTML = 'Edit';
+    editBtn.innerHTML = document.getElementById("edit_author_button").innerHTML;
     editBtn.href = urlPath + `/${rowData.id}/edit`;
     modalFooter.appendChild(editBtn);
 
@@ -63,7 +63,7 @@ const createModal = (rowData, index, urlPath) => {
 
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'btn btn-danger';
-    deleteBtn.innerHTML = 'Delete';
+    deleteBtn.innerHTML = document.getElementById("delete_author_button").innerHTML;
     deleteBtn.type = 'submit';
     deleteForm.appendChild(deleteBtn);
 
@@ -77,7 +77,7 @@ const createModal = (rowData, index, urlPath) => {
             data: $(deleteForm).serialize(),
             success: function (data) {
                 // Display a success message
-                alert('Author deleted successfully!');
+                alert(document.getElementById("author_delete_success").innerText);
 
                 // Remove the row from the table
                 $(`#author${index}`).modal('hide');
@@ -85,9 +85,9 @@ const createModal = (rowData, index, urlPath) => {
 
                 wizard(urlPath);
             },
-            error: function (jqXHR, textStatus, errorThrown) {
+            error: function (jqXHR, textStatus, errorThrown, data) {
                 // Display an error message
-                alert('An error occurred while deleting the author: ' + errorThrown);
+                alert(document.getElementById("author_delete_error").innerText);
             }
         });
     });

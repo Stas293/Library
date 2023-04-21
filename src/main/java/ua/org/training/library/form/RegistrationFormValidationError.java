@@ -5,7 +5,7 @@ import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode
-public class RegistrationFormValidation {
+public class RegistrationFormValidationError {
     private String login;
     private String firstName;
     private String lastName;

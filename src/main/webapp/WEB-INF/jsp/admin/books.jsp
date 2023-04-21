@@ -18,7 +18,7 @@
     </jsp:attribute>
     <jsp:body>
         <div id="book_count" class="hidden"><fmt:message key="book.count"/></div>
-        <div id="book_ISBN" class="hidden"><fmt:message key="book.ISBN"/></div>
+        <div id="book_ISBN" class="hidden"><fmt:message key="book.isbn"/></div>
         <div id="book_date_published" class="hidden"><fmt:message key="book.publicationDate"/></div>
         <div id="book_fine" class="hidden"><fmt:message key="book.fine"/></div>
         <div id="book_language" class="hidden"><fmt:message key="book.language"/></div>
@@ -60,7 +60,7 @@
                 </div>
             </c:if>
             <h1>
-                <fmt:message key="admin.pageTitle"/>
+                <fmt:message key="books.pageTitle"/>
             </h1>
             <div class="grid-container">
                 <div class="grid-left-3">

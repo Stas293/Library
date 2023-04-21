@@ -3,6 +3,7 @@ package ua.org.training.library.service;
 
 import ua.org.training.library.dto.BookChangeDto;
 import ua.org.training.library.dto.BookDto;
+import ua.org.training.library.form.BookChangeFormValidationError;
 import ua.org.training.library.model.Book;
 import ua.org.training.library.model.User;
 import ua.org.training.library.security.AuthorityUser;
@@ -31,9 +32,13 @@ public interface BookService {
 
     Optional<BookDto> deleteBookById(long id);
 
-    Optional<BookChangeDto> getBookChangeById(long id);
+    Optional<BookChangeDto> getBookChangeById(Locale locale, long id);
 
-    Optional<BookDto> saveBook(BookChangeDto bookDto);
+    BookChangeFormValidationError saveBook(Locale locale, BookChangeDto bookDto);
 
     Optional<BookDto> deleteBook(long id);
+
+    BookChangeFormValidationError updateBook(Locale locale, BookChangeDto bookDto);
+
+    Optional<BookChangeDto> getBookChangeByBookChangeDto(Locale locale, BookChangeDto bookDto);
 }

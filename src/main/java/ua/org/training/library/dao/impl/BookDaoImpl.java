@@ -93,11 +93,28 @@ public class BookDaoImpl implements BookDao {
             statement.setInt(2, page.getPageSize());
             statement.setLong(3, page.getOffset());
             try (ResultSet resultSet = statement.executeQuery()) {
-                return new PageImpl<>(collector.collectList(resultSet), page, count(connection));
+                return new PageImpl<>(collector.collectList(resultSet), page, countBooksWhichUserDidNotOrder(connection, userId));
             }
         } catch (SQLException e) {
             log.error("Error getting books which user did not order: {}", userId, e);
             throw new DaoException("Error getting books which user did not order: " + userId, e);
+        }
+    }
+
+    private long countBooksWhichUserDidNotOrder(Connection connection, Long userId) {
+        log.info("Counting books which user did not order: {}", userId);
+        try (PreparedStatement statement = connection.prepareStatement(
+                bookQueries.getCountBooksWhichUserDidNotOrderQueryNoSearch())) {
+            statement.setLong(1, userId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getLong(1);
+                }
+            }
+            return 0;
+        } catch (SQLException e) {
+            log.error("Error counting books which user did not order: {}", userId, e);
+            throw new DaoException("Error counting books which user did not order: " + userId, e);
         }
     }
 
@@ -215,6 +232,21 @@ public class BookDaoImpl implements BookDao {
         } catch (SQLException e) {
             log.error("Error getting books by author id: {}", id, e);
             throw new DaoException("Error getting books by author id: " + id, e);
+        }
+    }
+
+    @Override
+    public boolean existsByIsbn(Connection conn, String isbn) {
+        log.info("Checking if book exists by ISBN: {}", isbn);
+        try (PreparedStatement statement = conn.prepareStatement(
+                bookQueries.getExistsByIsbnQuery())) {
+            statement.setString(1, isbn);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
+        } catch (SQLException e) {
+            log.error("Error checking if book exists by ISBN: {}", isbn, e);
+            throw new DaoException("Error checking if book exists by ISBN: " + isbn, e);
         }
     }
 

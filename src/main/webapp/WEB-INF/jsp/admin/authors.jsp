@@ -17,6 +17,8 @@
         <script src="${pageContext.request.contextPath}/js/pagination.js"></script>
     </jsp:attribute>
     <jsp:body>
+        <div id="author_delete_success" hidden="hidden"><fmt:message key="admin.delete.author.success"/></div>
+        <div id="author_delete_error" hidden="hidden"><fmt:message key="admin.delete.author.error"/></div>
         <div id="edit_author_button" hidden="hidden"><fmt:message key="admin.edit.author.button"/></div>
         <div id="delete_author_button" hidden="hidden"><fmt:message key="admin.delete.author.button"/></div>
         <div class="container main-content">
@@ -48,16 +50,25 @@
                                     <label for="first-name" class="form-label"><fmt:message
                                             key="author.firstName"/></label>
                                     <input type="text" class="form-control" id="first-name" name="firstName" required>
+                                    <div class="alert alert-danger" id="first-name-error">
+                                        <fmt:message key="form.validation.name"/>
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="middle-name" class="form-label"><fmt:message
                                             key="author.middleName"/></label>
                                     <input type="text" class="form-control" id="middle-name" name="middleName">
+                                    <div class="alert alert-danger" id="middle-name-error">
+                                        <fmt:message key="form.validation.name"/>
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="last-name" class="form-label"><fmt:message
                                             key="author.lastName"/></label>
                                     <input type="text" class="form-control" id="last-name" name="lastName" required>
+                                    <div class="alert alert-danger" id="last-name-error">
+                                        <fmt:message key="form.validation.name"/>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -97,13 +108,13 @@
                     <table class="table table-active table-hover table-active table-hover table-striped">
                         <thead class="table-header table-dark">
                         <tr>
-                            <th id="author_id" scope="col"><fmt:message key="newBook.table.author_id"/></th>
+                            <th id="author_id" scope="col"><fmt:message key="author.table.author_id"/></th>
                             <th id="author_first_name" scope="col"><fmt:message
-                                    key="newBook.table.first_name"/></th>
+                                    key="author.table.first_name"/></th>
                             <th id="author_middle_name" scope="col"><fmt:message
-                                    key="newBook.table.middle_name"/></th>
+                                    key="author.table.middle_name"/></th>
                             <th id="author_last_name" scope="col"><fmt:message
-                                    key="newBook.table.last_name"/></th>
+                                    key="author.table.last_name"/></th>
                         </tr>
                         </thead>
                         <tbody id="pageable-list">
@@ -114,6 +125,9 @@
         </div>
         <script>
             $(document).ready(function () {
+                $('#first-name-error').hide();
+                $('#middle-name-error').hide();
+                $('#last-name-error').hide();
                 $('#create-author-modal form').submit(function (event) {
                     // Prevent the form from submitting normally
                     event.preventDefault();
@@ -123,20 +137,20 @@
                     let middleName = $('#middle-name').val().trim();
                     const lastName = $('#last-name').val().trim();
 
-                    middleName = middleName === '' ? null : middleName;
+                    let dataToSend = {
+                        firstName: firstName,
+                        middleName: middleName,
+                        lastName: lastName,
+                    };
 
                     // Send an AJAX request to create the author
                     $.ajax({
                         url: '/library/authors/admin',
                         type: 'POST',
-                        data: {
-                            firstName: firstName,
-                            middleName: middleName,
-                            lastName: lastName,
-                        },
+                        data: dataToSend,
                         success: function (data) {
                             // Display a success message
-                            alert('Author created successfully!');
+                            alert("<fmt:message key="admin.create.author.success"/>");
 
                             // Close the modal
                             $('#create-author-modal').modal('hide');
@@ -147,8 +161,33 @@
                             wizard(urlPath);
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
-                            // Display an error message
-                            alert('An error occurred while creating the author: ' + errorThrown);
+                            const response = JSON.parse(jqXHR.responseText);
+
+                            console.log(response);
+
+                            // add error messages to the modal
+                            if (response.containsErrors) {
+                                // Show error messages for each field
+                                if (response.firstName) {
+                                    $('#first-name-error').show();
+                                } else {
+                                    $('#first-name-error').hide();
+                                }
+
+                                if (response.middleName) {
+                                    $('#middle-name-error').show();
+                                } else {
+                                    $('#middle-name-error').hide();
+                                }
+
+                                if (response.lastName) {
+                                    $('#last-name-error').show();
+                                } else {
+                                    $('#last-name-error').hide();
+                                }
+                            } else {
+                                alert("<fmt:message key="admin.create.author.error"/>");
+                            }
                         }
                     });
                 });

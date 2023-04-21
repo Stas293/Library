@@ -12,8 +12,10 @@ import ua.org.training.library.context.annotations.Controller;
 import ua.org.training.library.context.annotations.mapping.Delete;
 import ua.org.training.library.context.annotations.mapping.Get;
 import ua.org.training.library.context.annotations.mapping.Post;
+import ua.org.training.library.context.annotations.mapping.Put;
 import ua.org.training.library.dto.AuthorDto;
 import ua.org.training.library.dto.AuthorManagementDto;
+import ua.org.training.library.form.AuthorSaveFormValidationError;
 import ua.org.training.library.service.AuthorService;
 import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.mapper.JSONMapper;
@@ -67,13 +69,14 @@ public class AuthorController {
     public String createAuthor(HttpServletRequest request, HttpServletResponse response) {
         log.info("Create author");
         AuthorManagementDto authorDto = requestParamsObjectMapper.getAuthorDto(request);
-        Optional<AuthorDto> author = authorService.createAuthor(authorDto);
-        if (author.isEmpty()) {
+        AuthorSaveFormValidationError author = authorService.createAuthor(authorDto);
+        if (author.isContainsErrors()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            jsonMapper.toJson(response.getWriter(), author);
             return "";
         }
         response.setStatus(HttpServletResponse.SC_CREATED);
-        jsonMapper.toJson(response.getWriter(), author.get());
+        jsonMapper.toJson(response.getWriter(), authorDto);
         return "";
     }
 
@@ -90,5 +93,32 @@ public class AuthorController {
         response.setStatus(HttpServletResponse.SC_OK);
         jsonMapper.toJson(response.getWriter(), author.get());
         return "";
+    }
+
+    @Get("/admin/{id}/edit")
+    public String getAuthorEditPage(HttpServletRequest request, HttpServletResponse response) {
+        log.info("Get author edit page");
+        long id = Utility.getIdFromUri(request);
+        Optional<AuthorManagementDto> author = authorService.getAuthor(id);
+        if (author.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return "redirect:library/authors/admin/page";
+        }
+        request.setAttribute("author", author.get());
+        return "/WEB-INF/jsp/admin/edit-author.jsp";
+    }
+
+    @Put("/admin/{id}")
+    public String updateAuthor(HttpServletRequest request, HttpServletResponse response) {
+        log.info("Update author");
+        AuthorManagementDto authorDto = requestParamsObjectMapper.getAuthorDto(request);
+        AuthorSaveFormValidationError author = authorService.updateAuthor(authorDto);
+        if (author.isContainsErrors()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            request.setAttribute("author", authorDto);
+            request.setAttribute("errors", author);
+            return "/WEB-INF/jsp/admin/edit-author.jsp";
+        }
+        return "redirect:library/authors/admin/page";
     }
 }

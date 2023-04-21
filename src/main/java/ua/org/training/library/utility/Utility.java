@@ -5,7 +5,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import ua.org.training.library.enums.DefaultValues;
+import ua.org.training.library.model.Book;
+import ua.org.training.library.model.Order;
 
+import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -84,5 +87,40 @@ public class Utility {
                 .map(MatchResult::group)
                 .findFirst().orElse("-1"));
 
+    }
+
+    public static Book mapBookFine(Order order) {
+        log.info("Map order to order dto");
+        log.info("Order: {}", order);
+        Book book = order.getBook();
+        if (order.getDateExpire() != null) {
+            log.info("Order date expire: {}", order.getDateExpire());
+            if (order.getDateExpire().isAfter(LocalDate.now())) {
+                log.info("Order date expire is before today");
+                book.setFine(0);
+            } else {
+                log.info("Order date expire is after today");
+                int daysToFine = (int) (LocalDate.now().toEpochDay() - order.getDateExpire().toEpochDay());
+                book.setFine(book.getFine() * daysToFine);
+            }
+        }
+        return book;
+    }
+
+    public static double delocalizeFine(Locale locale, double fine) {
+        double exchangeRate = Double.parseDouble(
+                Utility.getBundleInterface(
+                        locale,
+                        DefaultValues.BUNDLE_CURRENCY_EXCHANGE.getValue()));
+        return Math.round(fine / exchangeRate * 100.0) / 100.0;
+    }
+
+    public static Long tryParseLong(String id) {
+        try {
+            return Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            log.error(String.format("Number format exception %s", id));
+        }
+        return null;
     }
 }

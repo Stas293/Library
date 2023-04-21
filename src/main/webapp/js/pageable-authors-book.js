@@ -1,7 +1,28 @@
 const urlPath = `/library/authors/admin`;
 const keywordsPath = `/library/keywords/admin`;
 
+function addAlreadySelectedAuthotsAndKeywords() {
+    $("#author-list li").each(function () {
+        const author = {
+            value: $(this).text().trim(),
+            id: $(this).data("id")
+        };
+        $("#author-list li[data-id='" + author.id + "']").remove();
+        addAuthorToList(author);
+    });
+
+    $("#keyword-list li").each(function () {
+        const keyword = {
+            value: $(this).text().trim(),
+            id: $(this).data("id")
+        };
+        $("#keyword-list li[data-id='" + keyword.id + "']").remove();
+        addKeywordToList(keyword);
+    });
+}
+
 window.onload = () => {
+    addAlreadySelectedAuthotsAndKeywords();
     createAuthorSearch(urlPath);
     createKeywordSearch(keywordsPath);
 }
@@ -28,7 +49,7 @@ function createAuthorSearch(authorsPath) {
         const newAuthorLastName = $("#newAuthorLastNameInput").val().trim();
         const newAuthor = {
             firstName: newAuthorFirstName,
-            middleName: newAuthorMiddleName === "" ? null : newAuthorMiddleName,
+            middleName: newAuthorMiddleName,
             lastName: newAuthorLastName
         };
         $.ajax({
@@ -40,7 +61,8 @@ function createAuthorSearch(authorsPath) {
                 console.log(data);
                 // Add the newly created author to the list
                 addAuthorToList({
-                    value: data.middleName ? data.firstName + " " + data.middleName + " " + data.lastName : data.firstName + " " + data.lastName,
+                    value: data.middleName !== "" ? data.firstName + " " + data.middleName + " " + data.lastName
+                        : data.firstName + " " + data.lastName,
                     id: data.id
                 });
                 // Hide the modal
@@ -48,14 +70,35 @@ function createAuthorSearch(authorsPath) {
                 $("#newAuthorFirstNameInput").val("");
                 $("#newAuthorMiddleNameInput").val("");
                 $("#newAuthorLastNameInput").val("");
-                $("#success-message").text("New author added successfully.");
                 $("#success-alert").show();
             },
             error: function (xhr, status, error) {
                 console.error(xhr.status + ": " + xhr.statusText)
-                $("#createAuthorModal").modal("hide");
-                $("#error-message").text("An error occurred while adding the author.");
-                $("#error-alert").show();
+                const response = JSON.parse(xhr.responseText);
+
+                console.log(response);
+
+                // add error messages to the modal
+                if (response.containsErrors) {
+                    // Show error messages for each field
+                    if (response.firstName) {
+                        $('#first-name-error').show();
+                    } else {
+                        $('#first-name-error').hide();
+                    }
+
+                    if (response.middleName) {
+                        $('#middle-name-error').show();
+                    } else {
+                        $('#middle-name-error').hide();
+                    }
+
+                    if (response.lastName) {
+                        $('#last-name-error').show();
+                    } else {
+                        $('#last-name-error').hide();
+                    }
+                }
             }
         });
     });

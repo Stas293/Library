@@ -30,13 +30,10 @@
                 <div class="col-12">
                     <div class="alert alert-success" id="success-alert" style="display: none">
                         <button type="button" class="btn btn-close" data-dismiss="alert"></button>
-                        <strong>Success!</strong>
-                        <span id="success-message"></span>
-                    </div>
-                    <div class="alert alert-danger" id="error-alert" style="display: none">
-                        <button type="button" class="btn btn-close" data-dismiss="alert"></button>
-                        <strong>Error!</strong>
-                        <span id="error-message"></span>
+                        <strong><fmt:message key="newBook.label.success"/></strong>
+                        <span id="success-message">
+                            <fmt:message key="newBook.label.successMessage"/>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -86,16 +83,25 @@
                                     <label for="newAuthorFirstNameInput" class="form-label"><fmt:message
                                             key="newBook.label.firstName"/></label>
                                     <input type="text" class="form-control" id="newAuthorFirstNameInput" required>
+                                    <div class="alert alert-danger" id="first-name-error">
+                                        <fmt:message key="form.validation.name"/>
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="newAuthorMiddleNameInput" class="form-label"><fmt:message
                                             key="newBook.label.middleName"/></label>
                                     <input type="text" class="form-control" id="newAuthorMiddleNameInput">
+                                    <div class="alert alert-danger" id="middle-name-error">
+                                        <fmt:message key="form.validation.name"/>
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="newAuthorLastNameInput" class="form-label"><fmt:message
                                             key="newBook.label.lastName"/></label>
                                     <input type="text" class="form-control" id="newAuthorLastNameInput" required>
+                                    <div class="alert alert-danger" id="last-name-error">
+                                        <fmt:message key="form.validation.name"/>
+                                    </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -193,11 +199,11 @@
                     <c:if test="${not empty bookFine}">
                         <c:set var="bookFineNumber">${book.fine}</c:set>
                     </c:if>
-                    <input class="col-2 rounded border" id="bookFine" type="number" min="0" required name="fine"
+                    <input class="col-2 rounded border" id="bookFine" type="number" step="0.01" min="0" required name="fine"
                            value=${bookFineNumber}>
-                    <c:set var="bookNameErrors">${bookValidationError.finePerDay}</c:set>
+                    <c:set var="bookNameErrors">${bookValidationError.fine}</c:set>
                     <c:if test="${not empty bookNameErrors}">
-                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.finePerDay}"/></div>
+                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.fine}"/></div>
                     </c:if>
                 </div>
                 <div class="mb-3">
@@ -210,10 +216,6 @@
                            <c:if test="${bookLanguage == 'Українська'}">checked</c:if> required>
                     <fmt:message key="newBook.label.ukrainian"/>
                 </div>
-                <c:set var="bookAuthorsErrors">${bookValidationError.authors}</c:set>
-                <c:if test="${not empty bookAuthorsErrors}">
-                    <div class="alert alert-danger"><fmt:message key="${bookValidationError.authors}"/></div>
-                </c:if>
                 <div class="mb-3">
                     <label for="location">
                         <fmt:message key="newBook.label.location"/>
@@ -232,14 +234,33 @@
                     <label for="author-choices" class="form-label"><fmt:message key="newBook.label.authors"/></label>
                     <input type="text" class="form-control" id="author-choices" placeholder="<fmt:message
                             key="newBook.label.enter_authors"/>">
-                    <ul id="author-list"></ul>
+                    <ul id="author-list">
+                        <c:forEach items="${book.authors}" var="author">
+                            <li data-id="${author.id}">
+                                <c:if test="${not empty author.middleName}">
+                                    ${author.firstName} ${author.middleName} ${author.lastName}
+                                </c:if>
+                                <c:if test="${empty author.middleName}">
+                                    ${author.firstName} ${author.lastName}
+                                </c:if>
+                                <button class='btn btn-close btn-sm' aria-label='Close'></button>
+                            </li>
+                        </c:forEach>
+                    </ul>
                     <input type="hidden" name="authors" id="authors-input">
                 </div>
                 <div class="mb-3">
                     <label for="keyword-choices" class="form-label"><fmt:message key="newBook.label.keywords"/></label>
                     <input type="text" class="form-control" id="keyword-choices" placeholder="<fmt:message
                             key="newBook.label.enter_keywords"/>">
-                    <ul id="keyword-list"></ul>
+                    <ul id="keyword-list">
+                        <c:forEach items="${book.keywords}" var="keyword">
+                            <li data-id="${keyword.id}">
+                                    ${keyword.data}
+                                <button class='btn btn-close btn-sm' aria-label='Close'></button>
+                            </li>
+                        </c:forEach>
+                    </ul>
                     <input type="hidden" name="keywords" id="keywords-input">
                 </div>
                 <div class="form-group">
@@ -267,10 +288,12 @@
                             e.preventDefault();
                         }
                     });
-                });
-                $(document).ready(function () {
                     document.getElementById("publicationDate").max = new Date().toISOString().split("T")[0];
+                    $('#first-name-error').hide();
+                    $('#middle-name-error').hide();
+                    $('#last-name-error').hide();
                 });
+
             </script>
 
         </div>

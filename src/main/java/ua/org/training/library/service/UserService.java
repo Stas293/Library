@@ -4,7 +4,7 @@ package ua.org.training.library.service;
 import ua.org.training.library.dto.*;
 import ua.org.training.library.form.LoggedUserUpdatePasswordFormValidationError;
 import ua.org.training.library.form.PersonalEditFormValidationError;
-import ua.org.training.library.form.RegistrationFormValidation;
+import ua.org.training.library.form.RegistrationFormValidationError;
 import ua.org.training.library.form.ResetValidationError;
 import ua.org.training.library.model.User;
 import ua.org.training.library.security.AuthorityUser;
@@ -14,7 +14,7 @@ import ua.org.training.library.utility.page.Pageable;
 import java.util.Optional;
 
 public interface UserService {
-    RegistrationFormValidation save(UserRegistrationDto user);
+    RegistrationFormValidationError save(UserRegistrationDto user);
 
     boolean login(String login, String password);
 

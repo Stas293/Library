@@ -388,4 +388,31 @@ public class BookQueriesImpl implements BookQueries {
                         .where("ba.author_id = ?")
                         .build());
     }
+
+    @Override
+    public String getCountBooksWhichUserDidNotOrderQueryNoSearch() {
+        return queries.computeIfAbsent("getCountBooksWhichUserDidNotOrderQueryNoSearch",
+                key -> queryBuilderImpl.setUp()
+                        .select("count(*) FROM (")
+                        .select("b.*")
+                        .from("books b")
+                        .except()
+                        .select("b.*")
+                        .from("books b")
+                        .join("orders o", "b.id = o.book_id")
+                        .where("o.user_id = ?")
+                        .groupBy("b.id")
+                        .as("t")
+                        .build());
+    }
+
+    @Override
+    public String getExistsByIsbnQuery() {
+        return queries.computeIfAbsent("getExistsByIsbnQuery",
+                key -> queryBuilderImpl.setUp()
+                        .select("b.id")
+                        .from("books b")
+                        .where("b.isbn = ?")
+                        .build());
+    }
 }

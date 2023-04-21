@@ -48,4 +48,8 @@ public interface BookQueries {
     String getBookCountQuery();
 
     String getBooksByAuthorIdQuery();
+
+    String getCountBooksWhichUserDidNotOrderQueryNoSearch();
+
+    String getExistsByIsbnQuery();
 }

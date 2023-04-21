@@ -17,7 +17,7 @@ import ua.org.training.library.dto.UserChangePasswordDto;
 import ua.org.training.library.dto.UserLoginDto;
 import ua.org.training.library.dto.UserRegistrationDto;
 import ua.org.training.library.enums.Links;
-import ua.org.training.library.form.RegistrationFormValidation;
+import ua.org.training.library.form.RegistrationFormValidationError;
 import ua.org.training.library.form.ResetValidationError;
 import ua.org.training.library.security.AuthorityUser;
 import ua.org.training.library.security.SecurityService;
@@ -68,7 +68,7 @@ public class AuthController {
 
         securityService.addLoggedUserToContext(request, authorityUser.get());
 
-        return Links.USER_PAGE_REDIRECT.getLink();
+        return Links.MAIN_PAGE_REDIRECT.getLink();
     }
 
     @Post("/register")
@@ -76,11 +76,11 @@ public class AuthController {
         log.info("Post register");
         UserRegistrationDto user = requestParamsObjectMapper.collectFromRegistrationForm(request);
 
-        RegistrationFormValidation registrationFormValidation = userService.save(user);
+        RegistrationFormValidationError registrationFormValidationError = userService.save(user);
 
-        if (registrationFormValidation.containsErrors()) {
+        if (registrationFormValidationError.containsErrors()) {
             request.setAttribute("user_reg", user);
-            request.setAttribute("errors", registrationFormValidation);
+            request.setAttribute("errors", registrationFormValidationError);
             return Links.REGISTRATION_PAGE.getLink();
         }
         return Links.LOGIN_PAGE_REDIRECT.getLink();

@@ -48,22 +48,22 @@
                         <form id="createKeywordForm">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="createKeywordModalLabel"><fmt:message
-                                        key="newBook.label.createKeyword"/></h5>
+                                        key="editBook.label.createKeyword"/></h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="mb-3">
                                     <label for="newKeywordInput" class="form-label"><fmt:message
-                                            key="newBook.label.keyword"/></label>
+                                            key="editBook.label.keyword"/></label>
                                     <input type="text" class="form-control" id="newKeywordInput" required>
                                 </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><fmt:message
-                                        key="newBook.label.close"/></button>
+                                        key="editBook.label.close"/></button>
                                 <button type="submit" class="btn btn-primary"><fmt:message
-                                        key="newBook.label.save"/></button>
+                                        key="editBook.label.save"/></button>
                             </div>
                         </form>
                     </div>
@@ -77,32 +77,32 @@
                         <form id="createAuthorForm">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="createAuthorModalLabel"><fmt:message
-                                        key="newBook.label.createAuthor"/></h5>
+                                        key="editBook.label.createAuthor"/></h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="mb-3">
                                     <label for="newAuthorFirstNameInput" class="form-label"><fmt:message
-                                            key="newBook.label.firstName"/></label>
+                                            key="editBook.label.firstName"/></label>
                                     <input type="text" class="form-control" id="newAuthorFirstNameInput" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="newAuthorMiddleNameInput" class="form-label"><fmt:message
-                                            key="newBook.label.middleName"/></label>
+                                            key="editBook.label.middleName"/></label>
                                     <input type="text" class="form-control" id="newAuthorMiddleNameInput">
                                 </div>
                                 <div class="mb-3">
                                     <label for="newAuthorLastNameInput" class="form-label"><fmt:message
-                                            key="newBook.label.lastName"/></label>
+                                            key="editBook.label.lastName"/></label>
                                     <input type="text" class="form-control" id="newAuthorLastNameInput" required>
                                 </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><fmt:message
-                                        key="newBook.label.close"/></button>
+                                        key="editBook.label.close"/></button>
                                 <button type="submit" class="btn btn-primary"><fmt:message
-                                        key="newBook.label.save"/></button>
+                                        key="editBook.label.save"/></button>
                             </div>
                         </form>
                     </div>
@@ -110,15 +110,16 @@
             </div>
             <form id="add-book-form" data-toggle="validator" method="post">
                 <input type="hidden" name="_method" value="PUT"/>
+                <input type="hidden" name="id" value="${book.id}"/>
                 <div class="mb-3">
                     <label for="title">
-                        <fmt:message key="editBook.label.name"/>
+                        <fmt:message key="editBook.label.title"/>
                     </label>
                     <c:set var="title">${book.title}</c:set>
                     <c:if test="${not empty title}">
                         <c:set var="title">${book.title}</c:set>
                     </c:if>
-                    <input name="title" id="title" class="form-control" required value=${title}>
+                    <input name="title" id="title" class="form-control" required value="${title}">
                     <c:set var="bookNameErrors">${bookValidationError.title}</c:set>
                     <c:if test="${not empty bookNameErrors}">
                         <div class="alert alert-danger"><fmt:message key="${bookValidationError.title}"/></div>
@@ -192,7 +193,7 @@
                     <c:if test="${not empty bookFine}">
                         <c:set var="bookFineNumber">${book.fine}</c:set>
                     </c:if>
-                    <input class="col-2 rounded border" id="bookFine" type="number" min="0" required name="fine"
+                    <input class="col-2 rounded border" id="bookFine" type="number" step="0.01" min="0" required name="fine"
                            value=${bookFineNumber}>
                     <c:set var="bookNameErrors">${bookValidationError.finePerDay}</c:set>
                     <c:if test="${not empty bookNameErrors}">
@@ -228,9 +229,9 @@
                     <div class="alert alert-danger"><fmt:message key="${bookValidationError.authors}"/></div>
                 </c:if>
                 <div class="mb-3">
-                    <label for="author-choices" class="form-label"><fmt:message key="newBook.label.authors"/></label>
+                    <label for="author-choices" class="form-label"><fmt:message key="editBook.label.authors"/></label>
                     <input type="text" class="form-control" id="author-choices" placeholder="<fmt:message
-                            key="newBook.label.enter_authors"/>">
+                            key="editBook.label.enter_authors"/>">
                     <ul id="author-list">
                         <c:forEach items="${book.authors}" var="author">
                             <li data-id="${author.id}">
@@ -247,9 +248,9 @@
                     <input type="hidden" name="authors" id="authors-input">
                 </div>
                 <div class="mb-3">
-                    <label for="keyword-choices" class="form-label"><fmt:message key="newBook.label.keywords"/></label>
+                    <label for="keyword-choices" class="form-label"><fmt:message key="editBook.label.keywords"/></label>
                     <input type="text" class="form-control" id="keyword-choices" placeholder="<fmt:message
-                            key="newBook.label.enter_keywords"/>">
+                            key="editBook.label.enter_keywords"/>">
                     <ul id="keyword-list">
                         <c:forEach items="${book.keywords}" var="keyword">
                             <li data-id="${keyword.id}">
@@ -261,22 +262,27 @@
                     <input type="hidden" name="keywords" id="keywords-input">
                 </div>
                 <div class="form-group">
-                    <button type="submit" id="form-submit" class="btn btn-primary" onclick="addAuthorsAndKeywords()">
-                        <span><fmt:message key="newRequest.label.submit"/></span>
+                    <button type="submit" id="form-submit" class="btn btn-primary">
+                        <span><fmt:message key="editBook.label.submit"/></span>
                     </button>
                 </div>
                 <div class="form-group">
                     <a class="btn btn-danger" href='/library/books/admin/page'>
-                        <fmt:message key="newRequest.label.close"/>
+                        <fmt:message key="editBook.label.close"/>
                     </a>
                 </div>
             </form>
             <script>
                 $(document).ready(function () {
                     $('#add-book-form').submit(function (e) {
-                        var authors = $('#authors-list').children();
+                        const authors = $('#author-list').children();
                         if (authors.length === 0) {
                             alert("<fmt:message key="editBook.alert.authors"/>");
+                            e.preventDefault();
+                        }
+                        const keywords = $('#keyword-list').children();
+                        if (keywords.length === 0) {
+                            alert("<fmt:message key="editBook.alert.keywords"/>");
                             e.preventDefault();
                         }
                     });
@@ -284,6 +290,7 @@
                 $(document).ready(function () {
                     document.getElementById("publicationDate").max = new Date().toISOString().split("T")[0];
                 });
+
             </script>
         </div>
 

@@ -268,19 +268,19 @@ class BookServiceTest {
                 .createBook();
         Mockito.when(daoFactory.createBookDao()).thenReturn(bookDao);
         bookService = new BookService(daoFactory);
-        assertDoesNotThrow(() -> bookService.updateBook(book));
+        assertDoesNotThrow(() -> bookService.updateBook(locale, book));
         Mockito.doThrow(SQLException.class).when(bookDao).update(book);
         Mockito.when(daoFactory.createBookDao()).thenReturn(bookDao);
         bookService = new BookService(daoFactory);
-        assertThrows(ConnectionDBException.class, () -> bookService.updateBook(book));
+        assertThrows(ConnectionDBException.class, () -> bookService.updateBook(locale, book));
         daoFactory = Mockito.mock(DaoFactory.class);
         Mockito.when(daoFactory.createBookDao()).thenThrow(JDBCException.class);
         bookService = new BookService(daoFactory);
-        assertThrows(ConnectionDBException.class, () -> bookService.updateBook(book));
+        assertThrows(ConnectionDBException.class, () -> bookService.updateBook(locale, book));
         daoFactory = Mockito.mock(DaoFactory.class);
         Mockito.when(daoFactory.createBookDao()).thenThrow(DaoException.class);
         bookService = new BookService(daoFactory);
-        assertThrows(ServiceException.class, () -> bookService.updateBook(book));
+        assertThrows(ServiceException.class, () -> bookService.updateBook(locale, book));
     }
 
     @Test

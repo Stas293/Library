@@ -34,4 +34,6 @@ public interface BookDao extends GenericDao<Book> {
     long getBookCount(Connection conn, Long id);
 
     List<Book> getBooksByAuthorId(Connection conn, Long id);
+
+    boolean existsByIsbn(Connection conn, String isbn);
 }

@@ -10,7 +10,7 @@
 
 <tag:authorization>
     <jsp:attribute name="head">
-    	<title><fmt:message key="admin.title"/></title>
+    	<title><fmt:message key="admin.book"/></title>
     </jsp:attribute>
     <jsp:body>
         <div class="container mt-5 main-content">

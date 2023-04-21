@@ -49,11 +49,22 @@ const listRegisteredOrders = () => {
     wizard(urlRegisteredOrders);
 }
 
+function setTableHeadersAcceptOrder() {
+    let isbn = document.querySelector(`#isbn`);
+    let date_publication = document.querySelector(`#date_publication`);
+    let authors = document.querySelector(`#book_authors`);
+
+    isbn.innerHTML = document.querySelector(`#label_date_expire`).innerHTML;
+    date_publication.innerHTML = document.querySelector(`#label_place`).innerHTML;
+    authors.innerHTML = document.querySelector(`#label_fine`).innerHTML;
+}
+
 const listAcceptedOrder = () => {
     setSize();
     clearTextFields();
     urlPath = urlAcceptedOrders;
     setBookListeners(urlAcceptedOrders);
+    setTableHeadersAcceptOrder();
     wizard(urlAcceptedOrders);
 }
 
@@ -141,10 +152,35 @@ function makeRowOrder(rowData) {
     return tableRow;
 }
 
+function makeRowOrderAccepted(rowData) {
+    console.log(rowData);
+    let tableRow = document.createElement('tr');
+    let tableData = document.createElement('td');
+    let anchor = document.createElement('a');
+
+    anchor.setAttribute('href', `${urlGetOrder}/${rowData.id}`);
+    anchor.appendChild(document.createTextNode(rowData.book.title));
+    tableData.appendChild(anchor);
+    tableRow.appendChild(tableData);
+
+    tableData = document.createElement('td');
+    tableData.appendChild(document.createTextNode(rowData.dateExpire));
+    tableRow.appendChild(tableData);
+    tableData = document.createElement('td');
+    tableData.appendChild(document.createTextNode(rowData.place.name));
+    tableRow.appendChild(tableData);
+    tableData = document.createElement('td');
+    tableData.appendChild(document.createTextNode(rowData.book.fine));
+    tableRow.appendChild(tableData);
+    return tableRow;
+}
+
 const makeRow = (rowData, index) => {
     console.log(rowData);
-    if (urlPath === urlRegisteredOrders || urlPath === urlAcceptedOrders) {
+    if (urlPath === urlRegisteredOrders) {
         return makeRowOrder(rowData);
+    } else if (urlPath === urlAcceptedOrders) {
+        return makeRowOrderAccepted(rowData);
     }
     rowData = Book.from(rowData);
     console.log(rowData);

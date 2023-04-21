@@ -34,4 +34,6 @@ public interface BookRepository extends JRepository<Book, Long> {
     void updateBookCount(Book book);
 
     List<Book> findAllByAuthors(Author author);
+
+    boolean existsByIsbn(String isbn);
 }

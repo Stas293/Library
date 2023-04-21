@@ -16,7 +16,6 @@
         <div class="error-body">
             <div class="error-message">
                 <h1><fmt:message key="error.title" /></h1>
-                <c:if test="${param.failedconnection == true}"><p><fmt:message key="error.dbconnection" /></p></c:if>
                 <c:out value="${param.message}"/>
                 <p><fmt:message key="error.contact.admin" /></p>
             </div>

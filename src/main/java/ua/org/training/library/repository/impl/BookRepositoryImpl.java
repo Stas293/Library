@@ -275,4 +275,11 @@ public class BookRepositoryImpl implements BookRepository {
         Connection conn = transactionManager.getConnection();
         return (List<Book>) bookDao.getBooksByAuthorId(conn, author.getId());
     }
+
+    @Override
+    public boolean existsByIsbn(String isbn) {
+        log.info("Checking if book exists by ISBN: {}", isbn);
+        Connection conn = transactionManager.getConnection();
+        return bookDao.existsByIsbn(conn, isbn);
+    }
 }

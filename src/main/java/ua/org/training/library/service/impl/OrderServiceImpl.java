@@ -48,12 +48,13 @@ public class OrderServiceImpl implements OrderService {
         log.info("Getting orders by status and user: {}, {}, {}", page, status, user);
         Status statusOrder = statusRepository.findByCode(status).orElseThrow();
         User userOrder = userRepository.getByLogin(user.getLogin()).orElseThrow();
+        Page<Order> orderPage;
         if (search != null && !search.isEmpty()) {
-            Page<Order> orderPage = orderRepository.getPageByStatusAndUserAndSearch(page, statusOrder, userOrder, search, locale);
-            return objectMapper.mapOrderPageToOrderDtoPage(orderPage);
+            orderPage = orderRepository.getPageByStatusAndUserAndSearch(page, statusOrder, userOrder, search, locale);
+        } else {
+            orderPage = orderRepository.getPageByStatusAndUser(page, statusOrder, userOrder, locale);
         }
-        Page<Order> pageByStatusAndUser = orderRepository.getPageByStatusAndUser(page, statusOrder, userOrder, locale);
-        return objectMapper.mapOrderPageToOrderDtoPage(pageByStatusAndUser);
+        return objectMapper.mapOrderPageToOrderDtoPage(locale, orderPage);
     }
 
     @Override
@@ -125,7 +126,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Optional<OrderDto> getOrderById(long id, Locale locale) {
         log.info("Getting order by id: {}", id);
-        return orderRepository.findById(id, locale).map(objectMapper::mapOrderToOrderDto);
+        return orderRepository.findById(id, locale)
+                .map(order -> objectMapper.mapOrderToOrderDto(locale, order));
     }
 
     @Override
@@ -172,7 +174,7 @@ public class OrderServiceImpl implements OrderService {
             Status status = order.get().getStatus();
             List<Status> nextStatuses = statusRepository.getNextStatusesForStatusById(status.getId(), locale);
             status.setNextStatuses(nextStatuses);
-            return Optional.of(objectMapper.mapOrderToOrderDto(order.get()));
+            return Optional.of(objectMapper.mapOrderToOrderDto(locale, order.get()));
         }
         return Optional.empty();
     }

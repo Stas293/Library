@@ -9,6 +9,7 @@ import ua.org.training.library.model.Book;
 import ua.org.training.library.model.Order;
 import ua.org.training.library.model.Place;
 import ua.org.training.library.security.AuthorityUser;
+import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.PageRequest;
 import ua.org.training.library.utility.page.impl.Sort;
@@ -128,6 +129,7 @@ public class RequestParamsObjectMapper {
                         .build())
                 .toList();
         return BookChangeDto.builder()
+                .id(Utility.tryParseLong(request.getParameter("id")))
                 .title(request.getParameter("title"))
                 .count(Integer.parseInt(request.getParameter("count")))
                 .isbn(request.getParameter("isbn"))
@@ -142,9 +144,11 @@ public class RequestParamsObjectMapper {
     }
 
     public AuthorManagementDto getAuthorDto(HttpServletRequest request) {
+        String middleName = request.getParameter("middleName");
         return AuthorManagementDto.builder()
+                .id(Utility.tryParseLong(request.getParameter("id")))
                 .firstName(request.getParameter("firstName"))
-                .middleName(request.getParameter("middleName"))
+                .middleName(middleName.equals("") ? null : middleName)
                 .lastName(request.getParameter("lastName"))
                 .build();
     }

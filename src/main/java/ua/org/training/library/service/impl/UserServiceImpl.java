@@ -13,7 +13,7 @@ import ua.org.training.library.dto.*;
 import ua.org.training.library.enums.Validation;
 import ua.org.training.library.form.LoggedUserUpdatePasswordFormValidationError;
 import ua.org.training.library.form.PersonalEditFormValidationError;
-import ua.org.training.library.form.RegistrationFormValidation;
+import ua.org.training.library.form.RegistrationFormValidationError;
 import ua.org.training.library.form.ResetValidationError;
 import ua.org.training.library.model.Role;
 import ua.org.training.library.model.User;
@@ -49,14 +49,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public RegistrationFormValidation save(UserRegistrationDto userRegistrationDto) {
+    public RegistrationFormValidationError save(UserRegistrationDto userRegistrationDto) {
         log.info("Saving userRegistrationDto: {}", userRegistrationDto);
-        RegistrationFormValidation registrationFormValidation = userRegistrationValidator.validation(userRegistrationDto);
-        validateEmail(userRegistrationDto.getEmail(), registrationFormValidation);
-        validateLogin(userRegistrationDto.getLogin(), registrationFormValidation);
-        validatePhone(userRegistrationDto.getPhone(), registrationFormValidation);
-        if (registrationFormValidation.containsErrors()) {
-            return registrationFormValidation;
+        RegistrationFormValidationError registrationFormValidationError = userRegistrationValidator.validation(userRegistrationDto);
+        validateEmail(userRegistrationDto.getEmail(), registrationFormValidationError);
+        validateLogin(userRegistrationDto.getLogin(), registrationFormValidationError);
+        validatePhone(userRegistrationDto.getPhone(), registrationFormValidationError);
+        if (registrationFormValidationError.containsErrors()) {
+            return registrationFormValidationError;
         }
         String bcryptPassword = BCrypt.hashpw(
                 userRegistrationDto.getPassword(), BCrypt.gensalt(APP_BCRYPT_SALT));
@@ -67,24 +67,24 @@ public class UserServiceImpl implements UserService {
                 roleRepository.findByCode(DefaultValues.ROLE_USER.getValue()).orElseThrow());
         newUser.setRoles(roles);
         userRepository.updateRolesForUser(newUser);
-        return registrationFormValidation;
+        return registrationFormValidationError;
     }
 
-    private void validateLogin(String login, RegistrationFormValidation errors) {
+    private void validateLogin(String login, RegistrationFormValidationError errors) {
         if (getByLogin(login).isEmpty())
             return;
         errors.setLogin(Validation.DUPLICATE_FIELD_ERROR.getMessage());
         log.info(String.format("Login: %s already exists", login));
     }
 
-    private void validateEmail(String email, RegistrationFormValidation errors) {
+    private void validateEmail(String email, RegistrationFormValidationError errors) {
         if (getByEmail(email).isEmpty())
             return;
         log.debug(String.format("Email: %s already exists", email));
         errors.setEmail(Validation.DUPLICATE_FIELD_ERROR.getMessage());
     }
 
-    private void validatePhone(String phone, RegistrationFormValidation errors) {
+    private void validatePhone(String phone, RegistrationFormValidationError errors) {
         if (getByPhone(phone).isEmpty())
             return;
         log.debug(String.format("Phone: %s already exists", phone));
