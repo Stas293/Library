@@ -66,12 +66,11 @@ public class StatusQueriesImpl implements StatusQueries {
         if (sort == null) {
             return getGetAllStatusesQuery();
         }
-        return queries.computeIfAbsent("getGetAllStatusesQuerySort",
-                key -> queryBuilderImpl.setUp()
+        return queryBuilderImpl.setUp()
                         .select("*")
                         .from("statuses")
                         .orderBy(sort)
-                        .build());
+                        .build();
     }
 
     @Override
@@ -85,14 +84,13 @@ public class StatusQueriesImpl implements StatusQueries {
                             .offset("?")
                             .build());
         }
-        return queries.computeIfAbsent("getGetPageStatusesQuerySort",
-                key -> queryBuilderImpl.setUp()
+        return queryBuilderImpl.setUp()
                         .select("*")
                         .from("statuses")
                         .orderBy(page.getSort())
                         .limit("?")
                         .offset("?")
-                        .build());
+                        .build();
     }
 
     @Override

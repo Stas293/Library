@@ -57,12 +57,20 @@
                     </select>
                 </div>
 
+                <c:if test="${order.place.choosable == true}">
                 <div class="form-group mb-3"
-                     id="chooseDateExpiration" ${!order.place.choosable ? 'style="display: none;"' : ''}>
+                     id="chooseDateExpiration">
                     <label for="dateExpire" class="form-label"><fmt:message key="newRequest.label.dateExpire"/></label>
                     <input type="date" class="form-control" id="dateExpire" name="dateExpire"
                            value="${order.place.defaultDate}" required/>
                 </div>
+                </c:if>
+
+                <c:if test="${order.place.choosable == false}">
+                        <input type="date" class="form-control" id="dateExpire" name="dateExpire"
+                               value="${order.place.defaultDate}" hidden/>
+                </c:if>
+
 
                 <div class="d-grid gap-2 mb-3">
                     <button type="submit" id="form-submit" class="btn btn-primary" name="submit"><fmt:message

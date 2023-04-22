@@ -185,10 +185,10 @@
                     </c:if>
                     <input class="col-2 rounded border" id="publicationDate" type="date" required name="publicationDate"
                            value=${bookPublicationDateNumber}>
-                    <c:set var="bookNameErrors">${bookValidationError.datePublication}</c:set>
+                    <c:set var="bookNameErrors">${bookValidationError.publicationDate}</c:set>
                     <c:if test="${not empty bookNameErrors}">
                         <div class="alert alert-danger"><fmt:message
-                                key="${bookValidationError.datePublication}"/></div>
+                                key="${bookValidationError.publicationDate}"/></div>
                     </c:if>
                 </div>
                 <div class="mb-3">

@@ -60,10 +60,9 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
         if (sort == null) {
             return getSelectAllQuery();
         }
-        return queries.computeIfAbsent("getSelectAllQuerySort",
-                key -> selectFromHistoryOrders()
+        return selectFromHistoryOrders()
                         .orderBy(sort)
-                        .build());
+                        .build();
     }
 
     @Override
@@ -75,12 +74,11 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
                             .offset("?")
                             .build());
         }
-        return queries.computeIfAbsent("getSelectAllQuerySortPage",
-                key -> selectFromHistoryOrders()
+        return selectFromHistoryOrders()
                         .orderBy(page.getSort())
                         .limit("?")
                         .offset("?")
-                        .build());
+                        .build();
     }
 
     @Override
@@ -146,12 +144,11 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
                             .offset("?")
                             .build());
         }
-        return queries.computeIfAbsent("getSelectAllByUserIdQuerySortPage",
-                key -> selectFromHistoryOrderWhereUserId()
+        return selectFromHistoryOrderWhereUserId()
                         .orderBy(page.getSort())
                         .limit("?")
                         .offset("?")
-                        .build());
+                        .build();
     }
 
     private QueryBuilder selectFromHistoryOrderWhereUserId() {

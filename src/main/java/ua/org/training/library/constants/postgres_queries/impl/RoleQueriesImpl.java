@@ -66,12 +66,11 @@ public class RoleQueriesImpl implements RoleQueries {
         if (sort == null) {
             return getGetAllQuery();
         }
-        return queries.computeIfAbsent("getGetAllQuerySort",
-                key -> queryBuilderImpl.setUp()
+        return queryBuilderImpl.setUp()
                         .select("*")
                         .from("roles")
                         .orderBy(sort)
-                        .build());
+                        .build();
     }
 
     @Override
@@ -85,14 +84,13 @@ public class RoleQueriesImpl implements RoleQueries {
                             .offset("?")
                             .build());
         }
-        return queries.computeIfAbsent("getGetPageQuerySort",
-                key -> queryBuilderImpl.setUp()
+        return queryBuilderImpl.setUp()
                         .select("*")
                         .from("roles")
                         .orderBy(page.getSort())
                         .limit("?")
                         .offset("?")
-                        .build());
+                        .build();
     }
 
     @Override

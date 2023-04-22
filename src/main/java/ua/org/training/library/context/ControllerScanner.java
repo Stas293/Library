@@ -52,7 +52,9 @@ public class ControllerScanner {
         if (controllerFactoryMap.size() == 1) {
             ControllerFactory factory = (ControllerFactory) controllerFactoryMap.get(ControllerFactory.class);
             factory.setHttpMapping(mappings);
+            return;
         }
+        throw new RuntimeException("ControllerFactory not found or more than one");
     }
 }
 

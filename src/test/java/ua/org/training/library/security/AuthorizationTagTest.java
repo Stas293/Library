@@ -8,7 +8,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.org.training.library.model.Role;
 import ua.org.training.library.model.User;
-import ua.org.training.library.utility.Constants;
 
 import java.util.List;
 
@@ -22,8 +21,7 @@ class AuthorizationTagTest {
 
     @Test
     void doStartTag() throws NoSuchMethodException {
-
-        Mockito.when(pageContext.findAttribute(Constants.RequestAttributes.USER_ATTRIBUTE)).thenReturn(null);
+        Mockito.when(pageContext.findAttribute("user")).thenReturn(null);
         authorizationTag = new AuthorizationTag(pageContext);
         authorizationTag.setRole("hasRole('USER')");
         assertEquals(0, authorizationTag.doStartTag());
@@ -35,24 +33,29 @@ class AuthorizationTagTest {
         assertEquals(0, authorizationTag.doStartTag());
 
         User user = User.builder()
-                .setId(1L)
-                .setLogin("login")
-                .setPhone("phone")
-                .setEmail("email")
-                .setFirstName("first")
-                .setLastName("last")
-                .setRoles(
+                .id(1L)
+                .login("login")
+                .phone("phone")
+                .email("email")
+                .firstName("first")
+                .lastName("last")
+                .roles(
                         List.of(
                                 Role.builder()
-                                        .setId(1L)
-                                        .setName("USER")
-                                        .setCode("USER")
-                                        .createRole()
+                                        .id(1L)
+                                        .name("USER")
+                                        .code("USER")
+                                        .build()
                         )
                 )
-                .createUser();
-        AuthorityUser authorityUser = new AuthorityUser(user);
-        Mockito.when(pageContext.findAttribute(Constants.RequestAttributes.USER_ATTRIBUTE)).thenReturn(authorityUser);
+                .build();
+        AuthorityUser authorityUser = new AuthorityUser(
+                user.getLogin(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getRoles()
+        );
+        Mockito.when(pageContext.findAttribute("user")).thenReturn(authorityUser);
         authorizationTag = new AuthorizationTag(pageContext);
         authorizationTag.setRole("hasRole('USER')");
         assertEquals(1, authorizationTag.doStartTag());

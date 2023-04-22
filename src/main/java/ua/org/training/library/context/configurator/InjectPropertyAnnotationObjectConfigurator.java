@@ -3,17 +3,16 @@ package ua.org.training.library.context.configurator;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.context.AnnotationConfigApplicationContext;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.context.annotations.FieldSetterType;
 import ua.org.training.library.context.annotations.InjectProperty;
+import ua.org.training.library.enums.DefaultValues;
+import ua.org.training.library.field_setters.FieldSetter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -21,6 +20,7 @@ import java.util.stream.Collectors;
 public class InjectPropertyAnnotationObjectConfigurator implements ObjectConfigurator {
     private static final String APP_PROPERTIES_NAME = "application";
     private final Map<String, String> propertiesMap;
+    private final Map<Class<?>, FieldSetter> fieldSetters;
 
     @SneakyThrows
     public InjectPropertyAnnotationObjectConfigurator() {
@@ -31,6 +31,7 @@ public class InjectPropertyAnnotationObjectConfigurator implements ObjectConfigu
         propertiesMap = bundle.keySet().stream()
                 .map(key -> Map.entry(key, getEnvOrProperty(bundle.getString(key))))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        fieldSetters = new HashMap<>();
     }
 
     private String getEnvOrProperty(String s) {
@@ -45,6 +46,8 @@ public class InjectPropertyAnnotationObjectConfigurator implements ObjectConfigu
     @SneakyThrows
     public void configure(Object t, AnnotationConfigApplicationContext context) {
         log.info("Configuring properties");
+        Map<Class<?>, FieldSetter> beansImplementingInterface = context.getBeansImplementingInterface(FieldSetter.class);
+        beansImplementingInterface.forEach(this::fillMapWithFieldSetters);
         Class<?> implClass = t.getClass();
         for (Field field : implClass.getDeclaredFields()) {
             if (field.isAnnotationPresent(InjectProperty.class)) {
@@ -58,25 +61,28 @@ public class InjectPropertyAnnotationObjectConfigurator implements ObjectConfigu
                 }
                 String propertyValue = propertiesMap.get(propertyName);
                 field.setAccessible(true);
-                Type type = field.getGenericType();
+                Type type = field.getType();
                 setFieldDependingOnType(t, field, propertyValue, type);
                 field.setAccessible(false);
             }
         }
     }
 
-    private static void setFieldDependingOnType(Object t, Field field, String propertyValue, Type type)
+    private void fillMapWithFieldSetters(Class<?> key, FieldSetter value) {
+        FieldSetterType annotation = key.getAnnotation(FieldSetterType.class);
+        if (annotation == null) {
+            throw new RuntimeException("FieldSetterType annotation is not present");
+        }
+        Class<?>[] classesToCastTo = annotation.values();
+        Arrays.stream(classesToCastTo).forEach(classToCastTo -> fieldSetters.put(classToCastTo, value));
+    }
+
+    private void setFieldDependingOnType(Object t, Field field, String propertyValue, Type type)
             throws IllegalAccessException {
-        if (type.equals(int.class)) {
-            field.set(t, Integer.parseInt(propertyValue));
-        } else if (type.equals(long.class)) {
-            field.set(t, Long.parseLong(propertyValue));
-        } else if (type.equals(double.class)) {
-            field.set(t, Double.parseDouble(propertyValue));
-        } else if (type.equals(boolean.class)) {
-            field.set(t, Boolean.parseBoolean(propertyValue));
-        } else if (type.equals(String.class)) {
-            field.set(t, propertyValue);
-        } else throw new RuntimeException("Unsupported type: " + type);
+        FieldSetter fieldSetter = fieldSetters.get(type);
+        if (fieldSetter == null) {
+            throw new RuntimeException("Unsupported type: " + type);
+        }
+        fieldSetter.setField(field, t, propertyValue);
     }
 }

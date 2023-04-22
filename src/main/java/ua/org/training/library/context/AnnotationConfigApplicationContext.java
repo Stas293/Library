@@ -10,6 +10,7 @@ import ua.org.training.library.context.config.Config;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class AnnotationConfigApplicationContext {
@@ -46,7 +47,9 @@ public class AnnotationConfigApplicationContext {
         return t;
     }
 
-    private static <T> boolean checkIfClassIsPresent(Class<? extends T> tClass, Map.Entry<Class<?>, Object> entry, String[] qualifiers) {
+    private static <T> boolean checkIfClassIsPresent(Class<? extends T> tClass,
+                                                     Map.Entry<Class<?>, Object> entry,
+                                                     String[] qualifiers) {
         if (tClass.isAssignableFrom(entry.getKey())) {
             if (qualifiers.length == 1 &&
                     (entry.getKey().isAnnotationPresent(Component.class) &&
@@ -67,32 +70,28 @@ public class AnnotationConfigApplicationContext {
     public void close() {
         log.info("Closing context");
         synchronized (startupShutdownMonitor) {
-            for (Object o : cache.values()) {
+            cache.values().forEach(o -> {
                 log.info("Destroying object {}", o);
                 objectFactory.destroy(o);
                 cache.remove(o.getClass());
-            }
+            });
         }
     }
 
     public Map<Class<?>, Object> getBeansWithAnnotation(Class<? extends Annotation> annotation) {
-        Map<Class<?>, Object> beans = new ConcurrentHashMap<>();
-        for (Map.Entry<Class<?>, Object> entry : cache.entrySet()) {
-            if (entry.getKey().isAnnotationPresent(annotation)) {
-                beans.put(entry.getKey(), entry.getValue());
-            }
-        }
-        return beans;
+        return cache.entrySet().parallelStream()
+                .filter(entry -> entry.getKey().isAnnotationPresent(annotation))
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> b));
 
     }
 
     public <T> Map<Class<?>, T> getBeansImplementingInterface(Class<T> interfaceClass) {
-        Map<Class<?>, T> beans = new ConcurrentHashMap<>();
-        for (Map.Entry<Class<?>, Object> entry : cache.entrySet()) {
-            if (interfaceClass.isAssignableFrom(entry.getKey())) {
-                beans.put(entry.getKey(), interfaceClass.cast(entry.getValue()));
-            }
-        }
-        return beans;
+        return cache.entrySet().parallelStream()
+                .filter(entry -> interfaceClass.isAssignableFrom(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        entry -> interfaceClass.cast(entry.getValue()),
+                        (a, b) -> b));
     }
 }

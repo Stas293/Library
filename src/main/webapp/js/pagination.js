@@ -140,3 +140,72 @@ function setBookListeners(url) {
     };
     sortBy = "title";
 }
+
+function setUsersListeners(urlPath) {
+    const login = document.querySelector("#login");
+    const first_name = document.querySelector("#first_name");
+    const last_name = document.querySelector("#last_name");
+    const phone = document.querySelector("#phone");
+
+    login.onclick = function () {
+        sortBy = "login";
+        func(urlPath);
+    }
+    first_name.onclick = function () {
+        sortBy = "first_name";
+        func(urlPath);
+    }
+    last_name.onclick = function () {
+        sortBy = "last_name";
+        func(urlPath);
+    }
+    phone.onclick = function () {
+        sortBy = "phone";
+        func(urlPath);
+    }
+    sortBy = "login";
+}
+
+function setAuthorsListeners(urlPath) {
+    const author_id = document.querySelector("#author_id");
+    const first_name = document.querySelector("#author_first_name");
+    const last_name = document.querySelector("#author_last_name");
+    const middle_name = document.querySelector("#author_middle_name");
+
+    author_id.onclick = function () {
+        sortBy = "id";
+        func(urlPath);
+    }
+    first_name.onclick = function () {
+        sortBy = "first_name";
+        func(urlPath);
+    }
+    last_name.onclick = function () {
+        sortBy = "last_name";
+        func(urlPath);
+    }
+    middle_name.onclick = function () {
+        sortBy = "middle_name";
+        func(urlPath);
+    }
+    sortBy = "id";
+}
+
+function setHistoryListeners(url) {
+    const book_title = document.querySelector("#book_name");
+    const date_return = document.querySelector("#date_returned");
+    const date_created = document.querySelector("#date_created");
+    book_title.onclick = function () {
+        sortBy = "book_title";
+        func(url);
+    };
+    date_return.onclick = function () {
+        sortBy = "date_returned";
+        func(url);
+    };
+    date_created.onclick = function () {
+        sortBy = "date_created";
+        func(url);
+    };
+    sortBy = "date_created";
+}

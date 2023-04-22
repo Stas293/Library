@@ -89,6 +89,7 @@ public class BookDaoImpl implements BookDao {
         log.info("Getting books which user did not order: {}", userId);
         try (PreparedStatement statement = connection.prepareStatement(
                 bookQueries.getBooksWhichUserDidNotOrderQuery(page))) {
+            log.info("Statement: {}", statement);
             statement.setLong(1, userId);
             statement.setInt(2, page.getPageSize());
             statement.setLong(3, page.getOffset());

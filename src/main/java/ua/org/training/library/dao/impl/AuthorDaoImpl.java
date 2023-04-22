@@ -220,7 +220,9 @@ public class AuthorDaoImpl implements AuthorDao {
         log.info("Get authors by ids: {}", ids);
         try (PreparedStatement statement = connection.prepareStatement(
                 authorQueries.getAuthorsByIds(ids.size()))) {
-            statement.setArray(1, connection.createArrayOf("bigint", ids.toArray()));
+            for (int i = 0; i < ids.size(); i++) {
+                statement.setLong(i + 1, ids.get(i));
+            }
             try (ResultSet resultSet = statement.executeQuery()) {
                 return authorCollector.collectList(resultSet);
             }

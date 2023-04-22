@@ -28,10 +28,10 @@
                 <input id="search" class="col-4 rounded border" type="text"
                        placeholder="<fmt:message key="table.search" />">
                 <input id="size" class="col-2 rounded border" type="number" min="2" max="8" value="5">
-                <input name="sorting" class="hidden" type="radio" id="asc" value="asc" checked><label class="col-2"
+                <input name="sorting" class="hidden" type="radio" id="asc" value="ASC" checked><label class="col-2"
                                                                                                       for="asc"><fmt:message
                     key="table.asc"/></label>
-                <input name="sorting" class="hidden" type="radio" id="desc" value="desc"><label class="col-2"
+                <input name="sorting" class="hidden" type="radio" id="desc" value="DESC"><label class="col-2"
                                                                                                 for="desc"><fmt:message
                     key="table.desc"/></label>
                 <div id="page-navigation" class="pagination"></div>

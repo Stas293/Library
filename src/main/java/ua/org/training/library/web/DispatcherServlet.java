@@ -1,10 +1,12 @@
 package ua.org.training.library.web;
 
 
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import ua.org.training.library.context.HttpMapping;
 import ua.org.training.library.context.annotations.Autowired;
@@ -12,16 +14,18 @@ import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.utility.mapper.HttpServletRequestMethodMapper;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.lang.invoke.MethodHandle;
 
 @Component
 @Slf4j
 @AllArgsConstructor(onConstructor = @__(@Autowired))
+@WebServlet
 public class DispatcherServlet extends HttpServlet {
     private final ControllerFactory controllerFactory;
     private final HttpServletRequestMethodMapper mapper;
 
     @Override
+    @SneakyThrows
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         log.info("Request URI: {}", req.getRequestURI());
         String httpMethod = req.getMethod();
@@ -29,7 +33,7 @@ public class DispatcherServlet extends HttpServlet {
         try {
             HttpMapping mapping = controllerFactory.getControllerCommand(httpMethod, httpPath);
             log.info("Mapping: {}", mapping);
-            Method method = mapping.method();
+            MethodHandle method = mapping.method();
             log.info("Method: {}", method);
             Object page = method.invoke(mapping.controller(), req, resp);
             log.info("Page: {}", page);

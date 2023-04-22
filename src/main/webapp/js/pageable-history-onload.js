@@ -1,7 +1,8 @@
 const urlPath = `/library/history/user`;
 
 window.onload = () => {
-    wizard(urlPath, null);
+    setHistoryListeners(urlPath);
+    wizard(urlPath);
 }
 
 class HistoryOrder {

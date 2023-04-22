@@ -1,8 +1,10 @@
 package ua.org.training.library.context;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
+import java.lang.invoke.MethodHandle;
 
-public record HttpMapping(String httpMethod, String httpPath, Method method, Object controller) implements Serializable {
-
+public record HttpMapping(String httpMethod,
+                          String httpPath,
+                          MethodHandle method,
+                          Object controller) implements Serializable {
 }

@@ -46,11 +46,11 @@ function setOrderListeners(url) {
         func(url);
     }
     book_name.onclick = () => {
-        sortBy = 'book_name';
+        sortBy = 'title';
         func(url);
     }
     isbn.onclick = () => {
-        sortBy = 'ISBN';
+        sortBy = 'isbn';
         func(url);
     }
     date_created.onclick = () => {

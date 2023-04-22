@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
 import ua.org.training.library.context.annotations.Component;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,7 @@ public class JavaConfig implements Config {
 
     @Override
     public <T> Class<? extends T> getImplClass(Class<? extends T> interfaceClass, String... qualifiers) {
-        log.info("qualifiers: {}", qualifiers);
+        log.info("qualifiers: {}", Arrays.toString(qualifiers));
         log.info("Interface: {}", interfaceClass);
         if (qualifiers.length == 0) {
             return getImplClass(interfaceClass);
@@ -55,6 +56,7 @@ public class JavaConfig implements Config {
     }
 
     @NotNull
+    @SuppressWarnings("unchecked")
     private <T> Set<Class<? extends T>> getClassesAccordingToQualifier(Class<? extends T> interfaceClass, String[] qualifiers) {
         return reflectionsSet.parallelStream()
                 .filter(interfaceClass::isAssignableFrom)

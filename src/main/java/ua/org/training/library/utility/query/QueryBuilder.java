@@ -51,5 +51,7 @@ public interface QueryBuilder {
     QueryBuilder as(String alias);
 
     QueryBuilder orderByMinMax(Sort sort);
+
+    QueryBuilder orderBy(String s);
 }
 

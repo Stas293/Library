@@ -56,12 +56,11 @@ public class UserQueriesImpl implements UserQueries {
         if (sort == null) {
             return getQueryAll();
         }
-        return queries.computeIfAbsent("getQueryAllSort",
-                key -> queryBuilderImpl.setUp()
+        return queryBuilderImpl.setUp()
                         .select("*")
                         .from("users")
                         .orderBy(sort)
-                        .build());
+                        .build();
     }
 
     @Override
@@ -75,14 +74,13 @@ public class UserQueriesImpl implements UserQueries {
                             .offset("?")
                             .build());
         }
-        return queries.computeIfAbsent("getQueryPageSort",
-                key -> queryBuilderImpl.setUp()
+        return queryBuilderImpl.setUp()
                         .select("*")
                         .from("users")
                         .orderBy(page.getSort())
                         .limit("?")
                         .offset("?")
-                        .build());
+                        .build();
     }
 
     @Override

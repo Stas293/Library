@@ -86,16 +86,25 @@
                                     <label for="newAuthorFirstNameInput" class="form-label"><fmt:message
                                             key="editBook.label.firstName"/></label>
                                     <input type="text" class="form-control" id="newAuthorFirstNameInput" required>
+                                    <div class="alert alert-danger" id="first-name-error">
+                                        <fmt:message key="form.validation.name"/>
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="newAuthorMiddleNameInput" class="form-label"><fmt:message
                                             key="editBook.label.middleName"/></label>
                                     <input type="text" class="form-control" id="newAuthorMiddleNameInput">
+                                    <div class="alert alert-danger" id="middle-name-error">
+                                        <fmt:message key="form.validation.name"/>
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="newAuthorLastNameInput" class="form-label"><fmt:message
                                             key="editBook.label.lastName"/></label>
                                     <input type="text" class="form-control" id="newAuthorLastNameInput" required>
+                                    <div class="alert alert-danger" id="last-name-error">
+                                        <fmt:message key="form.validation.name"/>
+                                    </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -179,10 +188,10 @@
                     </c:if>
                     <input class="col-2 rounded border" id="publicationDate" type="date" required name="publicationDate"
                            value=${bookPublicationDateNumber}>
-                    <c:set var="bookNameErrors">${bookValidationError.datePublication}</c:set>
+                    <c:set var="bookNameErrors">${bookValidationError.publicationDate}</c:set>
                     <c:if test="${not empty bookNameErrors}">
                         <div class="alert alert-danger"><fmt:message
-                                key="${bookValidationError.datePublication}"/></div>
+                                key="${bookValidationError.publicationDate}"/></div>
                     </c:if>
                 </div>
                 <div class="mb-3">
@@ -195,9 +204,9 @@
                     </c:if>
                     <input class="col-2 rounded border" id="bookFine" type="number" step="0.01" min="0" required name="fine"
                            value=${bookFineNumber}>
-                    <c:set var="bookNameErrors">${bookValidationError.finePerDay}</c:set>
+                    <c:set var="bookNameErrors">${bookValidationError.fine}</c:set>
                     <c:if test="${not empty bookNameErrors}">
-                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.finePerDay}"/></div>
+                        <div class="alert alert-danger"><fmt:message key="${bookValidationError.fine}"/></div>
                     </c:if>
                 </div>
                 <div class="mb-3">
@@ -286,9 +295,10 @@
                             e.preventDefault();
                         }
                     });
-                });
-                $(document).ready(function () {
                     document.getElementById("publicationDate").max = new Date().toISOString().split("T")[0];
+                    $('#first-name-error').hide();
+                    $('#middle-name-error').hide();
+                    $('#last-name-error').hide();
                 });
 
             </script>

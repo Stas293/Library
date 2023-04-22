@@ -33,16 +33,16 @@
             <h1><fmt:message key="usersList.pageTitle" /></h1>
             <input id="search" class="col-4 rounded border" type="text" placeholder="<fmt:message key="table.search" />">
             <input id="size" class="col-2 rounded border" type="number" min="2" max="8" value="5">
-            <input name="sorting" class="hidden" type="radio" id="asc" value="asc" checked><label class="col-2" for="asc"><fmt:message key="table.asc" /></label>
-            <input name="sorting" class="hidden" type="radio" id="desc" value="desc"><label class="col-2" for="desc"><fmt:message key="table.desc" /></label>
+            <input name="sorting" class="hidden" type="radio" id="asc" value="ASC" checked><label class="col-2" for="asc"><fmt:message key="table.asc" /></label>
+            <input name="sorting" class="hidden" type="radio" id="desc" value="DESC"><label class="col-2" for="desc"><fmt:message key="table.desc" /></label>
             <div id="page-navigation"></div>
             <table class="table table-bordered table-active table-hover table-striped">
                 <thead class="table-header table-dark">
                 <tr>
-                    <th class="string"><fmt:message key="usersList.table.login" /></th>
-                    <th class="string"><fmt:message key="usersList.table.firstName" /></th>
-                    <th class="string"><fmt:message key="usersList.table.lastName" /></th>
-                    <th class="string"><fmt:message key="usersList.table.phone" /></th>
+                    <th id="login" class="string"><fmt:message key="usersList.table.login" /></th>
+                    <th id="first_name" class="string"><fmt:message key="usersList.table.firstName" /></th>
+                    <th id="last_name" class="string"><fmt:message key="usersList.table.lastName" /></th>
+                    <th id="phone" class="string"><fmt:message key="usersList.table.phone" /></th>
                 </tr>
                 </thead>
                 <tbody id="pageable-list">

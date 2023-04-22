@@ -61,7 +61,7 @@ function createAuthorSearch(authorsPath) {
                 console.log(data);
                 // Add the newly created author to the list
                 addAuthorToList({
-                    value: data.middleName !== "" ? data.firstName + " " + data.middleName + " " + data.lastName
+                    value: data.middleName !== null ? data.firstName + " " + data.middleName + " " + data.lastName
                         : data.firstName + " " + data.lastName,
                     id: data.id
                 });

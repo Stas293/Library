@@ -1,6 +1,7 @@
 let urlPath = `/library/admin/manage`;
 
 window.onload = () => {
+    setUsersListeners(urlPath);
     wizard(urlPath, null);
 }
 

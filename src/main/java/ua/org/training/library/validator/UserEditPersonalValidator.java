@@ -3,10 +3,10 @@ package ua.org.training.library.validator;
 
 import lombok.extern.slf4j.Slf4j;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.dto.UserUpdateDto;
 import ua.org.training.library.enums.Patterns;
 import ua.org.training.library.enums.Validation;
 import ua.org.training.library.form.PersonalEditFormValidationError;
-import ua.org.training.library.model.User;
 
 import java.util.regex.Pattern;
 
@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 @Slf4j
 public class UserEditPersonalValidator {
 
-    public PersonalEditFormValidationError validation(User user) {
+    public PersonalEditFormValidationError validation(UserUpdateDto user) {
         log.info("Validation user");
         log.info("User: {}", user);
         PersonalEditFormValidationError errors = new PersonalEditFormValidationError();

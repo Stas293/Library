@@ -111,7 +111,7 @@ public class BookController {
         Locale locale = Utility.getLocale(request);
         BookChangeFormValidationError bookChangeFormValidationError = bookService.saveBook(locale, bookDto);
         if (bookChangeFormValidationError.isContainsErrors()) {
-            request.setAttribute("book", bookService.getBookChangeByBookChangeDto(locale, bookDto));
+            request.setAttribute("book", bookService.getBookChangeByBookChangeDto(locale, bookDto).get());
             request.setAttribute("bookValidationError", bookChangeFormValidationError);
             return "/WEB-INF/jsp/admin/add-book.jsp";
         }
@@ -125,7 +125,7 @@ public class BookController {
         Locale locale = Utility.getLocale(request);
         BookChangeFormValidationError bookChangeFormValidationError = bookService.updateBook(locale, bookDto);
         if (bookChangeFormValidationError.isContainsErrors()) {
-            request.setAttribute("book", bookService.getBookChangeByBookChangeDto(locale, bookDto));
+            request.setAttribute("book", bookService.getBookChangeByBookChangeDto(locale, bookDto).get());
             request.setAttribute("bookValidationError", bookChangeFormValidationError);
             return "/WEB-INF/jsp/admin/edit-book.jsp";
         }

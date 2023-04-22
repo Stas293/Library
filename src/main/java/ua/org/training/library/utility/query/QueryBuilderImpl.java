@@ -29,8 +29,8 @@ public class QueryBuilderImpl implements QueryBuilder {
     @Override
     public QueryBuilder orderByMinMax(Sort sort) {
         StringBuilder stringBuilder = this.query.get();
-        Iterator<Sort.Order> sortIterator = sort.iterator();
         stringBuilder.append(" ORDER BY ");
+        Iterator<Sort.Order> sortIterator = sort.iterator();
         while (sortIterator.hasNext()) {
             Sort.Order order = sortIterator.next();
             if (order.getDirection().equals(Sort.Direction.ASC)) {
@@ -46,6 +46,12 @@ public class QueryBuilderImpl implements QueryBuilder {
                 stringBuilder.append(", ");
             }
         }
+        return this;
+    }
+
+    @Override
+    public QueryBuilder orderBy(String s) {
+        this.query.get().append(" ORDER BY ").append(s);
         return this;
     }
 

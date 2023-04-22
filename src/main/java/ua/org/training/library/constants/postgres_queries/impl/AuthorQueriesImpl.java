@@ -67,12 +67,11 @@ public class AuthorQueriesImpl implements AuthorQueries {
                             .offset("?")
                             .build());
         }
-        return queries.computeIfAbsent("getPageAuthorsSort",
-                key -> selectAuthors()
+        return selectAuthors()
                         .orderBy(sort)
                         .limit("?")
                         .offset("?")
-                        .build());
+                        .build();
     }
 
     private QueryBuilder selectAuthors() {
@@ -131,10 +130,9 @@ public class AuthorQueriesImpl implements AuthorQueries {
         if (sort == null) {
             return getAllAuthors();
         }
-        return queries.computeIfAbsent("getAllAuthorsSort",
-                key -> selectAuthors()
+        return selectAuthors()
                         .orderBy(sort)
-                        .build());
+                        .build();
     }
 
     @Override

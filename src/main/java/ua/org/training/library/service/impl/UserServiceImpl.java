@@ -175,22 +175,22 @@ public class UserServiceImpl implements UserService {
                                                               AuthorityUser authorityUser) {
         log.info("Updating personal data for user: {}", userFromRequest);
         User user = userRepository.getByLogin(authorityUser.getLogin()).orElseThrow();
-        User updatedUser = objectMapper.updateUserData(user, userFromRequest);
-        PersonalEditFormValidationError validationError = userEditPersonalValidator.validation(updatedUser);
+        PersonalEditFormValidationError validationError = userEditPersonalValidator.validation(userFromRequest);
         validateEmail(userFromRequest.getEmail(), validationError, user);
         validatePhone(userFromRequest.getPhone(), validationError, user);
         if (validationError.isContainsErrors()) {
             log.info("Validation error: {}", validationError);
             return validationError;
         }
-        if (checkIfPersonalDataChanged(user, updatedUser)) {
+        if (checkIfPersonalDataChanged(user, userFromRequest)) {
             log.info("Personal data changed for user: {}", userFromRequest);
+            User updatedUser = objectMapper.updateUserData(user, userFromRequest);
             userRepository.save(updatedUser);
         }
         return validationError;
     }
 
-    private boolean checkIfPersonalDataChanged(User user, User updatedUser) {
+    private boolean checkIfPersonalDataChanged(User user, UserUpdateDto updatedUser) {
         return !user.getFirstName().equals(updatedUser.getFirstName())
                 || !user.getLastName().equals(updatedUser.getLastName())
                 || !user.getEmail().equals(updatedUser.getEmail())

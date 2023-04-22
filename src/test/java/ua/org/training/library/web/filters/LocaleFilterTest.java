@@ -26,6 +26,8 @@ class LocaleFilterTest {
     @Test
     void doFilter() {
         LocaleFilter localeFilter = new LocaleFilter();
+        Mockito.when(request.getSession()).thenReturn(session);
+        Mockito.when(session.getAttribute("lang")).thenReturn("en");
         assertDoesNotThrow(() -> localeFilter.doFilter(request, response, filterChain));
 
         Mockito.when(request.getParameter("lang")).thenReturn("en");

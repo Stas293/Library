@@ -67,10 +67,9 @@ public class OrderQueriesImpl implements OrderQueries {
         if (sort == null) {
             return getSelectAllQuery();
         }
-        return queries.computeIfAbsent("getSelectAllQuerySort",
-                key -> selectFromOrders()
+        return selectFromOrders()
                         .orderBy(sort)
-                        .build());
+                        .build();
     }
 
     @Override
@@ -81,12 +80,11 @@ public class OrderQueriesImpl implements OrderQueries {
                     .offset("?")
                     .build();
         }
-        return queries.computeIfAbsent("getSelectAllQuery",
-                key -> selectFromOrders()
+        return selectFromOrders()
                         .orderByMinMax(page.getSort())
                         .limit("?")
                         .offset("?")
-                        .build());
+                        .build();
     }
 
     @Override
@@ -145,13 +143,12 @@ public class OrderQueriesImpl implements OrderQueries {
                             .offset("?")
                             .build());
         }
-        return queries.computeIfAbsent("getSelectAllByBookIdQuerySort",
-                key -> selectFromOrders()
+        return selectFromOrders()
                         .where("book_id = ?")
                         .orderBy(page.getSort())
                         .limit("?")
                         .offset("?")
-                        .build());
+                        .build();
     }
 
     @Override
@@ -175,14 +172,15 @@ public class OrderQueriesImpl implements OrderQueries {
                             .offset("?")
                             .build());
         }
-        return queries.computeIfAbsent("getSelectAllByStatusAndUserIdQuerySort",
-                key -> selectFromOrders()
+        return selectFromOrders()
+                .join("books b", "b.id = o.book_id")
+                .join("users u", "u.id = o.user_id")
                         .where("status_id = ?")
                         .and("user_id = ?")
                         .orderBy(page.getSort())
                         .limit("?")
                         .offset("?")
-                        .build());
+                        .build();
     }
 
     @Override
@@ -206,13 +204,12 @@ public class OrderQueriesImpl implements OrderQueries {
                             .offset("?")
                             .build());
         }
-        return queries.computeIfAbsent("getSelectAllByStatusIdQuerySort",
-                key -> selectFromOrders()
-                        .where("status_id = ?")
-                        .orderBy(page.getSort())
-                        .limit("?")
-                        .offset("?")
-                        .build());
+        return selectFromOrders()
+                .where("status_id = ?")
+                .orderBy(page.getSort())
+                .limit("?")
+                .offset("?")
+                .build();
     }
 
     @Override
@@ -344,14 +341,15 @@ public class OrderQueriesImpl implements OrderQueries {
                             .offset("?")
                             .build());
         }
-        return queries.computeIfAbsent("getSelectAllByStatusAndPlaceQuerySort",
-                key -> selectFromOrders()
+        return selectFromOrders()
+                .join("books b", "o.book_id = b.id")
+                .join("users u", "o.user_id = u.id")
                         .where("status_id = ?")
                         .and("place_id = ?")
                         .orderBy(page.getSort())
                         .limit("?")
                         .offset("?")
-                        .build());
+                        .build();
     }
 
     @Override

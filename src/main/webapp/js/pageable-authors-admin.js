@@ -1,6 +1,7 @@
 const urlPath = `/library/authors/admin`;
 
 window.onload = () => {
+    setAuthorsListeners(urlPath);
     wizard(urlPath);
 }
 

@@ -71,10 +71,9 @@ public class KeywordQueriesImpl implements KeywordQueries {
         if (sort == null) {
             return getSelectAllQuery();
         }
-        return queries.computeIfAbsent("getSelectAllQuery",
-                key -> selectFromKeywords()
+        return selectFromKeywords()
                         .orderBy(sort)
-                        .build());
+                        .build();
     }
 
     @Override
@@ -86,12 +85,11 @@ public class KeywordQueriesImpl implements KeywordQueries {
                             .offset("?")
                             .build());
         }
-        return queries.computeIfAbsent("getSelectAllQuerySort",
-                key -> selectFromKeywords()
+        return selectFromKeywords()
                         .orderBy(page.getSort())
                         .limit("?")
                         .offset("?")
-                        .build());
+                        .build();
     }
 
     @Override

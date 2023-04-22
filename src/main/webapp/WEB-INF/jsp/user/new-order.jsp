@@ -50,6 +50,7 @@
                             <h3 class="card-title"><fmt:message key="newRequest.label.place"/></h3>
                             <form id="add-book-form" data-toggle="validator" action="/library/order/user/${book.id}"
                                   method="post">
+                                <input type="hidden" name="bookId" value="${book.id}"/>
                                 <div class="form-group mb-3">
                                     <select required name="place" class="form-select">
                                         <c:forEach items="${places}" var="place">

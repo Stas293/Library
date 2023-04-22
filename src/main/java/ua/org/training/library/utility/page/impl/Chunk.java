@@ -1,6 +1,7 @@
 package ua.org.training.library.utility.page.impl;
 
 
+import lombok.EqualsAndHashCode;
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.Slice;
 
@@ -10,6 +11,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+@EqualsAndHashCode
 abstract class Chunk<T> implements Slice<T>, Serializable {
     private final List<T> content = new ArrayList<>();
     private final Pageable pageable;

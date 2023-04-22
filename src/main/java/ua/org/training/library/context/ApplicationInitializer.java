@@ -1,10 +1,13 @@
 package ua.org.training.library.context;
 
+import ua.org.training.library.context.annotations.ContextInitClass;
+
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ApplicationInitializer {
     private final AnnotationConfigApplicationContext context;
@@ -20,20 +23,20 @@ public class ApplicationInitializer {
 
     public void initialize() {
         List<Class<?>> sortedBeans = sortBeans(beans);
-        for (Class<?> bean : sortedBeans) {
-            context.getObject(bean);
-        }
+        sortedBeans.forEach(context::getObject);
     }
 
     public List<Class<?>> sortBeans(Set<Class<?>> beans) {
-        List<Class<?>> sortedBeans = new ArrayList<>();
+        List<Class<?>> sortedBeans;
         Set<Class<?>> visitedBeans = new HashSet<>();
 
-        for (Class<?> bean : beans) {
-            if (!visitedBeans.contains(bean)) {
-                visitBean(bean, visitedBeans, sortedBeans);
-            }
-        }
+        sortedBeans = beans.parallelStream()
+                .filter(bean -> bean.isAnnotationPresent(ContextInitClass.class))
+                .collect(Collectors.toList());
+
+        beans.stream()
+                .filter(bean -> !visitedBeans.contains(bean))
+                .forEach(bean -> visitBean(bean, visitedBeans, sortedBeans));
 
         return sortedBeans;
     }
@@ -42,14 +45,12 @@ public class ApplicationInitializer {
         visitedBeans.add(bean);
 
         Constructor<?>[] constructors = bean.getConstructors();
-        for (Constructor<?> constructor : constructors) {
-            Class<?>[] parameterTypes = constructor.getParameterTypes();
-            for (Class<?> parameterType : parameterTypes) {
-                if (!visitedBeans.contains(parameterType) && beans.contains(parameterType)) {
-                    visitBean(parameterType, visitedBeans, sortedBeans);
-                }
-            }
-        }
+        Arrays.stream(constructors)
+                .map(Constructor::getParameterTypes)
+                .flatMap(Arrays::stream)
+                .filter(parameterType -> !visitedBeans.contains(parameterType)
+                        && beans.contains(parameterType))
+                .forEach(parameterType -> visitBean(parameterType, visitedBeans, sortedBeans));
 
         sortedBeans.add(bean);
     }

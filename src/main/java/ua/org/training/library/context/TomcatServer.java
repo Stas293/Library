@@ -2,13 +2,14 @@ package ua.org.training.library.context;
 
 
 import jakarta.servlet.Filter;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.annotation.WebServlet;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
-import ua.org.training.library.web.DispatcherServlet;
 
 import java.io.File;
 
@@ -17,8 +18,10 @@ public class TomcatServer implements Runnable {
     private final AnnotationConfigApplicationContext applicationContext;
     private static final String CONTEXT_PATH = "";
     private static final String MAPPING_URL = "/library/*";
+    private static final String FILTER_MAPPING_URL = "/*";
     private static final int PORT = 8080;
     private static final String WEB_APP_DIRECTORY = "src/main/webapp";
+    private static final String SERVLET_NAME = "dispatcherServlet";
 
     public TomcatServer(AnnotationConfigApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -29,18 +32,22 @@ public class TomcatServer implements Runnable {
     public void run() {
         log.debug("Starting tomcat server");
         Tomcat tomcat = new Tomcat();
-        tomcat.setBaseDir("temp");
         tomcat.setPort(PORT);
         tomcat.getConnector();
 
-        Context ctx = tomcat.addWebapp(CONTEXT_PATH, new File(WEB_APP_DIRECTORY).getAbsolutePath());
+        Context ctx = tomcat.addWebapp(CONTEXT_PATH,
+                new File(WEB_APP_DIRECTORY).getAbsolutePath());
 
         log.debug("Getting servlet");
-        DispatcherServlet servlet = applicationContext.getObject(DispatcherServlet.class);
+        Servlet servlet = applicationContext.getBeansWithAnnotation(WebServlet.class)
+                .values().stream()
+                .findFirst()
+                .map(Servlet.class::cast)
+                .orElseThrow(() -> new RuntimeException("Dispatcher servlet not found"));
 
         log.debug("Adding servlet");
-        Tomcat.addServlet(ctx, "my-servlet", servlet);
-        ctx.addServletMappingDecoded(MAPPING_URL, "my-servlet");
+        Tomcat.addServlet(ctx, SERVLET_NAME, servlet);
+        ctx.addServletMappingDecoded(MAPPING_URL, SERVLET_NAME);
 
         log.debug("Adding filters");
         addFilters(ctx);
@@ -60,7 +67,7 @@ public class TomcatServer implements Runnable {
             ctx.addFilterDef(filterDef);
             FilterMap filterMap = new FilterMap();
             filterMap.setFilterName(aClass.getName());
-            filterMap.addURLPattern("/*");
+            filterMap.addURLPattern(FILTER_MAPPING_URL);
             ctx.addFilterMap(filterMap);
         });
     }

@@ -86,7 +86,7 @@ public class AuthorServiceImpl implements AuthorService {
     public Page<AuthorManagementDto> searchAuthors(Pageable pageable, String search) {
         log.info("Searching authors by: {}", search);
         Page<Author> authors;
-        if (search.isEmpty()) {
+        if (search == null || search.isEmpty()) {
             authors = repository.findAll(pageable);
         } else {
             authors = repository.searchAuthors(pageable, search);

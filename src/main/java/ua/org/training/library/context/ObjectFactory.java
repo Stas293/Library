@@ -83,9 +83,8 @@ public class ObjectFactory {
     }
 
     private <T> T wrapWithProxy(Class<? extends T> implClass, T t) {
-        for (ProxyConfigurator proxyConfigurator : proxyConfigurators) {
+        for (ProxyConfigurator proxyConfigurator : proxyConfigurators)
             t = proxyConfigurator.getProxyObjectWhenNeeded(t, implClass, context);
-        }
         return t;
     }
 
@@ -171,28 +170,25 @@ public class ObjectFactory {
         closeIfAutoCloseable(o);
     }
 
+    @SneakyThrows
     private void closeIfAutoCloseable(Object o) {
         if (o instanceof AutoCloseable autoCloseable) {
             log.info("Closing object AutoCloseable {}", o);
-            try {
-                autoCloseable.close();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            autoCloseable.close();
         }
     }
 
     private void runPreDestroy(Object o) {
         Method[] methods = o.getClass().getMethods();
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(PreDestroy.class)) {
-                log.info("Running pre destroy for object {} method {}", o, method);
-                try {
-                    method.invoke(o);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
+        Arrays.stream(methods)
+                .filter(method -> method.isAnnotationPresent(PreDestroy.class))
+                .forEach(method -> {
+            log.info("Running pre destroy for object {} method {}", o, method);
+            try {
+                method.invoke(o);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
             }
-        }
+        });
     }
 }
