@@ -13,9 +13,9 @@ public class RoleCollector implements Collector<Role> {
     @Override
     public Role collect(@NotNull ResultSet rs) throws SQLException {
         return Role.builder()
-                .id(rs.getLong("id"))
-                .code(rs.getString("code"))
-                .name(rs.getString("name"))
+                .id(rs.getLong(1))
+                .code(rs.getString(2))
+                .name(rs.getString(3))
                 .build();
     }
 }

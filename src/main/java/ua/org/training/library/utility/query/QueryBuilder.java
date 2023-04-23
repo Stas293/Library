@@ -1,16 +1,12 @@
 package ua.org.training.library.utility.query;
 
 
-import ua.org.training.library.utility.page.impl.Sort;
-
 public interface QueryBuilder {
     QueryBuilder select(String... columns);
 
     QueryBuilder from(String table);
 
     QueryBuilder where(String clause);
-
-    QueryBuilder orderBy(Sort sort);
 
     QueryBuilder join(String table, String onClause);
 
@@ -49,8 +45,6 @@ public interface QueryBuilder {
     QueryBuilder setUp();
 
     QueryBuilder as(String alias);
-
-    QueryBuilder orderByMinMax(Sort sort);
 
     QueryBuilder orderBy(String s);
 }

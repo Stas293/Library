@@ -29,31 +29,17 @@ public interface OrderQueries {
 
     String getSelectAllByBookIdQuery(Pageable page);
 
-    String getCountByBookIdQuery();
-
     String getSelectAllByStatusAndUserIdQuery(Pageable page);
-
-    String getCountByStatusAndUserIdQuery();
 
     String getSelectAllByStatusIdQuery(Pageable page);
 
-    String getCountByStatusIdQuery();
-
     String getSelectAllByStatusAndUserIdAndSearchQuery(Pageable page);
-
-    String getCountByStatusAndUserIdAndSearchQuery();
 
     String getSelectAllByStatusAndSearchQuery(Pageable page);
 
-    String getCountByStatusAndSearchQuery();
-
     String getSelectAllByStatusAndPlaceAndSearchQuery(Pageable page);
 
-    String getCountByStatusAndPlaceAndSearchQuery();
-
     String getSelectAllByStatusAndPlaceQuery(Pageable page);
-
-    String getCountByStatusAndPlaceQuery();
 
     String getSelectByUserIdAndBookIdQuery();
 

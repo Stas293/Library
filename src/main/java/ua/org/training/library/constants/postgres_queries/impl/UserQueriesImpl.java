@@ -4,6 +4,7 @@ package ua.org.training.library.constants.postgres_queries.impl;
 import ua.org.training.library.constants.postgres_queries.UserQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.WeakConcurrentHashMap;
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.Sort;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class UserQueriesImpl implements UserQueries {
     private final Map<String, String> queries;
     private final QueryBuilderImpl queryBuilderImpl;
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "login");
 
     @Autowired
     public UserQueriesImpl(QueryBuilderImpl queryBuilderImpl) {
@@ -53,34 +55,24 @@ public class UserQueriesImpl implements UserQueries {
 
     @Override
     public String getQueryAll(Sort sort) {
-        if (sort == null) {
-            return getQueryAll();
-        }
-        return queryBuilderImpl.setUp()
+        return String.format(queries.computeIfAbsent("getQueryAllSort",
+                key -> queryBuilderImpl.setUp()
                         .select("*")
                         .from("users")
-                        .orderBy(sort)
-                        .build();
+                        .orderBy("%s")
+                        .build()), Utility.orderBy(sort, DEFAULT_SORT));
     }
 
     @Override
     public String getQueryPage(Pageable page) {
-        if (page == null) {
-            return queries.computeIfAbsent("getQueryPage",
-                    key -> queryBuilderImpl.setUp()
-                            .select("*")
-                            .from("users")
-                            .limit("?")
-                            .offset("?")
-                            .build());
-        }
-        return queryBuilderImpl.setUp()
-                        .select("*")
+        return String.format(queries.computeIfAbsent("getQueryPage",
+                key -> queryBuilderImpl.setUp()
+                        .select("*, count(*) OVER() AS total")
                         .from("users")
-                        .orderBy(page.getSort())
+                        .orderBy("%s")
                         .limit("?")
                         .offset("?")
-                        .build();
+                        .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
     }
 
     @Override
@@ -243,44 +235,19 @@ public class UserQueriesImpl implements UserQueries {
 
     @Override
     public String getQuerySearchUsers(Pageable pageable, String search) {
-        if (pageable.getSort() == null) {
-            return queries.computeIfAbsent("getQuerySearchUsers",
+            return String.format(queries.computeIfAbsent("getQuerySearchUsers",
                     key -> queryBuilderImpl.setUp()
-                            .select("*")
+                            .select("*, count(*) OVER() AS total")
                             .from("users")
                             .where("login LIKE ?")
                             .or("first_name LIKE ?")
                             .or("last_name LIKE ?")
                             .or("email LIKE ?")
                             .or("phone LIKE ?")
+                            .orderBy("%s")
                             .limit("?")
                             .offset("?")
-                            .build());
-        }
-        return queryBuilderImpl.setUp()
-                .select("*")
-                .from("users")
-                .where("login LIKE ?")
-                .or("first_name LIKE ?")
-                .or("last_name LIKE ?")
-                .or("email LIKE ?")
-                .or("phone LIKE ?")
-                .orderBy(pageable.getSort())
-                .limit("?")
-                .offset("?")
-                .build();
+                            .build()), Utility.orderBy(pageable.getSort(), DEFAULT_SORT));
     }
 
-    @Override
-    public String getQueryCountUsers(String search) {
-        return queryBuilderImpl.setUp()
-                .select("count(*)")
-                .from("users")
-                .where("login LIKE ?")
-                .or("first_name LIKE ?")
-                .or("last_name LIKE ?")
-                .or("email LIKE ?")
-                .or("phone LIKE ?")
-                .build();
-    }
 }

@@ -12,9 +12,9 @@ public class PlaceNameCollector implements Collector<PlaceName> {
     @Override
     public PlaceName collect(ResultSet rs) throws SQLException {
         return PlaceName.builder()
-                .id(rs.getLong("id"))
-                .lang(rs.getString("lang"))
-                .name(rs.getString("name"))
+                .id(rs.getLong(1))
+                .lang(rs.getString(2))
+                .name(rs.getString(3))
                 .build();
     }
 }

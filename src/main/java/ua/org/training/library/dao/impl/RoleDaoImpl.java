@@ -16,6 +16,7 @@ import ua.org.training.library.utility.page.impl.PageImpl;
 import ua.org.training.library.utility.page.impl.Sort;
 
 import java.sql.*;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,6 +105,8 @@ public class RoleDaoImpl implements RoleDao {
         log.info("Getting roles by ids: {}", ids);
         try (PreparedStatement statement = connection.prepareStatement(
                 roleQueries.getGetByIdsQuery(ids.size()))) {
+            statement.setFetchSize(ids.size());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             for (int i = 0; i < ids.size(); i++) {
                 statement.setLong(i + 1, ids.get(i));
             }
@@ -121,6 +124,8 @@ public class RoleDaoImpl implements RoleDao {
         log.info("Getting all roles");
         try (PreparedStatement statement = connection.prepareStatement(
                 roleQueries.getGetAllQuery())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet rs = statement.executeQuery()) {
                 return roleCollector.collectList(rs);
             }
@@ -135,6 +140,8 @@ public class RoleDaoImpl implements RoleDao {
         log.info("Getting all roles with sort: {}", sort);
         try (PreparedStatement statement = connection.prepareStatement(
                 roleQueries.getGetAllQuery(sort))) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet rs = statement.executeQuery()) {
                 return roleCollector.collectList(rs);
             }
@@ -148,11 +155,18 @@ public class RoleDaoImpl implements RoleDao {
     public Page<Role> getPage(Connection connection, Pageable page) {
         log.info("Getting page of roles: {}", page);
         try (PreparedStatement statement = connection.prepareStatement(
-                roleQueries.getGetPageQuery(page))) {
+                roleQueries.getGetPageQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
             statement.setInt(1, page.getPageSize());
             statement.setLong(2, page.getOffset());
             try (ResultSet rs = statement.executeQuery()) {
-                return new PageImpl<>(roleCollector.collectList(rs), page, count(connection));
+                List<Role> roles = roleCollector.collectList(rs);
+                rs.last();
+                if (rs.getRow() == 0) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(roles, page, rs.getLong(4));
             }
         } catch (SQLException e) {
             log.error("Error getting page of roles: {}", e.getMessage());
@@ -288,6 +302,8 @@ public class RoleDaoImpl implements RoleDao {
         log.info("Getting roles by user id: {}", id);
         try (PreparedStatement statement = connection.prepareStatement(
                 roleQueries.getGetRolesByUserIdQuery())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setLong(1, id);
             try (ResultSet rs = statement.executeQuery()) {
                 return roleCollector.collectList(rs);
@@ -303,6 +319,8 @@ public class RoleDaoImpl implements RoleDao {
         log.info("Getting roles by codes: {}", roles);
         try (PreparedStatement statement = connection.prepareStatement(
                 roleQueries.getGetAllByCodesQuery(roles.size()))) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             for (int i = 0; i < roles.size(); i++) {
                 statement.setString(i + 1, roles.get(i));
             }

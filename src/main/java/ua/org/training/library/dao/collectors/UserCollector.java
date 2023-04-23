@@ -12,13 +12,13 @@ public class UserCollector implements Collector<User> {
     @Override
     public User collect(ResultSet rs) throws SQLException {
         return User.builder()
-                .id(rs.getLong("id"))
-                .login(rs.getString("login"))
-                .firstName(rs.getString("first_name"))
-                .lastName(rs.getString("last_name"))
-                .email(rs.getString("email"))
-                .phone(rs.getString("phone"))
-                .enabled(rs.getBoolean("enabled"))
+                .id(rs.getLong(1))
+                .login(rs.getString(2))
+                .firstName(rs.getString(3))
+                .lastName(rs.getString(4))
+                .phone(rs.getString(5))
+                .email(rs.getString(6))
+                .enabled(rs.getBoolean(9))
                 .build();
     }
 }

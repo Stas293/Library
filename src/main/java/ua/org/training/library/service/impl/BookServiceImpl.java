@@ -204,11 +204,7 @@ public class BookServiceImpl implements BookService {
     public Page<BookDto> searchBooks(Pageable page, Locale locale, String search) {
         log.info("Searching books: {} {}", page, search);
         Page<Book> bookPage;
-        if (search == null || search.isEmpty()) {
-            if (page.getSort() == null || !page.getSort().isOrdered()) {
-                Sort sort = Sort.by(Sort.Direction.ASC, "title");
-                page = PageRequest.of(page.getPageNumber(), page.getPageSize(), sort);
-            }
+        if (search == null || search.equals("")) {
             bookPage = bookRepository.findAll(page);
         } else {
             bookPage = bookRepository.searchBooks(page, search);

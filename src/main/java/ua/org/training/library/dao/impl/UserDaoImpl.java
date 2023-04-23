@@ -16,14 +16,8 @@ import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.PageImpl;
 import ua.org.training.library.utility.page.impl.Sort;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.sql.*;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -71,6 +65,8 @@ public class UserDaoImpl implements UserDao {
         log.info("Getting users by ids: {}", ids);
         try (var statement = connection.prepareStatement(
                 userQueries.getQueryByIds(ids.size()))) {
+            statement.setFetchSize(ids.size());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             for (int i = 0; i < ids.size(); i++) {
                 statement.setLong(i + 1, ids.get(i));
             }
@@ -88,6 +84,8 @@ public class UserDaoImpl implements UserDao {
         log.info("Getting all users");
         try (var statement = connection.prepareStatement(
                 userQueries.getQueryAll())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (var resultSet = statement.executeQuery()) {
                 return userCollector.collectList(resultSet);
             }
@@ -102,6 +100,8 @@ public class UserDaoImpl implements UserDao {
         log.info("Getting all users with sort: {}", sort);
         try (var statement = connection.prepareStatement(
                 userQueries.getQueryAll(sort))) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (var resultSet = statement.executeQuery()) {
                 return userCollector.collectList(resultSet);
             }
@@ -115,12 +115,18 @@ public class UserDaoImpl implements UserDao {
     public Page<User> getPage(Connection connection, Pageable page) {
         log.info("Getting page of users with page: {}", page);
         try (var statement = connection.prepareStatement(
-                userQueries.getQueryPage(page))) {
+                userQueries.getQueryPage(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
             statement.setInt(1, page.getPageSize());
             statement.setLong(2, page.getOffset());
             try (var resultSet = statement.executeQuery()) {
                 List<User> users = userCollector.collectList(resultSet);
-                return new PageImpl<>(users, page, count(connection));
+                resultSet.last();
+                if (resultSet.getRow() == 0) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(users, page, resultSet.getLong(11));
             }
         } catch (SQLException e) {
             log.error("Error getting page of users with page: {}", page, e);
@@ -395,7 +401,11 @@ public class UserDaoImpl implements UserDao {
     public Page<User> searchUsers(Connection connection, Pageable pageable, String search) {
         log.info("Searching users by search: {}", search);
         try (PreparedStatement statement = connection.prepareStatement(
-                userQueries.getQuerySearchUsers(pageable, search))) {
+                userQueries.getQuerySearchUsers(pageable, search),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            statement.setFetchSize(pageable.getPageSize());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setString(1, "%"+search+"%");
             statement.setString(2, "%"+search+"%");
             statement.setString(3, "%"+search+"%");
@@ -404,36 +414,16 @@ public class UserDaoImpl implements UserDao {
             statement.setLong(6, pageable.getPageSize());
             statement.setLong(7, pageable.getOffset());
             try (var resultSet = statement.executeQuery()) {
-                List<User> users = new ArrayList<>();
-                while (resultSet.next()) {
-                    users.add(userCollector.collect(resultSet));
+                List<User> users = userCollector.collectList(resultSet);
+                resultSet.last();
+                if (resultSet.getRow() == 0) {
+                    return new PageImpl<>(Collections.emptyList(), pageable, 0);
                 }
-                return new PageImpl<>(users, pageable, countUsers(connection, search));
+                return new PageImpl<>(users, pageable, resultSet.getLong(11));
             }
         } catch (SQLException e) {
             log.error("Error searching users by search: {}", search, e);
             throw new DaoException("Error searching users by search: " + search, e);
-        }
-    }
-
-    private long countUsers(Connection connection, String search) {
-        log.info("Counting users by search: {}", search);
-        try (PreparedStatement statement = connection.prepareStatement(
-                userQueries.getQueryCountUsers(search))) {
-            statement.setString(1, "%"+search+"%");
-            statement.setString(2, "%"+search+"%");
-            statement.setString(3, "%"+search+"%");
-            statement.setString(4, "%"+search+"%");
-            statement.setString(5, "%"+search+"%");
-            try (var resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getLong(1);
-                }
-            }
-            return 0;
-        } catch (SQLException e) {
-            log.error("Error counting users by search: {}", search, e);
-            throw new DaoException("Error counting users by search: " + search, e);
         }
     }
 

@@ -13,8 +13,8 @@ public class KeywordCollector implements Collector<Keyword> {
     @Override
     public Keyword collect(@NotNull ResultSet rs) throws SQLException {
         return Keyword.builder()
-                .id(rs.getLong("id"))
-                .data(rs.getString("keyword"))
+                .id(rs.getLong(1))
+                .data(rs.getString(2))
                 .build();
     }
 }

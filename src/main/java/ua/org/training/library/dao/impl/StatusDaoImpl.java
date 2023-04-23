@@ -16,8 +16,10 @@ import ua.org.training.library.utility.page.impl.PageImpl;
 import ua.org.training.library.utility.page.impl.Sort;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,6 +101,8 @@ public class StatusDaoImpl implements StatusDao {
         log.info("Getting statuses by ids: {}", ids);
         try (var statement = connection.prepareStatement(
                 statusQueries.getGetStatusesByIdsQuery(ids.size()))) {
+            statement.setFetchSize(ids.size());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             for (Long id : ids) {
                 statement.setLong(1, id);
                 statement.addBatch();
@@ -117,6 +121,8 @@ public class StatusDaoImpl implements StatusDao {
         log.info("Getting all statuses");
         try (var statement = connection.prepareStatement(
                 statusQueries.getGetAllStatusesQuery())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (var resultSet = statement.executeQuery()) {
                 return statusCollector.collectList(resultSet);
             }
@@ -131,6 +137,8 @@ public class StatusDaoImpl implements StatusDao {
         log.info("Getting all statuses with sort: {}", sort);
         try (var statement = connection.prepareStatement(
                 statusQueries.getGetAllStatusesQuery(sort))) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (var resultSet = statement.executeQuery()) {
                 return statusCollector.collectList(resultSet);
             }
@@ -144,11 +152,18 @@ public class StatusDaoImpl implements StatusDao {
     public Page<Status> getPage(Connection connection, Pageable page) {
         log.info("Getting page of statuses: {}", page);
         try (var statement = connection.prepareStatement(
-                statusQueries.getGetPageStatusesQuery(page))) {
+                statusQueries.getGetPageStatusesQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
             statement.setInt(1, page.getPageSize());
             statement.setLong(2, page.getOffset());
             try (var resultSet = statement.executeQuery()) {
-                return new PageImpl<>(statusCollector.collectList(resultSet), page, count(connection));
+                List<Status> statuses = statusCollector.collectList(resultSet);
+                resultSet.last();
+                if (resultSet.getRow() == 0) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(statuses, page, resultSet.getLong(4));
             }
         } catch (SQLException e) {
             log.error("Error getting page of statuses: {}", e.getMessage());
@@ -302,6 +317,8 @@ public class StatusDaoImpl implements StatusDao {
         log.info("Getting next statuses for status by id: {}", id);
         try (var statement = connection.prepareStatement(
                 statusQueries.getGetNextStatusesForStatusByIdQuery())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setLong(1, id);
             try (var resultSet = statement.executeQuery()) {
                 return statusCollector.collectList(resultSet);

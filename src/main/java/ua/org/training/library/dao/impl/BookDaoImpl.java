@@ -16,6 +16,7 @@ import ua.org.training.library.utility.page.impl.PageImpl;
 import ua.org.training.library.utility.page.impl.Sort;
 
 import java.sql.*;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +25,6 @@ import java.util.Optional;
 public class BookDaoImpl implements BookDao {
     private final BookQueries bookQueries;
     private final Collector<Book> collector;
-
     @Autowired
     public BookDaoImpl(BookQueries bookQueries,
                        @Qualifier("bookCollector") Collector<Book> collector) {
@@ -36,12 +36,21 @@ public class BookDaoImpl implements BookDao {
     public Page<Book> getBooksByAuthorId(Connection connection, Pageable page, Long authorId) {
         log.info("Getting books by author id: {}", authorId);
         try (PreparedStatement statement = connection.prepareStatement(
-                bookQueries.getBooksByAuthorIdQuery(page))) {
+                bookQueries.getBooksByAuthorIdQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            statement.setFetchSize(page.getPageSize());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setLong(1, authorId);
             statement.setInt(2, page.getPageSize());
             statement.setLong(3, page.getOffset());
             try (ResultSet resultSet = statement.executeQuery()) {
-                return new PageImpl<>(collector.collectList(resultSet), page, count(connection));
+                List<Book> books = collector.collectList(resultSet);
+                resultSet.last();
+                if (books.isEmpty()) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(books, page, resultSet.getLong(10));
             }
         } catch (SQLException e) {
             log.error("Error getting books by author id: {}", authorId, e);
@@ -53,12 +62,21 @@ public class BookDaoImpl implements BookDao {
     public Page<Book> getBooksByLanguage(Connection connection, Pageable page, String language) {
         log.info("Getting books by language: {}", language);
         try (PreparedStatement statement = connection.prepareStatement(
-                bookQueries.getBooksByLanguageQuery(page))) {
+                bookQueries.getBooksByLanguageQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            statement.setFetchSize(page.getPageSize());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setString(1, language);
             statement.setInt(2, page.getPageSize());
             statement.setLong(3, page.getOffset());
             try (ResultSet resultSet = statement.executeQuery()) {
-                return new PageImpl<>(collector.collectList(resultSet), page, count(connection));
+                List<Book> books = collector.collectList(resultSet);
+                resultSet.last();
+                if (books.isEmpty()) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(books, page, resultSet.getLong(10));
             }
         } catch (SQLException e) {
             log.error("Error getting books by language: {}", language, e);
@@ -71,6 +89,7 @@ public class BookDaoImpl implements BookDao {
         log.info("Getting book by order id: {}", orderId);
         try (PreparedStatement statement = connection.prepareStatement(
                 bookQueries.getBookByOrderIdQuery())) {
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setLong(1, orderId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -88,13 +107,21 @@ public class BookDaoImpl implements BookDao {
     public Page<Book> getBooksWhichUserDidNotOrder(Connection connection, Pageable page, Long userId) {
         log.info("Getting books which user did not order: {}", userId);
         try (PreparedStatement statement = connection.prepareStatement(
-                bookQueries.getBooksWhichUserDidNotOrderQuery(page))) {
-            log.info("Statement: {}", statement);
+                bookQueries.getBooksWhichUserDidNotOrderQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            statement.setFetchSize(page.getPageSize());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setLong(1, userId);
             statement.setInt(2, page.getPageSize());
             statement.setLong(3, page.getOffset());
             try (ResultSet resultSet = statement.executeQuery()) {
-                return new PageImpl<>(collector.collectList(resultSet), page, countBooksWhichUserDidNotOrder(connection, userId));
+                List<Book> books = collector.collectList(resultSet);
+                resultSet.last();
+                if (books.isEmpty()) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(books, page, resultSet.getLong(10));
             }
         } catch (SQLException e) {
             log.error("Error getting books which user did not order: {}", userId, e);
@@ -102,66 +129,36 @@ public class BookDaoImpl implements BookDao {
         }
     }
 
-    private long countBooksWhichUserDidNotOrder(Connection connection, Long userId) {
-        log.info("Counting books which user did not order: {}", userId);
-        try (PreparedStatement statement = connection.prepareStatement(
-                bookQueries.getCountBooksWhichUserDidNotOrderQueryNoSearch())) {
-            statement.setLong(1, userId);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getLong(1);
-                }
-            }
-            return 0;
-        } catch (SQLException e) {
-            log.error("Error counting books which user did not order: {}", userId, e);
-            throw new DaoException("Error counting books which user did not order: " + userId, e);
-        }
-    }
-
     @Override
     public Page<Book> searchBooksWhichUserDidNotOrder(Connection connection, Pageable page, Long userId, String search) {
         log.info("Searching books which user did not order: {}, {}", userId, search);
         try (PreparedStatement statement = connection.prepareStatement(
-                bookQueries.getSearchBooksWhichUserDidNotOrderQuery(page))) {
-            statement.setString(1, "%" + search + "%");
-            statement.setString(2, "%" + search + "%");
-            statement.setString(3, "%" + search + "%");
-            statement.setString(4, "%" + search + "%");
-            statement.setString(5, "%" + search + "%");
-            statement.setString(6, "%" + search + "%");
+                bookQueries.getSearchBooksWhichUserDidNotOrderQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            statement.setFetchSize(page.getPageSize());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
+            String searchLike = "%" + search + "%";
+            statement.setString(1, searchLike);
+            statement.setString(2, searchLike);
+            statement.setString(3, searchLike);
+            statement.setString(4, searchLike);
+            statement.setString(5, searchLike);
+            statement.setString(6, searchLike);
             statement.setLong(7, userId);
             statement.setInt(8, page.getPageSize());
             statement.setLong(9, page.getOffset());
             try (ResultSet resultSet = statement.executeQuery()) {
-                return new PageImpl<>(collector.collectList(resultSet), page, countBooksWhichUserDidNotOrder(connection, userId, search));
+                List<Book> books = collector.collectList(resultSet);
+                resultSet.last();
+                if (resultSet.getRow() == 0) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(books, page, resultSet.getLong(10));
             }
         } catch (SQLException e) {
             log.error("Error searching books which user did not order: {}, {}", userId, search, e);
             throw new DaoException("Error searching books which user did not order: " + userId + ", " + search, e);
-        }
-    }
-
-    private long countBooksWhichUserDidNotOrder(Connection connection, Long userId, String search) {
-        log.info("Counting books which user did not order: {}, {}", userId, search);
-        try (PreparedStatement statement = connection.prepareStatement(
-                bookQueries.getCountBooksWhichUserDidNotOrderQuery())) {
-            statement.setString(1, "%" + search + "%");
-            statement.setString(2, "%" + search + "%");
-            statement.setString(3, "%" + search + "%");
-            statement.setString(4, "%" + search + "%");
-            statement.setString(5, "%" + search + "%");
-            statement.setString(6, "%" + search + "%");
-            statement.setLong(7, userId);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getLong(1);
-                }
-            }
-            return 0;
-        } catch (SQLException e) {
-            log.error("Error counting books which user did not order: {}, {}", userId, search, e);
-            throw new DaoException("Error counting books which user did not order: " + userId + ", " + search, e);
         }
     }
 
@@ -184,17 +181,27 @@ public class BookDaoImpl implements BookDao {
     public Page<Book> searchBooks(Connection connection, Pageable page, String search) {
         log.info("Searching books: {}", search);
         try (PreparedStatement statement = connection.prepareStatement(
-                bookQueries.getSearchBooksQuery(page))) {
-            statement.setString(1, "%" + search + "%");
-            statement.setString(2, "%" + search + "%");
-            statement.setString(3, "%" + search + "%");
-            statement.setString(4, "%" + search + "%");
-            statement.setString(5, "%" + search + "%");
-            statement.setString(6, "%" + search + "%");
+                bookQueries.getSearchBooksQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            statement.setFetchSize(page.getPageSize());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
+            String searchLike = "%" + search + "%";
+            statement.setString(1, searchLike);
+            statement.setString(2, searchLike);
+            statement.setString(3, searchLike);
+            statement.setString(4, searchLike);
+            statement.setString(5, searchLike);
+            statement.setString(6, searchLike);
             statement.setInt(7, page.getPageSize());
             statement.setLong(8, page.getOffset());
             try (ResultSet resultSet = statement.executeQuery()) {
-                return new PageImpl<>(collector.collectList(resultSet), page, countSearch(connection, search));
+                List<Book> books = collector.collectList(resultSet);
+                resultSet.last();
+                if (resultSet.getRow() == 0) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(books, page, resultSet.getLong(10));
             }
         } catch (SQLException e) {
             log.error("Error searching books: {}", search, e);
@@ -226,6 +233,8 @@ public class BookDaoImpl implements BookDao {
         log.info("Getting books by author id: {}", id);
         try (PreparedStatement statement = conn.prepareStatement(
                 bookQueries.getBooksByAuthorIdQuery())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setLong(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 return collector.collectList(resultSet);
@@ -251,29 +260,6 @@ public class BookDaoImpl implements BookDao {
         }
     }
 
-    private long countSearch(Connection connection, String search) {
-        log.info("Counting books by search: {}", search);
-        try (PreparedStatement statement = connection.prepareStatement(
-                bookQueries.getCountSearchBooksQuery())) {
-            statement.setString(1, "%" + search + "%");
-            statement.setString(2, "%" + search + "%");
-            statement.setString(3, "%" + search + "%");
-            statement.setString(4, "%" + search + "%");
-            statement.setString(5, "%" + search + "%");
-            statement.setString(6, "%" + search + "%");
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getLong(1);
-                } else {
-                    return 0;
-                }
-            }
-        } catch (SQLException e) {
-            log.error("Error counting books by search: {}", search, e);
-            throw new DaoException("Error counting books by search: " + search, e);
-        }
-    }
-
     @Override
     public Book create(Connection connection, Book model) {
         log.info("Creating book: {}", model);
@@ -283,7 +269,7 @@ public class BookDaoImpl implements BookDao {
             statement.setString(2, model.getDescription());
             statement.setString(3, model.getIsbn());
             statement.setLong(4, model.getCount());
-            statement.setDate(5, Date.valueOf(model.getPublicationDate()));
+            statement.setObject(5, model.getPublicationDate());
             statement.setDouble(6, model.getFine());
             statement.setString(7, model.getLanguage());
             statement.setString(8, model.getLocation());
@@ -306,13 +292,14 @@ public class BookDaoImpl implements BookDao {
     public List<Book> create(Connection connection, List<Book> models) {
         log.info("Creating books: {}", models);
         try (PreparedStatement statement = connection.prepareStatement(
-                bookQueries.getCreateBookQuery())) {
+                bookQueries.getCreateBookQuery(),
+                Statement.RETURN_GENERATED_KEYS)) {
             for (Book book : models) {
                 statement.setString(1, book.getTitle());
                 statement.setString(2, book.getDescription());
                 statement.setString(3, book.getIsbn());
                 statement.setLong(4, book.getCount());
-                statement.setDate(5, Date.valueOf(book.getPublicationDate()));
+                statement.setObject(5, book.getPublicationDate());
                 statement.setDouble(6, book.getFine());
                 statement.setString(7, book.getLanguage());
                 statement.setString(8, book.getLocation());
@@ -346,11 +333,11 @@ public class BookDaoImpl implements BookDao {
                     return Optional.of(collector.collect(resultSet));
                 }
             }
+            return Optional.empty();
         } catch (SQLException e) {
             log.error("Error getting book by id: {}", id, e);
             throw new DaoException("Error getting book by id: " + id, e);
         }
-        return Optional.empty();
     }
 
     @Override
@@ -358,6 +345,8 @@ public class BookDaoImpl implements BookDao {
         log.info("Getting books by ids: {}", ids);
         try (PreparedStatement statement = connection.prepareStatement(
                 bookQueries.getGetBooksByIdsQuery(ids.size()))) {
+            statement.setFetchSize(ids.size());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             for (int i = 0; i < ids.size(); i++) {
                 statement.setLong(i + 1, ids.get(i));
             }
@@ -375,6 +364,8 @@ public class BookDaoImpl implements BookDao {
         log.info("Getting all books");
         try (PreparedStatement statement = connection.prepareStatement(
                 bookQueries.getGetAllBooksQuery())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet resultSet = statement.executeQuery()) {
                 return collector.collectList(resultSet);
             }
@@ -389,6 +380,8 @@ public class BookDaoImpl implements BookDao {
         log.info("Getting all books with sort: {}", sort);
         try (PreparedStatement statement = connection.prepareStatement(
                 bookQueries.getGetAllBooksQuery(sort))) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet resultSet = statement.executeQuery()) {
                 return collector.collectList(resultSet);
             }
@@ -402,11 +395,21 @@ public class BookDaoImpl implements BookDao {
     public Page<Book> getPage(Connection connection, Pageable page) {
         log.info("Getting page of books: {}", page);
         try (PreparedStatement statement = connection.prepareStatement(
-                bookQueries.getGetPageOfBooksQuery(page))) {
+                bookQueries.getGetPageOfBooksQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            log.info("Executing query: {}", statement);
+            statement.setFetchSize(page.getPageSize());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setInt(1, page.getPageSize());
             statement.setLong(2, page.getOffset());
             try (ResultSet resultSet = statement.executeQuery()) {
-                return new PageImpl<>(collector.collectList(resultSet), page, count(connection));
+                List<Book> books = collector.collectList(resultSet);
+                resultSet.last();
+                if (resultSet.getRow() == 0) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(books, page, resultSet.getLong(10));
             }
         } catch (SQLException e) {
             log.error("Error getting page of books: {}", page, e);
@@ -423,7 +426,7 @@ public class BookDaoImpl implements BookDao {
             statement.setString(2, entity.getDescription());
             statement.setString(3, entity.getIsbn());
             statement.setLong(4, entity.getCount());
-            statement.setDate(5, Date.valueOf(entity.getPublicationDate()));
+            statement.setObject(5, entity.getPublicationDate());
             statement.setDouble(6, entity.getFine());
             statement.setString(7, entity.getLanguage());
             statement.setString(8, entity.getLocation());
@@ -453,16 +456,17 @@ public class BookDaoImpl implements BookDao {
         log.info("Counting books");
         try (PreparedStatement statement = conn.prepareStatement(
                 bookQueries.getGetCountOfBooksQuery())) {
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getLong(1);
                 }
             }
+            return 0;
         } catch (SQLException e) {
             log.error("Error counting books", e);
             throw new DaoException("Error counting books", e);
         }
-        return 0;
     }
 
     @Override
@@ -502,7 +506,7 @@ public class BookDaoImpl implements BookDao {
                 statement.setString(2, book.getDescription());
                 statement.setString(3, book.getIsbn());
                 statement.setLong(4, book.getCount());
-                statement.setDate(5, Date.valueOf(book.getPublicationDate()));
+                statement.setObject(5, book.getPublicationDate());
                 statement.setDouble(6, book.getFine());
                 statement.setString(7, book.getLanguage());
                 statement.setString(8, book.getLocation());

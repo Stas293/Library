@@ -13,9 +13,9 @@ public class StatusCollector implements Collector<Status> {
     @Override
     public Status collect(@NotNull ResultSet rs) throws SQLException {
         return Status.builder()
-                .id(rs.getLong("id"))
-                .code(rs.getString("code"))
-                .closed(rs.getBoolean("closed"))
+                .id(rs.getLong(1))
+                .code(rs.getString(2))
+                .closed(rs.getBoolean(3))
                 .build();
     }
 }

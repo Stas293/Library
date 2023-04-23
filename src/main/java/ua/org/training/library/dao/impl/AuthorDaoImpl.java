@@ -13,7 +13,6 @@ import ua.org.training.library.model.Author;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.PageImpl;
-import ua.org.training.library.utility.page.impl.PageRequest;
 import ua.org.training.library.utility.page.impl.Sort;
 
 import java.sql.*;
@@ -38,6 +37,8 @@ public class AuthorDaoImpl implements AuthorDao {
         log.info("Get authors by book id: {}", id);
         try (PreparedStatement statement = connection.prepareStatement(
                 authorQueries.getAuthorsByBookId())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setLong(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 return authorCollector.collectList(resultSet);
@@ -59,7 +60,11 @@ public class AuthorDaoImpl implements AuthorDao {
     public Page<Author> searchAuthors(Connection conn, Pageable page, String search) {
         log.info("Search authors: {}", search);
         try (PreparedStatement statement = conn.prepareStatement(
-                authorQueries.getSearchAuthors(page.getSort()))) {
+                authorQueries.getSearchAuthors(page.getSort()),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            statement.setFetchSize(page.getPageSize());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             String searchParam = "%" + search + "%";
             statement.setString(1, searchParam);
             statement.setString(2, searchParam);
@@ -68,7 +73,9 @@ public class AuthorDaoImpl implements AuthorDao {
             statement.setLong(5, page.getOffset());
             try (ResultSet resultSet = statement.executeQuery()) {
                 List<Author> authors = authorCollector.collectList(resultSet);
-                return new PageImpl<>(authors, page, getAuthorsCount(conn, search));
+                resultSet.last();
+                long total = resultSet.getLong(5);
+                return new PageImpl<>(authors, page, total);
             }
         } catch (SQLException e) {
             log.error(String.format("Cannot search authors: %s", search), e);
@@ -81,6 +88,8 @@ public class AuthorDaoImpl implements AuthorDao {
         log.info("Find all authors by name containing: {}", search);
         try (PreparedStatement statement = conn.prepareStatement(
                 authorQueries.getFindAllByNameContainingIgnoreCase())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             String searchParam = "%" + search + "%";
             statement.setString(1, searchParam);
             statement.setString(2, searchParam);
@@ -94,31 +103,12 @@ public class AuthorDaoImpl implements AuthorDao {
         }
     }
 
-    private long getAuthorsCount(Connection conn, String search) {
-        log.info("Get authors count: {}", search);
-        try (PreparedStatement statement = conn.prepareStatement(
-                authorQueries.getAuthorsCount())) {
-            String searchParam = "%" + search + "%";
-            statement.setString(1, searchParam);
-            statement.setString(2, searchParam);
-            statement.setString(3, searchParam);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getLong(1);
-                }
-            }
-        } catch (SQLException e) {
-            log.error(String.format("Cannot get authors count: %s", search), e);
-            throw new DaoException("Cannot get authors count: " + search, e);
-        }
-        return 0;
-    }
-
-
     private void saveAuthorsToBook(Connection connection, Long bookId, List<Author> authors) {
         log.info("Save authors to book: {}", bookId);
         try (PreparedStatement statement = connection.prepareStatement(
                 authorQueries.getSaveAuthorsToBook())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             for (Author author : authors) {
                 statement.setLong(1, bookId);
                 statement.setLong(2, author.getId());
@@ -135,6 +125,8 @@ public class AuthorDaoImpl implements AuthorDao {
         log.info("Delete authors by book id: {}", bookId);
         try (PreparedStatement statement = connection.prepareStatement(
                 authorQueries.getDeleteAuthorsByBookId())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setLong(1, bookId);
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -201,6 +193,7 @@ public class AuthorDaoImpl implements AuthorDao {
         log.info("Get author by id: {}", id);
         try (PreparedStatement statement = connection.prepareStatement(
                 authorQueries.getAuthorById())) {
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setLong(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -220,6 +213,8 @@ public class AuthorDaoImpl implements AuthorDao {
         log.info("Get authors by ids: {}", ids);
         try (PreparedStatement statement = connection.prepareStatement(
                 authorQueries.getAuthorsByIds(ids.size()))) {
+            statement.setFetchSize(ids.size());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             for (int i = 0; i < ids.size(); i++) {
                 statement.setLong(i + 1, ids.get(i));
             }
@@ -237,6 +232,8 @@ public class AuthorDaoImpl implements AuthorDao {
         log.info("Get all authors");
         try (PreparedStatement statement = connection.prepareStatement(
                 authorQueries.getAllAuthors())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet resultSet = statement.executeQuery()) {
                 return authorCollector.collectList(resultSet);
             }
@@ -251,6 +248,8 @@ public class AuthorDaoImpl implements AuthorDao {
         log.info("Get all authors");
         try (PreparedStatement statement = connection.prepareStatement(
                 authorQueries.getAllAuthors(sort))) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet resultSet = statement.executeQuery()) {
                 return authorCollector.collectList(resultSet);
             }
@@ -264,15 +263,18 @@ public class AuthorDaoImpl implements AuthorDao {
     public Page<Author> getPage(Connection connection, Pageable page) {
         log.info("Get page of authors");
         try (PreparedStatement statement = connection.prepareStatement(
-                authorQueries.getPageAuthors(page.getSort()))) {
-            log.info("Page size: {}, offset: {}", page.getPageSize(), page.getOffset());
-            log.info("SQL: {}", statement.toString());
+                authorQueries.getPageAuthors(page.getSort()),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            statement.setFetchSize(page.getPageSize());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setInt(1, page.getPageSize());
             statement.setLong(2, page.getOffset());
             try (ResultSet resultSet = statement.executeQuery()) {
-                Pageable pageable = PageRequest.of(page.getPageNumber(), page.getPageSize(), page.getSort());
-                return new PageImpl<>(authorCollector.collectList(resultSet),
-                        pageable, count(connection));
+                List<Author> authors = authorCollector.collectList(resultSet);
+                resultSet.last();
+                long total = resultSet.getLong(5);
+                return new PageImpl<>(authors, page, total);
             }
         } catch (SQLException e) {
             log.error("Cannot get page of authors", e);
@@ -314,6 +316,7 @@ public class AuthorDaoImpl implements AuthorDao {
         log.info("Count authors");
         try (PreparedStatement statement = conn.prepareStatement(
                 authorQueries.getCountAuthors())) {
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getLong(1);

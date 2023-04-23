@@ -13,12 +13,10 @@ import java.time.LocalDate;
 public class OrderCollector implements Collector<Order> {
     @Override
     public Order collect(@NotNull ResultSet rs) throws SQLException {
-        LocalDate dateExpire = rs.getDate("date_expire") != null ?
-                rs.getDate("date_expire").toLocalDate() : null;
         return Order.builder()
-                .id(rs.getLong("id"))
-                .dateCreated(rs.getDate("date_created").toLocalDate())
-                .dateExpire(dateExpire)
+                .id(rs.getLong(1))
+                .dateCreated(rs.getDate(2).toLocalDate())
+                .dateExpire(rs.getObject(3, LocalDate.class))
                 .build();
     }
 }

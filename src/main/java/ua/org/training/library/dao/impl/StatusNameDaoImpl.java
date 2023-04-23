@@ -16,6 +16,7 @@ import ua.org.training.library.utility.page.impl.PageImpl;
 import ua.org.training.library.utility.page.impl.Sort;
 
 import java.sql.*;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -105,6 +106,8 @@ public class StatusNameDaoImpl implements StatusNameDao {
         log.info("Getting status names by ids: {}", ids);
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 statusNameQueries.getGetStatusNameByIdsQuery(ids.size()))) {
+            preparedStatement.setFetchSize(ids.size());
+            preparedStatement.setFetchDirection(ResultSet.FETCH_FORWARD);
             for (Long id : ids) {
                 preparedStatement.setLong(1, id);
                 preparedStatement.addBatch();
@@ -123,6 +126,8 @@ public class StatusNameDaoImpl implements StatusNameDao {
         log.info("Getting all status names");
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 statusNameQueries.getGetAllStatusNamesQuery())) {
+            preparedStatement.setFetchSize(100);
+            preparedStatement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 return statusNameCollector.collectList(resultSet);
             }
@@ -137,6 +142,8 @@ public class StatusNameDaoImpl implements StatusNameDao {
         log.info("Getting all status names with sort: {}", sort);
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 statusNameQueries.getGetAllStatusNamesQuery(sort))) {
+            preparedStatement.setFetchSize(100);
+            preparedStatement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 return statusNameCollector.collectList(resultSet);
             }
@@ -150,9 +157,20 @@ public class StatusNameDaoImpl implements StatusNameDao {
     public Page<StatusName> getPage(Connection connection, Pageable page) {
         log.info("Getting page of status names: {}", page);
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                statusNameQueries.getGetPageStatusNamesQuery(page))) {
+                statusNameQueries.getGetPageStatusNamesQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            preparedStatement.setFetchSize(page.getPageSize());
+            preparedStatement.setFetchDirection(ResultSet.FETCH_FORWARD);
+            preparedStatement.setInt(1, page.getPageSize());
+            preparedStatement.setLong(2, page.getOffset());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                return new PageImpl<>(statusNameCollector.collectList(resultSet), page, count(connection));
+                List<StatusName> statusNames = statusNameCollector.collectList(resultSet);
+                resultSet.last();
+                if (resultSet.getRow() == 0) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(statusNames, page, resultSet.getLong(5));
             }
         } catch (SQLException e) {
             log.error("Error getting page of status names: {}", e.getMessage());
@@ -257,6 +275,8 @@ public class StatusNameDaoImpl implements StatusNameDao {
         log.info("Getting status names by status id: {}", id);
         try (PreparedStatement preparedStatement = conn.prepareStatement(
                 statusNameQueries.getGetStatusNamesByStatusIdQuery())) {
+            preparedStatement.setFetchSize(100);
+            preparedStatement.setFetchDirection(ResultSet.FETCH_FORWARD);
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 return statusNameCollector.collectList(resultSet);

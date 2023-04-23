@@ -4,6 +4,7 @@ package ua.org.training.library.constants.postgres_queries.impl;
 import ua.org.training.library.constants.postgres_queries.HistoryOrderQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.WeakConcurrentHashMap;
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.Sort;
@@ -16,6 +17,8 @@ import java.util.Map;
 public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
     private final Map<String, String> queries;
     private final QueryBuilderImpl queryBuilderImpl;
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "book_title");
+
 
     @Autowired
     public HistoryOrderQueriesImpl(QueryBuilderImpl queryBuilderImpl) {
@@ -43,7 +46,7 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
 
     private QueryBuilder selectFromHistoryOrders() {
         return queryBuilderImpl.setUp()
-                .select("*")
+                .select("*, COUNT(*) OVER() AS full_count")
                 .from("history_orders");
     }
 
@@ -57,28 +60,20 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
 
     @Override
     public String getSelectAllQuery(Sort sort) {
-        if (sort == null) {
-            return getSelectAllQuery();
-        }
-        return selectFromHistoryOrders()
-                        .orderBy(sort)
-                        .build();
+        return String.format(queries.computeIfAbsent("getSelectAllQuerySort",
+                key -> selectFromHistoryOrders()
+                        .orderBy("%s")
+                        .build()), Utility.orderBy(sort, DEFAULT_SORT));
     }
 
     @Override
     public String getSelectAllQuery(Pageable page) {
-        if (page.getSort() == null) {
-            return queries.computeIfAbsent("getSelectAllQueryPage",
-                    key -> selectFromHistoryOrders()
-                            .limit("?")
-                            .offset("?")
-                            .build());
-        }
-        return selectFromHistoryOrders()
-                        .orderBy(page.getSort())
+        return String.format(queries.computeIfAbsent("getSelectAllQueryPage",
+                key -> selectFromHistoryOrders()
+                        .orderBy("%s")
                         .limit("?")
                         .offset("?")
-                        .build();
+                        .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
     }
 
     @Override
@@ -137,69 +132,33 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
 
     @Override
     public String getSelectAllByUserIdQuery(Pageable page) {
-        if (page.getSort() == null) {
-            return queries.computeIfAbsent("getSelectAllByUserIdQueryPage",
-                    key -> selectFromHistoryOrderWhereUserId()
-                            .limit("?")
-                            .offset("?")
-                            .build());
-        }
-        return selectFromHistoryOrderWhereUserId()
-                        .orderBy(page.getSort())
+        return String.format(queries.computeIfAbsent("getSelectAllByUserIdQueryPage",
+                key -> selectFromHistoryOrderWhereUserId()
+                        .orderBy("%s")
                         .limit("?")
                         .offset("?")
-                        .build();
+                        .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
     }
 
     private QueryBuilder selectFromHistoryOrderWhereUserId() {
         return queryBuilderImpl.setUp()
-                .select("*")
+                .select("*, COUNT(*) OVER() AS total")
                 .from("history_orders")
                 .where("user_id = ?");
     }
 
     @Override
-    public String getCountByUserIdQuery() {
-        return queries.computeIfAbsent("getCountByUserIdQuery",
-                key -> queryBuilderImpl.setUp()
-                        .select("count(*)")
-                        .from("history_orders")
-                        .where("user_id = ?")
-                        .build());
-    }
-
-    @Override
     public String getSelectAllByUserIdAndSearchQuery(Pageable page) {
-        if (page.getSort() == null) {
-            return queries.computeIfAbsent("getSelectAllByUserIdAndSearchQueryPage",
-                    key -> queryBuilderImpl.setUp()
-                            .select("*")
-                            .from("history_orders")
-                            .where("user_id = ?")
-                            .and("book_title LIKE ?")
-                            .limit("?")
-                            .offset("?")
-                            .build());
-        }
-        return queryBuilderImpl.setUp()
-                .select("*")
-                .from("history_orders")
-                .where("user_id = ?")
-                .and("book_title LIKE ?")
-                .orderBy(page.getSort())
-                .limit("?")
-                .offset("?")
-                .build();
-    }
-
-    @Override
-    public String getCountByUserIdAndSearchQuery() {
-        return queries.computeIfAbsent("getCountByUserIdAndSearchQuery",
+        return String.format(queries.computeIfAbsent("getSelectAllByUserIdAndSearchQueryPage",
                 key -> queryBuilderImpl.setUp()
-                        .select("count(*)")
+                        .select("*, COUNT(*) OVER() AS total")
                         .from("history_orders")
                         .where("user_id = ?")
                         .and("book_title LIKE ?")
-                        .build());
+                        .orderBy("%s")
+                        .limit("?")
+                        .offset("?")
+                        .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
     }
+
 }

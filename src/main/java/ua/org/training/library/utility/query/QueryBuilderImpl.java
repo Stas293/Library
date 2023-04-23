@@ -2,9 +2,6 @@ package ua.org.training.library.utility.query;
 
 
 import ua.org.training.library.context.annotations.Component;
-import ua.org.training.library.utility.page.impl.Sort;
-
-import java.util.Iterator;
 
 @Component
 public class QueryBuilderImpl implements QueryBuilder {
@@ -23,29 +20,6 @@ public class QueryBuilderImpl implements QueryBuilder {
     @Override
     public QueryBuilder as(String alias) {
         query.get().append(") AS ").append(alias);
-        return this;
-    }
-
-    @Override
-    public QueryBuilder orderByMinMax(Sort sort) {
-        StringBuilder stringBuilder = this.query.get();
-        stringBuilder.append(" ORDER BY ");
-        Iterator<Sort.Order> sortIterator = sort.iterator();
-        while (sortIterator.hasNext()) {
-            Sort.Order order = sortIterator.next();
-            if (order.getDirection().equals(Sort.Direction.ASC)) {
-                stringBuilder.append("MIN(");
-            } else {
-                stringBuilder.append("MAX(");
-            }
-            stringBuilder.append(order.getProperty()).append(")");
-            if (order.getDirection().equals(Sort.Direction.DESC)) {
-                stringBuilder.append(" DESC");
-            }
-            if (sortIterator.hasNext()) {
-                stringBuilder.append(", ");
-            }
-        }
         return this;
     }
 
@@ -74,23 +48,6 @@ public class QueryBuilderImpl implements QueryBuilder {
 
     public QueryBuilder where(String clause) {
         this.query.get().append(" WHERE ").append(clause);
-        return this;
-    }
-
-    public QueryBuilder orderBy(Sort sort) {
-        if (sort == null) {
-            return this;
-        }
-        StringBuilder stringBuilder = this.query.get();
-        Iterator<Sort.Order> sortIterator = sort.iterator();
-        stringBuilder.append(" ORDER BY ");
-        while (sortIterator.hasNext()) {
-            Sort.Order order = sortIterator.next();
-            stringBuilder.append(order.getProperty()).append(" ").append(order.getDirection());
-            if (sortIterator.hasNext()) {
-                stringBuilder.append(", ");
-            }
-        }
         return this;
     }
 

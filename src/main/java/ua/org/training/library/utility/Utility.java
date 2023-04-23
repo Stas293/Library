@@ -7,8 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.model.Book;
 import ua.org.training.library.model.Order;
+import ua.org.training.library.utility.page.impl.Sort;
 
 import java.time.LocalDate;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -105,6 +107,46 @@ public class Utility {
             }
         }
         return book;
+    }
+
+    public String orderByMinMax(Sort sort, Sort defaultSort) {
+        if (sort == null) {
+            sort = defaultSort;
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        Iterator<Sort.Order> sortIterator = sort.iterator();
+        while (sortIterator.hasNext()) {
+            Sort.Order order = sortIterator.next();
+            if (order.getDirection().equals(Sort.Direction.ASC)) {
+                stringBuilder.append("MIN(");
+            } else {
+                stringBuilder.append("MAX(");
+            }
+            stringBuilder.append(order.getProperty()).append(")");
+            if (order.getDirection().equals(Sort.Direction.DESC)) {
+                stringBuilder.append(" DESC");
+            }
+            if (sortIterator.hasNext()) {
+                stringBuilder.append(", ");
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    public String orderBy(Sort sort, Sort defaultSort) {
+        if (sort == null) {
+            sort = defaultSort;
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        Iterator<Sort.Order> sortIterator = sort.iterator();
+        while (sortIterator.hasNext()) {
+            Sort.Order order = sortIterator.next();
+            stringBuilder.append(order.getProperty()).append(" ").append(order.getDirection());
+            if (sortIterator.hasNext()) {
+                stringBuilder.append(", ");
+            }
+        }
+        return stringBuilder.toString();
     }
 
     public static double delocalizeFine(Locale locale, double fine) {

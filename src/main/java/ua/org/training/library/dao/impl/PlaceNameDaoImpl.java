@@ -15,9 +15,8 @@ import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.PageImpl;
 import ua.org.training.library.utility.page.impl.Sort;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -39,7 +38,8 @@ public class PlaceNameDaoImpl implements PlaceNameDao {
     public PlaceName create(Connection connection, PlaceName model) {
         log.info("Creating PlaceName: {}", model);
         try (PreparedStatement statement = connection.prepareStatement(
-                placeNameQueries.getCreateQuery())) {
+                placeNameQueries.getCreateQuery(),
+                Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, model.getLang());
             statement.setString(2, model.getName());
             statement.setLong(3, model.getPlace().getId());
@@ -47,9 +47,10 @@ public class PlaceNameDaoImpl implements PlaceNameDao {
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     model.setId(generatedKeys.getLong(1));
+                    return model;
                 }
+                throw new SQLException("Creating PlaceName failed, no ID obtained.");
             }
-            return model;
         } catch (Exception e) {
             log.error("Error creating PlaceName: {}", e.getMessage());
             throw new DaoException("Error creating PlaceName: " + e.getMessage());
@@ -60,7 +61,8 @@ public class PlaceNameDaoImpl implements PlaceNameDao {
     public List<PlaceName> create(Connection connection, List<PlaceName> models) {
         log.info("Creating PlaceNames: {}", models);
         try (PreparedStatement statement = connection.prepareStatement(
-                placeNameQueries.getCreateQuery())) {
+                placeNameQueries.getCreateQuery(),
+                Statement.RETURN_GENERATED_KEYS)) {
             for (PlaceName model : models) {
                 statement.setString(1, model.getLang());
                 statement.setString(2, model.getName());
@@ -72,6 +74,8 @@ public class PlaceNameDaoImpl implements PlaceNameDao {
                 for (PlaceName model : models) {
                     if (rs.next()) {
                         model.setId(rs.getLong(1));
+                    } else {
+                        throw new SQLException("Creating PlaceName failed, no ID obtained.");
                     }
                 }
             }
@@ -106,6 +110,8 @@ public class PlaceNameDaoImpl implements PlaceNameDao {
         log.info("Getting PlaceNames by ids: {}", ids);
         try (PreparedStatement statement = connection.prepareStatement(
                 placeNameQueries.getGetByIdsQuery(ids.size()))) {
+            statement.setFetchSize(ids.size());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             for (int i = 0; i < ids.size(); i++) {
                 statement.setLong(i + 1, ids.get(i));
             }
@@ -123,6 +129,8 @@ public class PlaceNameDaoImpl implements PlaceNameDao {
         log.info("Getting all PlaceNames");
         try (PreparedStatement statement = connection.prepareStatement(
                 placeNameQueries.getGetAllQuery())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet rs = statement.executeQuery()) {
                 return placeNameCollector.collectList(rs);
             }
@@ -136,7 +144,12 @@ public class PlaceNameDaoImpl implements PlaceNameDao {
     public List<PlaceName> getAll(Connection connection, Sort sort) {
         log.info("Getting all PlaceNames with sort: {}", sort);
         try (PreparedStatement statement = connection.prepareStatement(
-                placeNameQueries.getGetAllQuery(sort))) {
+                placeNameQueries.getGetAllQuery(sort),
+                ResultSet.TYPE_FORWARD_ONLY,
+                ResultSet.CONCUR_READ_ONLY,
+                ResultSet.CLOSE_CURSORS_AT_COMMIT)) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet rs = statement.executeQuery()) {
                 return placeNameCollector.collectList(rs);
             }
@@ -150,9 +163,20 @@ public class PlaceNameDaoImpl implements PlaceNameDao {
     public Page<PlaceName> getPage(Connection connection, Pageable page) {
         log.info("Getting PlaceNames page: {}", page);
         try (PreparedStatement statement = connection.prepareStatement(
-                placeNameQueries.getGetPageQuery(page))) {
+                placeNameQueries.getGetPageQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            statement.setFetchSize(page.getPageSize());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
+            statement.setInt(1, page.getPageSize());
+            statement.setLong(2, page.getOffset());
             try (ResultSet rs = statement.executeQuery()) {
-                return new PageImpl<>(placeNameCollector.collectList(rs), page, count(connection));
+                List<PlaceName> content = placeNameCollector.collectList(rs);
+                rs.last();
+                if (rs.getRow() < 1) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(content, page, rs.getLong(5));
             }
         } catch (Exception e) {
             log.error("Error getting PlaceNames page: {}", e.getMessage());
@@ -254,6 +278,8 @@ public class PlaceNameDaoImpl implements PlaceNameDao {
         log.info("Getting all PlaceNames by Place id: {}", id);
         try (PreparedStatement statement = connection.prepareStatement(
                 placeNameQueries.getGetAllByPlaceIdQuery())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setLong(1, id);
             try (ResultSet rs = statement.executeQuery()) {
                 return placeNameCollector.collectList(rs);

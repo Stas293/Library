@@ -4,6 +4,7 @@ package ua.org.training.library.constants.postgres_queries.impl;
 import ua.org.training.library.constants.postgres_queries.StatusNameQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.WeakConcurrentHashMap;
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.Sort;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class StatusNameQueriesImpl implements StatusNameQueries {
     private final Map<String, String> queries;
     private final QueryBuilderImpl queryBuilderImpl;
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "name");
 
     @Autowired
     public StatusNameQueriesImpl(QueryBuilderImpl queryBuilderImpl) {
@@ -63,22 +65,24 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
 
     @Override
     public String getGetAllStatusNamesQuery(Sort sort) {
-        return queryBuilderImpl.setUp()
-                .select("*")
-                .from("status_name")
-                .orderBy(sort)
-                .build();
+        return String.format(queries.computeIfAbsent("getGetAllStatusNamesQuery",
+                key -> queryBuilderImpl.setUp()
+                        .select("*")
+                        .from("status_name")
+                        .orderBy("%s")
+                        .build()), Utility.orderBy(sort, DEFAULT_SORT));
     }
 
     @Override
     public String getGetPageStatusNamesQuery(Pageable page) {
-        return queryBuilderImpl.setUp()
-                .select("*")
-                .from("status_name")
-                .orderBy(page.getSort())
-                .limit("?")
-                .offset("?")
-                .build();
+        return String.format(queries.computeIfAbsent("getGetPageStatusNamesQuery",
+                key -> queryBuilderImpl.setUp()
+                        .select("*, count(*) OVER() AS total")
+                        .from("status_name")
+                        .orderBy("%s")
+                        .limit("?")
+                        .offset("?")
+                        .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
     }
 
     @Override
@@ -142,15 +146,6 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
                 key -> queryBuilderImpl.setUp()
                         .select("*")
                         .from("status_name")
-                        .where("status_id = ?")
-                        .build());
-    }
-
-    @Override
-    public String getDeleteStatusNamesByStatusIdQuery() {
-        return queries.computeIfAbsent("getDeleteStatusNamesByStatusIdQuery",
-                key -> queryBuilderImpl.setUp()
-                        .deleteFrom("status_name")
                         .where("status_id = ?")
                         .build());
     }

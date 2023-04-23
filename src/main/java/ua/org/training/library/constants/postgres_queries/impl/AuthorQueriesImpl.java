@@ -4,6 +4,7 @@ package ua.org.training.library.constants.postgres_queries.impl;
 import ua.org.training.library.constants.postgres_queries.AuthorQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.WeakConcurrentHashMap;
 import ua.org.training.library.utility.page.impl.Sort;
 import ua.org.training.library.utility.query.QueryBuilder;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class AuthorQueriesImpl implements AuthorQueries {
     private final Map<String, String> queries;
     private final QueryBuilderImpl queryBuilderImpl;
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "id");
 
     @Autowired
     public AuthorQueriesImpl(QueryBuilderImpl queryBuilderImpl) {
@@ -60,18 +62,14 @@ public class AuthorQueriesImpl implements AuthorQueries {
 
     @Override
     public String getPageAuthors(Sort sort) {
-        if (sort == null) {
-            return queries.computeIfAbsent("getPageAuthors",
-                    key -> selectAuthors()
-                            .limit("?")
-                            .offset("?")
-                            .build());
-        }
-        return selectAuthors()
-                        .orderBy(sort)
+        return String.format(queries.computeIfAbsent("getPageAuthors",
+                key -> queryBuilderImpl.setUp()
+                        .select("*, count(*) OVER() AS total")
+                        .from("authors")
+                        .orderBy("%s")
                         .limit("?")
                         .offset("?")
-                        .build();
+                        .build()), Utility.orderBy(sort, DEFAULT_SORT));
     }
 
     private QueryBuilder selectAuthors() {
@@ -127,12 +125,12 @@ public class AuthorQueriesImpl implements AuthorQueries {
 
     @Override
     public String getAllAuthors(Sort sort) {
-        if (sort == null) {
-            return getAllAuthors();
-        }
-        return selectAuthors()
-                        .orderBy(sort)
-                        .build();
+        return String.format(queries.computeIfAbsent("getAllAuthorsSort",
+                key -> queryBuilderImpl.setUp()
+                        .select("*")
+                        .from("authors")
+                        .orderBy("%s")
+                        .build()), Utility.orderBy(sort, DEFAULT_SORT));
     }
 
     @Override
@@ -165,24 +163,16 @@ public class AuthorQueriesImpl implements AuthorQueries {
 
     @Override
     public String getSearchAuthors(Sort sort) {
-        if (sort == null) {
-            return queries.computeIfAbsent("getSearchAuthors",
-                    key -> selectAuthors()
+            return String.format(queries.computeIfAbsent("getSearchAuthors",
+                    key -> queryBuilderImpl.setUp()
+                            .select("*, count(*) OVER()")
+                            .from("authors")
                             .where("first_name LIKE ?")
                             .or("middle_name LIKE ?")
                             .or("last_name LIKE ?")
                             .limit("?")
                             .offset("?")
-                            .build());
-        }
-        return selectAuthors()
-                .where("first_name LIKE ?")
-                .or("middle_name LIKE ?")
-                .or("last_name LIKE ?")
-                .orderBy(sort)
-                .limit("?")
-                .offset("?")
-                .build();
+                            .build()), Utility.orderBy(sort, DEFAULT_SORT));
     }
 
     @Override

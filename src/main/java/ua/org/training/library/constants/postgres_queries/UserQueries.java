@@ -49,5 +49,4 @@ public interface UserQueries {
 
     String getQuerySearchUsers(Pageable pageable, String search);
 
-    String getQueryCountUsers(String search);
 }

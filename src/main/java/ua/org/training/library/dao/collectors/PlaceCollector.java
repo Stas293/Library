@@ -12,10 +12,10 @@ public class PlaceCollector implements Collector<Place> {
     @Override
     public Place collect(ResultSet rs) throws SQLException {
         return Place.builder()
-                .id(rs.getLong("id"))
-                .code(rs.getString("code"))
-                .defaultDays(rs.getInt("default_days"))
-                .choosable(rs.getBoolean("choosable"))
+                .id(rs.getLong(1))
+                .code(rs.getString(2))
+                .defaultDays(rs.getInt(3))
+                .choosable(rs.getBoolean(4))
                 .build();
     }
 }

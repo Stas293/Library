@@ -41,15 +41,9 @@ public interface BookQueries {
 
     String getGetAllBooksQuery(Sort sort);
 
-    String getCountSearchBooksQuery();
-
-    String getCountBooksWhichUserDidNotOrderQuery();
-
     String getBookCountQuery();
 
     String getBooksByAuthorIdQuery();
-
-    String getCountBooksWhichUserDidNotOrderQueryNoSearch();
 
     String getExistsByIsbnQuery();
 }

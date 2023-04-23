@@ -12,9 +12,9 @@ public class StatusNameCollector implements Collector<StatusName> {
     @Override
     public StatusName collect(ResultSet rs) throws SQLException {
         return StatusName.builder()
-                .id(rs.getLong("id"))
-                .name(rs.getString("name"))
-                .lang(rs.getString("lang"))
+                .id(rs.getLong(1))
+                .name(rs.getString(2))
+                .lang(rs.getString(3))
                 .build();
     }
 }

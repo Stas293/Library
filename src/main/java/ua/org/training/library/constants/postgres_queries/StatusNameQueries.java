@@ -31,7 +31,5 @@ public interface StatusNameQueries {
 
     String getGetStatusNamesByStatusIdQuery();
 
-    String getDeleteStatusNamesByStatusIdQuery();
-
     String getGetStatusNameByStatusIdAndLocaleQuery();
 }

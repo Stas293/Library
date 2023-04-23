@@ -4,6 +4,7 @@ package ua.org.training.library.constants.postgres_queries.impl;
 import ua.org.training.library.constants.postgres_queries.RoleQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.WeakConcurrentHashMap;
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.Sort;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class RoleQueriesImpl implements RoleQueries {
     private final Map<String, String> queries;
     private final QueryBuilderImpl queryBuilderImpl;
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "name");
 
     @Autowired
     public RoleQueriesImpl(QueryBuilderImpl queryBuilderImpl) {
@@ -63,34 +65,24 @@ public class RoleQueriesImpl implements RoleQueries {
 
     @Override
     public String getGetAllQuery(Sort sort) {
-        if (sort == null) {
-            return getGetAllQuery();
-        }
-        return queryBuilderImpl.setUp()
+        return String.format(queries.computeIfAbsent("getGetAllQuerySort",
+                key -> queryBuilderImpl.setUp()
                         .select("*")
                         .from("roles")
-                        .orderBy(sort)
-                        .build();
+                        .orderBy("%s")
+                        .build()), Utility.orderBy(sort, DEFAULT_SORT));
     }
 
     @Override
     public String getGetPageQuery(Pageable page) {
-        if (page == null) {
-            return queries.computeIfAbsent("getGetPageQuery",
-                    key -> queryBuilderImpl.setUp()
-                            .select("*")
-                            .from("roles")
-                            .limit("?")
-                            .offset("?")
-                            .build());
-        }
-        return queryBuilderImpl.setUp()
-                        .select("*")
+        return String.format(queries.computeIfAbsent("getGetPageQuery",
+                key -> queryBuilderImpl.setUp()
+                        .select("*, count(*) OVER() AS total")
                         .from("roles")
-                        .orderBy(page.getSort())
+                        .orderBy("%s")
                         .limit("?")
                         .offset("?")
-                        .build();
+                        .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
     }
 
     @Override

@@ -4,6 +4,7 @@ package ua.org.training.library.constants.postgres_queries.impl;
 import ua.org.training.library.constants.postgres_queries.PlaceNameQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.WeakConcurrentHashMap;
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.Sort;
@@ -16,6 +17,8 @@ import java.util.Map;
 public class PlaceNameQueriesImpl implements PlaceNameQueries {
     private final Map<String, String> queries;
     private final QueryBuilderImpl queryBuilderImpl;
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "id");
+
 
     @Autowired
     public PlaceNameQueriesImpl(QueryBuilderImpl queryBuilderImpl) {
@@ -64,32 +67,24 @@ public class PlaceNameQueriesImpl implements PlaceNameQueries {
 
     @Override
     public String getGetAllQuery(Sort sort) {
-        return queryBuilderImpl.setUp()
-                .select("*")
-                .from("place_names")
-                .orderBy(sort)
-                .build();
+        return String.format(queries.computeIfAbsent("getGetAllQuerySort",
+                key -> queryBuilderImpl.setUp()
+                        .select("*")
+                        .from("place_names")
+                        .orderBy("%s")
+                        .build()), Utility.orderBy(sort, DEFAULT_SORT));
     }
 
     @Override
     public String getGetPageQuery(Pageable page) {
-        if (page.getSort() == null) {
-            return queries.computeIfAbsent("getGetPageQuery",
-                    key -> queryBuilderImpl.setUp()
-                            .select("*")
-                            .from("place_names")
-                            .limit("?")
-                            .offset("?")
-                            .build());
-        } else {
-            return queryBuilderImpl.setUp()
-                    .select("*")
-                    .from("place_names")
-                    .orderBy(page.getSort())
-                    .limit("?")
-                    .offset("?")
-                    .build();
-        }
+        return String.format(queries.computeIfAbsent("getGetPageQuery",
+                key -> queryBuilderImpl.setUp()
+                        .select("*, COUNT(*) OVER()")
+                        .from("place_names")
+                        .orderBy("%s")
+                        .limit("?")
+                        .offset("?")
+                        .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
     }
 
     @Override

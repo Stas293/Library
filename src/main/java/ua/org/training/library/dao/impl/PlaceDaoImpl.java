@@ -16,6 +16,7 @@ import ua.org.training.library.utility.page.impl.PageImpl;
 import ua.org.training.library.utility.page.impl.Sort;
 
 import java.sql.*;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,9 +46,8 @@ public class PlaceDaoImpl implements PlaceDao {
                 if (rs.next()) {
                     model.setId(rs.getLong(1));
                     return model;
-                } else {
-                    throw new DaoException("Error creating order: " + model);
                 }
+                throw new DaoException("Error creating order: " + model);
             }
         } catch (SQLException e) {
             log.error("Error creating order: {}", e.getMessage());
@@ -91,10 +91,9 @@ public class PlaceDaoImpl implements PlaceDao {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return Optional.of(placeCollector.collect(rs));
-                } else {
-                    return Optional.empty();
                 }
             }
+            return Optional.empty();
         } catch (SQLException e) {
             log.error("Error getting place by id: {}", e.getMessage());
             throw new DaoException("Error getting place by id: " + id, e);
@@ -105,6 +104,8 @@ public class PlaceDaoImpl implements PlaceDao {
     public List<Place> getByIds(Connection connection, List<Long> ids) {
         log.info("Getting places by ids: {}", ids);
         try (PreparedStatement ps = connection.prepareStatement(placeQueries.getGetByIdsQuery(ids.size()))) {
+            ps.setFetchSize(ids.size());
+            ps.setFetchDirection(ResultSet.FETCH_FORWARD);
             for (int i = 0; i < ids.size(); i++) {
                 ps.setLong(i + 1, ids.get(i));
             }
@@ -121,6 +122,8 @@ public class PlaceDaoImpl implements PlaceDao {
     public List<Place> getAll(Connection connection) {
         log.info("Getting all places");
         try (PreparedStatement ps = connection.prepareStatement(placeQueries.getGetAllQuery())) {
+            ps.setFetchSize(100);
+            ps.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet rs = ps.executeQuery()) {
                 return placeCollector.collectList(rs);
             }
@@ -134,6 +137,8 @@ public class PlaceDaoImpl implements PlaceDao {
     public List<Place> getAll(Connection connection, Sort sort) {
         log.info("Getting all places");
         try (PreparedStatement ps = connection.prepareStatement(placeQueries.getGetAllQuery(sort))) {
+            ps.setFetchSize(100);
+            ps.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet rs = ps.executeQuery()) {
                 return placeCollector.collectList(rs);
             }
@@ -146,11 +151,20 @@ public class PlaceDaoImpl implements PlaceDao {
     @Override
     public Page<Place> getPage(Connection connection, Pageable page) {
         log.info("Getting page of places");
-        try (PreparedStatement ps = connection.prepareStatement(placeQueries.getGetPageQuery(page))) {
+        try (PreparedStatement ps = connection.prepareStatement(placeQueries.getGetPageQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            ps.setFetchSize(page.getPageSize());
+            ps.setFetchDirection(ResultSet.FETCH_FORWARD);
             ps.setInt(1, page.getPageSize());
             ps.setLong(2, page.getOffset());
             try (ResultSet rs = ps.executeQuery()) {
-                return new PageImpl<>(placeCollector.collectList(rs), page, count(connection));
+                List<Place> content = placeCollector.collectList(rs);
+                rs.last();
+                if (rs.getRow() == 0) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(content, page, rs.getLong(5));
             }
         } catch (SQLException e) {
             log.error("Error getting page of places: {}", e.getMessage());
@@ -192,9 +206,8 @@ public class PlaceDaoImpl implements PlaceDao {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getLong(1);
-                } else {
-                    throw new DaoException("Error counting places");
                 }
+                throw new DaoException("Error counting places");
             }
         } catch (SQLException e) {
             log.error("Error counting places: {}", e.getMessage());
@@ -253,10 +266,9 @@ public class PlaceDaoImpl implements PlaceDao {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return Optional.of(placeCollector.collect(rs));
-                } else {
-                    return Optional.empty();
                 }
             }
+            return Optional.empty();
         } catch (SQLException e) {
             log.error("Error getting place by order id: {}", e.getMessage());
             throw new DaoException("Error getting place by order id: " + id, e);
@@ -271,10 +283,9 @@ public class PlaceDaoImpl implements PlaceDao {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return Optional.of(placeCollector.collect(rs));
-                } else {
-                    return Optional.empty();
                 }
             }
+            return Optional.empty();
         } catch (SQLException e) {
             log.error("Error getting place by name: {}", e.getMessage());
             throw new DaoException("Error getting place by name: " + name, e);

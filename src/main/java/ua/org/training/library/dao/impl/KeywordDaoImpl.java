@@ -16,6 +16,7 @@ import ua.org.training.library.utility.page.impl.PageImpl;
 import ua.org.training.library.utility.page.impl.Sort;
 
 import java.sql.*;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,9 +45,8 @@ public class KeywordDaoImpl implements KeywordDao {
                 if (rs.next()) {
                     model.setId(rs.getLong(1));
                     return model;
-                } else {
-                    throw new SQLException("Error creating keyword: no ID obtained.");
                 }
+                throw new SQLException("Error creating keyword: no ID obtained.");
             }
         } catch (SQLException ex) {
             log.error("Error creating keyword: {}", ex.getMessage());
@@ -90,9 +90,8 @@ public class KeywordDaoImpl implements KeywordDao {
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
                     return Optional.of(keywordCollector.collect(rs));
-                } else {
-                    return Optional.empty();
                 }
+                return Optional.empty();
             }
         } catch (SQLException ex) {
             log.error("Error getting keyword by id: {}", ex.getMessage());
@@ -105,6 +104,8 @@ public class KeywordDaoImpl implements KeywordDao {
         log.info("Getting keywords by ids: {}", ids);
         try (PreparedStatement statement = connection.prepareStatement(
                 keywordQueries.getSelectByIdsQuery(ids.size()))) {
+            statement.setFetchSize(ids.size());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             for (int i = 0; i < ids.size(); i++) {
                 statement.setLong(i + 1, ids.get(i));
             }
@@ -122,6 +123,8 @@ public class KeywordDaoImpl implements KeywordDao {
         log.info("Getting all keywords");
         try (PreparedStatement statement = connection.prepareStatement(
                 keywordQueries.getSelectAllQuery())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet rs = statement.executeQuery()) {
                 return keywordCollector.collectList(rs);
             }
@@ -136,6 +139,8 @@ public class KeywordDaoImpl implements KeywordDao {
         log.info("Getting all keywords");
         try (PreparedStatement statement = connection.prepareStatement(
                 keywordQueries.getSelectAllQuery(sort))) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet rs = statement.executeQuery()) {
                 return keywordCollector.collectList(rs);
             }
@@ -149,11 +154,20 @@ public class KeywordDaoImpl implements KeywordDao {
     public Page<Keyword> getPage(Connection connection, Pageable page) {
         log.info("Getting page of keywords");
         try (PreparedStatement statement = connection.prepareStatement(
-                keywordQueries.getSelectAllQuery(page))) {
+                keywordQueries.getSelectAllQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            statement.setFetchSize(page.getPageSize());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setInt(1, page.getPageSize());
             statement.setLong(2, page.getOffset());
             try (ResultSet rs = statement.executeQuery()) {
-                return new PageImpl<>(keywordCollector.collectList(rs), page, count(connection));
+                List<Keyword> keywords = keywordCollector.collectList(rs);
+                rs.last();
+                if (rs.getRow() == 0) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(keywords, page, rs.getLong(3));
             }
         } catch (SQLException ex) {
             log.error("Error getting page of keywords: {}", ex.getMessage());
@@ -193,6 +207,7 @@ public class KeywordDaoImpl implements KeywordDao {
         log.info("Counting keywords");
         try (PreparedStatement statement = conn.prepareStatement(
                 keywordQueries.getCountQuery())) {
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
                     return rs.getLong(1);
@@ -255,6 +270,8 @@ public class KeywordDaoImpl implements KeywordDao {
         log.info("Getting keywords by book id: {}", id);
         try (PreparedStatement statement = connection.prepareStatement(
                 keywordQueries.getSelectByBookIdQuery())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setLong(1, id);
             try (ResultSet rs = statement.executeQuery()) {
                 return keywordCollector.collectList(rs);
@@ -277,6 +294,9 @@ public class KeywordDaoImpl implements KeywordDao {
         log.info("Getting keywords by query: {}", query);
         try (PreparedStatement statement = conn.prepareStatement(
                 keywordQueries.getSelectByQueryQuery())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
+            statement.setQueryTimeout(5);
             statement.setString(1, "%" + query + "%");
             try (ResultSet rs = statement.executeQuery()) {
                 return keywordCollector.collectList(rs);
@@ -292,6 +312,9 @@ public class KeywordDaoImpl implements KeywordDao {
         log.info("Getting keyword by data: {}", keyword);
         try (PreparedStatement statement = conn.prepareStatement(
                 keywordQueries.getSelectByDataQuery())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
+            statement.setQueryTimeout(5);
             statement.setString(1, keyword);
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {

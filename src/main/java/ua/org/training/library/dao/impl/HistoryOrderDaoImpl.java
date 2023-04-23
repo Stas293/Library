@@ -16,6 +16,7 @@ import ua.org.training.library.utility.page.impl.PageImpl;
 import ua.org.training.library.utility.page.impl.Sort;
 
 import java.sql.*;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,8 +39,8 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
         try (PreparedStatement statement = connection.prepareStatement(
                 historyOrderQueries.getCreateQuery(), Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, model.getBookTitle());
-            statement.setDate(2, Date.valueOf(model.getDateCreated()));
-            statement.setDate(3, model.getDateReturned() == null ? null : Date.valueOf(model.getDateReturned()));
+            statement.setObject(2, model.getDateCreated());
+            statement.setObject(3, model.getDateReturned());
             statement.setLong(4, model.getUser().getId());
             statement.setLong(5, model.getStatus().getId());
             statement.executeUpdate();
@@ -47,9 +48,8 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
                 if (generatedKeys.next()) {
                     model.setId(generatedKeys.getLong(1));
                     return model;
-                } else {
-                    throw new SQLException("Creating history order failed, no ID obtained.");
                 }
+                throw new SQLException("Creating history order failed, no ID obtained.");
             }
         } catch (SQLException e) {
             log.error("Error creating history order: {}", e.getMessage());
@@ -65,8 +65,8 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
                 Statement.RETURN_GENERATED_KEYS)) {
             for (HistoryOrder model : models) {
                 statement.setString(1, model.getBookTitle());
-                statement.setDate(2, Date.valueOf(model.getDateCreated()));
-                statement.setDate(3, Date.valueOf(model.getDateReturned()));
+                statement.setObject(2, model.getDateCreated());
+                statement.setObject(3, model.getDateReturned());
                 statement.setLong(4, model.getUser().getId());
                 statement.setLong(5, model.getStatus().getId());
                 statement.addBatch();
@@ -93,6 +93,7 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
         log.info("Getting history order by id: {}", id);
         try (PreparedStatement statement = connection.prepareStatement(
                 historyOrderQueries.getSelectByIdQuery())) {
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setLong(1, id);
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
@@ -111,6 +112,8 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
         log.info("Getting history orders by ids: {}", ids);
         try (PreparedStatement statement = connection.prepareStatement(
                 historyOrderQueries.getSelectByIdsQuery(ids.size()))) {
+            statement.setFetchSize(ids.size());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             for (int i = 0; i < ids.size(); i++) {
                 statement.setLong(i + 1, ids.get(i));
             }
@@ -128,6 +131,8 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
         log.info("Getting all history orders");
         try (PreparedStatement statement = connection.prepareStatement(
                 historyOrderQueries.getSelectAllQuery())) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet rs = statement.executeQuery()) {
                 return historyOrderCollector.collectList(rs);
             }
@@ -142,6 +147,8 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
         log.info("Getting all history orders");
         try (PreparedStatement statement = connection.prepareStatement(
                 historyOrderQueries.getSelectAllQuery(sort))) {
+            statement.setFetchSize(100);
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet rs = statement.executeQuery()) {
                 return historyOrderCollector.collectList(rs);
             }
@@ -155,11 +162,20 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
     public Page<HistoryOrder> getPage(Connection connection, Pageable page) {
         log.info("Getting page of history orders");
         try (PreparedStatement statement = connection.prepareStatement(
-                historyOrderQueries.getSelectAllQuery(page))) {
+                historyOrderQueries.getSelectAllQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            statement.setFetchSize(page.getPageSize());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setInt(1, page.getPageSize());
             statement.setLong(2, page.getOffset());
             try (ResultSet rs = statement.executeQuery()) {
-                return new PageImpl<>(historyOrderCollector.collectList(rs), page, count(connection));
+                List<HistoryOrder> historyOrders = historyOrderCollector.collectList(rs);
+                rs.last();
+                if (rs.getRow() == 0) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(historyOrders, page, rs.getRow());
             }
         } catch (SQLException e) {
             log.error("Error getting page of history orders: {}", e.getMessage());
@@ -173,8 +189,8 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
         try (PreparedStatement statement = connection.prepareStatement(
                 historyOrderQueries.getUpdateQuery())) {
             statement.setString(1, entity.getBookTitle());
-            statement.setDate(2, Date.valueOf(entity.getDateCreated()));
-            statement.setDate(3, Date.valueOf(entity.getDateReturned()));
+            statement.setObject(2, entity.getDateCreated());
+            statement.setObject(3, entity.getDateReturned());
             statement.setLong(4, entity.getUser().getId());
             statement.setLong(5, entity.getStatus().getId());
             statement.setLong(6, entity.getId());
@@ -203,6 +219,7 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
         log.info("Counting history orders");
         try (PreparedStatement statement = conn.prepareStatement(
                 historyOrderQueries.getCountQuery())) {
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
                     return rs.getLong(1);
@@ -249,8 +266,8 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
                 historyOrderQueries.getUpdateQuery())) {
             for (HistoryOrder entity : entities) {
                 statement.setString(1, entity.getBookTitle());
-                statement.setDate(2, Date.valueOf(entity.getDateCreated()));
-                statement.setDate(3, Date.valueOf(entity.getDateReturned()));
+                statement.setObject(2, entity.getDateCreated());
+                statement.setObject(3, entity.getDateReturned());
                 statement.setLong(4, entity.getUser().getId());
                 statement.setLong(5, entity.getStatus().getId());
                 statement.setLong(6, entity.getId());
@@ -267,12 +284,21 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
     public Page<HistoryOrder> getPageByUserId(Connection conn, Pageable page, Long userId) {
         log.info("Getting page of history orders by user id: {}", userId);
         try (PreparedStatement statement = conn.prepareStatement(
-                historyOrderQueries.getSelectAllByUserIdQuery(page))) {
+                historyOrderQueries.getSelectAllByUserIdQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            statement.setFetchSize(page.getPageSize());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setLong(1, userId);
             statement.setInt(2, page.getPageSize());
             statement.setLong(3, page.getOffset());
             try (ResultSet rs = statement.executeQuery()) {
-                return new PageImpl<>(historyOrderCollector.collectList(rs), page, countByUserId(conn, userId));
+                List<HistoryOrder> historyOrders = historyOrderCollector.collectList(rs);
+                rs.last();
+                if (rs.getRow() == 0) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(historyOrders, page, rs.getLong(7));
             }
         } catch (SQLException e) {
             log.error("Error getting page of history orders by user id: {}", e.getMessage());
@@ -284,52 +310,27 @@ public class HistoryOrderDaoImpl implements HistoryOrderDao {
     public Page<HistoryOrder> getPageByUserIdAndSearch(Connection conn, Pageable page, Long id, String search) {
         log.info("Getting page of history orders by user id: {} and search: {}", id, search);
         try (PreparedStatement statement = conn.prepareStatement(
-                historyOrderQueries.getSelectAllByUserIdAndSearchQuery(page))) {
+                historyOrderQueries.getSelectAllByUserIdAndSearchQuery(page),
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            log.info("Statement: {}", statement);
+            statement.setFetchSize(page.getPageSize());
+            statement.setFetchDirection(ResultSet.FETCH_FORWARD);
             statement.setLong(1, id);
             statement.setString(2, "%" + search + "%");
             statement.setInt(3, page.getPageSize());
             statement.setLong(4, page.getOffset());
             try (ResultSet rs = statement.executeQuery()) {
-                return new PageImpl<>(historyOrderCollector.collectList(rs), page, countByUserIdAndSearch(conn, id, search));
+                List<HistoryOrder> historyOrders = historyOrderCollector.collectList(rs);
+                rs.last();
+                if (rs.getRow() == 0) {
+                    return new PageImpl<>(Collections.emptyList(), page, 0);
+                }
+                return new PageImpl<>(historyOrders, page, rs.getLong(7));
             }
         } catch (SQLException e) {
             log.error("Error getting page of history orders by user id: {} and search: {}", e.getMessage());
             throw new DaoException("Error getting page of history orders by user id: " + e.getMessage(), e);
-        }
-    }
-
-    private long countByUserIdAndSearch(Connection conn, Long id, String search) {
-        log.info("Counting history orders by user id: {} and search: {}", id, search);
-        try (PreparedStatement statement = conn.prepareStatement(
-                historyOrderQueries.getCountByUserIdAndSearchQuery())) {
-            statement.setLong(1, id);
-            statement.setString(2, "%" + search + "%");
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getLong(1);
-                }
-            }
-            return 0;
-        } catch (SQLException e) {
-            log.error("Error counting history orders by user id: {} and search: {}", e.getMessage());
-            throw new DaoException("Error counting history orders by user id: " + e.getMessage(), e);
-        }
-    }
-
-    private long countByUserId(Connection conn, Long userId) {
-        log.info("Counting history orders by user id: {}", userId);
-        try (PreparedStatement statement = conn.prepareStatement(
-                historyOrderQueries.getCountByUserIdQuery())) {
-            statement.setLong(1, userId);
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getLong(1);
-                }
-            }
-            return 0;
-        } catch (SQLException e) {
-            log.error("Error counting history orders by user id: {}", e.getMessage());
-            throw new DaoException("Error counting history orders by user id: " + e.getMessage(), e);
         }
     }
 }

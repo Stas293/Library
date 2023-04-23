@@ -13,10 +13,10 @@ public class AuthorCollector implements Collector<Author> {
     @Override
     public Author collect(@NotNull ResultSet rs) throws SQLException {
         return Author.builder()
-                .id(rs.getLong("id"))
-                .firstName(rs.getString("first_name"))
-                .middleName(rs.getString("middle_name"))
-                .lastName(rs.getString("last_name"))
+                .id(rs.getLong(1))
+                .firstName(rs.getString(2))
+                .middleName(rs.getString(4))
+                .lastName(rs.getString(3))
                 .build();
     }
 }
