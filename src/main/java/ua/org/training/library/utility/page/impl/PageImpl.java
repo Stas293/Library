@@ -2,12 +2,14 @@ package ua.org.training.library.utility.page.impl;
 
 
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
 
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class PageImpl<T> extends Chunk<T> implements Page<T> {
     private final long total;
 
@@ -37,14 +39,6 @@ public class PageImpl<T> extends Chunk<T> implements Page<T> {
     }
     public boolean isLast() {
         return !this.hasNext();
-    }
-
-    @Override
-    public String toString() {
-        return "PageImpl{" +
-                "total=" + total +
-                super.toString() +
-                '}';
     }
 }
 

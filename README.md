@@ -4,7 +4,7 @@
 
 ## Description
 
-I have created my own application context in this application. There is not Spring in this project. I have used the following technologies:
+My application context is used in this project. There is no Spring in this project. The following technologies are used:
 - Java 20 (+Virtual Threads)
 - JDBC
 - PostgreSQL
@@ -17,17 +17,21 @@ I have created my own application context in this application. There is not Spri
 - Tomcat 11
 
 The reader registers in the system and then can:
-- search (by author / title);
+- search (by author (s) / title / description / ISBN / keywords) and view books from the catalog;
 - place an order for a Book from the Catalog.
-  An unregistered reader cannot order a book.
+  A non-registered reader cannot order a book.
   
-For the catalog the ability to sort books has to be implemented:
+For the catalog the ability to sort books is implemented:
 - by name;
-- by author;
-- by publication;
+- by author (s);
+- by ISBN;
 - by date of publication.
   
-The librarian gives the reader a book on a subscription or to the reading room. The book is issued to the reader for a certain period. If the book is not returned within the specified period, the reader will be fined. The book may be present in the library in one or more copies. The system keeps track of the available number of books. Each user has a personal account that displays registration information
+The librarian gives the reader a book on a subscription or to the reading room. 
+The book is issued to the reader for a certain period. If the book is not returned within the specified period, 
+the reader will be fined. The book may be present in the library in one or more copies. 
+The system keeps track of the available number of books. 
+Each user has a personal account that displays registration information
 
 And also:
 1) for reader:
@@ -37,7 +41,7 @@ And also:
 - list of readers and their subscriptions.
 3) the system administrator has the rights:
 - adding / deleting a book, editing information about the book;
-- create / delete librarian;
+- change user`s roles;
 - blocking / unblocking the user.
 
 ## How to run

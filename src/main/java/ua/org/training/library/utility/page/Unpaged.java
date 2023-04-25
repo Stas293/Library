@@ -1,8 +1,10 @@
 package ua.org.training.library.utility.page;
 
 
+import lombok.ToString;
 import ua.org.training.library.utility.page.impl.Sort;
 
+@ToString
 enum Unpaged implements Pageable {
     INSTANCE;
 

@@ -2,6 +2,7 @@ package ua.org.training.library.utility.page.impl;
 
 
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.Slice;
 
@@ -12,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @EqualsAndHashCode
+@ToString
 abstract class Chunk<T> implements Slice<T>, Serializable {
     private final List<T> content = new ArrayList<>();
     private final Pageable pageable;
@@ -63,14 +65,6 @@ abstract class Chunk<T> implements Slice<T>, Serializable {
 
     public Iterator<T> iterator() {
         return this.content.iterator();
-    }
-
-    @Override
-    public String toString() {
-        return "Chunk{" +
-                "content=" + content +
-                ", pageable=" + pageable +
-                '}';
     }
 }
 

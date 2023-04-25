@@ -27,12 +27,10 @@ public class ApplicationInitializer {
     }
 
     public List<Class<?>> sortBeans(Set<Class<?>> beans) {
-        List<Class<?>> sortedBeans;
-        Set<Class<?>> visitedBeans = new HashSet<>();
-
-        sortedBeans = beans.parallelStream()
+        List<Class<?>> sortedBeans = beans.parallelStream()
                 .filter(bean -> bean.isAnnotationPresent(ContextInitClass.class))
                 .collect(Collectors.toList());
+        Set<Class<?>> visitedBeans = new HashSet<>(sortedBeans);
 
         beans.stream()
                 .filter(bean -> !visitedBeans.contains(bean))
@@ -54,8 +52,6 @@ public class ApplicationInitializer {
 
         sortedBeans.add(bean);
     }
-
-
 
 
     public void addShutdownHook() {

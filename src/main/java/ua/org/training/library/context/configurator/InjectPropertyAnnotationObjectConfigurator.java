@@ -4,8 +4,8 @@ package ua.org.training.library.context.configurator;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import ua.org.training.library.context.AnnotationConfigApplicationContext;
+import ua.org.training.library.context.annotations.ClassManagerType;
 import ua.org.training.library.context.annotations.Component;
-import ua.org.training.library.context.annotations.FieldSetterType;
 import ua.org.training.library.context.annotations.InjectProperty;
 import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.field_setters.FieldSetter;
@@ -69,9 +69,9 @@ public class InjectPropertyAnnotationObjectConfigurator implements ObjectConfigu
     }
 
     private void fillMapWithFieldSetters(Class<?> key, FieldSetter value) {
-        FieldSetterType annotation = key.getAnnotation(FieldSetterType.class);
+        ClassManagerType annotation = key.getAnnotation(ClassManagerType.class);
         if (annotation == null) {
-            throw new RuntimeException("FieldSetterType annotation is not present");
+            throw new RuntimeException("ClassManagerType annotation is not present");
         }
         Class<?>[] classesToCastTo = annotation.values();
         Arrays.stream(classesToCastTo).forEach(classToCastTo -> fieldSetters.put(classToCastTo, value));

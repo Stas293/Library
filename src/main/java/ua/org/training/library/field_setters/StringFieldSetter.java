@@ -2,13 +2,13 @@ package ua.org.training.library.field_setters;
 
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.context.annotations.ContextInitClass;
-import ua.org.training.library.context.annotations.FieldSetterType;
+import ua.org.training.library.context.annotations.ClassManagerType;
 
 import java.lang.reflect.Field;
 
 @Component
 @ContextInitClass
-@FieldSetterType(values = {String.class})
+@ClassManagerType(values = {String.class})
 public class StringFieldSetter implements FieldSetter {
     @Override
     public void setField(Field field, Object obj, String value) throws IllegalAccessException {

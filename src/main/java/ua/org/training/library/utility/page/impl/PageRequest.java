@@ -1,5 +1,10 @@
 package ua.org.training.library.utility.page.impl;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+@EqualsAndHashCode(callSuper = false)
+@ToString
 public class PageRequest extends AbstractPageRequest {
     private final Sort sort;
 
@@ -40,16 +45,6 @@ public class PageRequest extends AbstractPageRequest {
         return new PageRequest(0, this.getPageSize(), this.getSort());
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        } else if ((obj instanceof PageRequest that)) {
-            return super.equals(that) && this.sort.equals(that.sort);
-        }
-        return false;
-    }
-
     public PageRequest withPage(int pageNumber) {
         return new PageRequest(pageNumber, this.getPageSize(), this.getSort());
     }
@@ -60,14 +55,6 @@ public class PageRequest extends AbstractPageRequest {
 
     public PageRequest withSort(Sort sort) {
         return new PageRequest(this.getPageNumber(), this.getPageSize(), sort);
-    }
-
-    public int hashCode() {
-        return 31 * super.hashCode() + this.sort.hashCode();
-    }
-
-    public String toString() {
-        return String.format("Page request [number: %d, size %d, sort: %s]", this.getPageNumber(), this.getPageSize(), this.sort);
     }
 }
 

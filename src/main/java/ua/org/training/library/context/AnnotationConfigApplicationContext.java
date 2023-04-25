@@ -32,9 +32,14 @@ public class AnnotationConfigApplicationContext {
             return tClass.cast(cache.get(tClass));
         }
 
-        for (Map.Entry<Class<?>, Object> entry : cache.entrySet()) {
-            if (checkIfClassIsPresent(tClass, entry, qualifiers))
-                return tClass.cast(entry.getValue());
+        T object = cache.entrySet().parallelStream()
+                .filter(entry -> entry.getKey().isAssignableFrom(tClass))
+                .filter(entry -> checkIfClassIsPresent(tClass, entry, qualifiers))
+                .map(entry -> tClass.cast(entry.getValue()))
+                .findFirst()
+                .orElse(null);
+        if (object != null) {
+            return object;
         }
 
         log.info("Creating new object {}", tClass);
@@ -47,22 +52,20 @@ public class AnnotationConfigApplicationContext {
         return t;
     }
 
-    private static <T> boolean checkIfClassIsPresent(Class<? extends T> tClass,
-                                                     Map.Entry<Class<?>, Object> entry,
-                                                     String[] qualifiers) {
-        if (tClass.isAssignableFrom(entry.getKey())) {
-            if (qualifiers.length == 1 &&
-                    (entry.getKey().isAnnotationPresent(Component.class) &&
-                            (entry.getKey().getAnnotation(Component.class).value()
-                                    .equals(qualifiers[0])))) {
-                log.info("Qualifier {} found for {}", qualifiers[0], tClass);
-                log.info("Assigning object {} to {}", entry.getValue(), tClass);
-                return true;
-            } else if (qualifiers.length == 0) {
-                log.info("No qualifier found for {}", tClass);
-                log.info("Assigning object {} to {}", entry.getValue(), tClass);
-                return true;
-            }
+    private <T> boolean checkIfClassIsPresent(Class<? extends T> tClass,
+                                              Map.Entry<Class<?>, Object> entry,
+                                              String[] qualifiers) {
+        if (qualifiers.length == 1 &&
+                (entry.getKey().isAnnotationPresent(Component.class) &&
+                        (entry.getKey().getAnnotation(Component.class).value()
+                                .equals(qualifiers[0])))) {
+            log.info("Qualifier {} found for {}", qualifiers[0], tClass);
+            log.info("Assigning object {} to {}", entry.getValue(), tClass);
+            return true;
+        } else if (qualifiers.length == 0) {
+            log.info("No qualifier found for {}", tClass);
+            log.info("Assigning object {} to {}", entry.getValue(), tClass);
+            return true;
         }
         return false;
     }

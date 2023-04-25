@@ -1,10 +1,14 @@
 package ua.org.training.library.utility.page.impl;
 
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import ua.org.training.library.utility.page.Pageable;
 
 import java.io.Serializable;
 
+@EqualsAndHashCode
+@ToString
 public abstract class AbstractPageRequest implements Pageable, Serializable {
     private final int page;
     private final int size;
@@ -41,22 +45,4 @@ public abstract class AbstractPageRequest implements Pageable, Serializable {
     }
 
     public abstract Pageable previous();
-
-    public int hashCode() {
-        int result = 1;
-        result = 31 * result + this.page;
-        result = 31 * result + this.size;
-        return result;
-    }
-
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        } else if (obj != null && this.getClass() == obj.getClass()) {
-            AbstractPageRequest other = (AbstractPageRequest)obj;
-            return this.page == other.page && this.size == other.size;
-        } else {
-            return false;
-        }
-    }
 }

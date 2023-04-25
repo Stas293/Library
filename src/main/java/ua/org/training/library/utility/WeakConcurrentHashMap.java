@@ -3,17 +3,13 @@ package ua.org.training.library.utility;
 import lombok.EqualsAndHashCode;
 
 import java.lang.ref.WeakReference;
-import java.util.AbstractMap;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 @EqualsAndHashCode(callSuper = true)
 public class WeakConcurrentHashMap<K, V> extends AbstractMap<K, V> {
 
-    private final ConcurrentMap<K, WeakReference<V>> cache;
+    private final Map<K, WeakReference<V>> cache;
 
     public WeakConcurrentHashMap() {
         cache = new ConcurrentHashMap<>();
