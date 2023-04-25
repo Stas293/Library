@@ -14,7 +14,10 @@ import java.lang.invoke.MethodHandle;
 @ClassManagerType(values = {Put.class})
 public class PutHttpMappingCommand implements HttpMappingCommand {
     @Override
-    public HttpMapping createHttpMapping(MethodHandle method, String path, Object controller, Annotation annotation) {
+    public HttpMapping createHttpMapping(MethodHandle method,
+                                         String path,
+                                         Object controller,
+                                         Annotation annotation) {
         Put put = (Put) annotation;
         String value = put.value();
         return new HttpMapping(RequestMethod.PUT.name(), path + value, method, controller);

@@ -71,9 +71,13 @@
                         <tr>
                             <th id="book_title" scope="col"><fmt:message key="orderList.table.title"/></th>
                             <th id="isbn" scope="col"><fmt:message key="orderList.table.ISBN"/></th>
+                            <th id="date_created" scope="col"><fmt:message key="orderList.table.dateCreated"/></th>
                             <th id="date_publication" scope="col"><fmt:message
                                     key="orderList.table.date_publication"/></th>
+                            <th id="place" scope="col"><fmt:message key="orderList.table.place"/></th>
+                            <th id="date_expire" scope="col"><fmt:message key="orderList.table.dateExpire"/></th>
                             <th id="book_authors" scope="col"><fmt:message key="orderList.table.authors"/></th>
+                            <th id="fine" scope="col"><fmt:message key="orderList.table.fine"/></th>
                         </tr>
                         </thead>
                         <tbody id="pageable-list">

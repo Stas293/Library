@@ -14,7 +14,10 @@ import java.lang.invoke.MethodHandle;
 @ClassManagerType(values = {Get.class})
 public class GetMappingCommand implements HttpMappingCommand {
     @Override
-    public HttpMapping createHttpMapping(MethodHandle method, String path, Object controller, Annotation annotation) {
+    public HttpMapping createHttpMapping(MethodHandle method,
+                                         String path,
+                                         Object controller,
+                                         Annotation annotation) {
         Get get = (Get) annotation;
         String value = get.value();
         return new HttpMapping(RequestMethod.GET.name(), path + value, method, controller);

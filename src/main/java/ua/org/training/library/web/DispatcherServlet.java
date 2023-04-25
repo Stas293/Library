@@ -1,7 +1,6 @@
 package ua.org.training.library.web;
 
 
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,7 +18,6 @@ import java.lang.invoke.MethodHandle;
 @Component
 @Slf4j
 @AllArgsConstructor(onConstructor = @__(@Autowired))
-@WebServlet
 public class DispatcherServlet extends HttpServlet {
     private final ControllerFactory controllerFactory;
     private final HttpServletRequestMethodMapper mapper;

@@ -313,6 +313,8 @@ public class OrderDaoImpl implements OrderDao {
                 orderQueries.getSelectAllByStatusAndUserIdQuery(page),
                 ResultSet.TYPE_SCROLL_INSENSITIVE,
                 ResultSet.CONCUR_READ_ONLY)) {
+            log.info("Getting page of orders by status id: {} and user id: {}", statusId, userId);
+            log.info("Query: {}", orderQueries.getSelectAllByStatusAndUserIdQuery(page));
             ps.setFetchSize(page.getPageSize());
             ps.setFetchDirection(ResultSet.FETCH_FORWARD);
             ps.setLong(1, statusId);

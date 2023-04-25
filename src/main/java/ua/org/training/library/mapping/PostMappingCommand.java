@@ -14,7 +14,10 @@ import java.lang.invoke.MethodHandle;
 @ClassManagerType(values = {Post.class})
 public class PostMappingCommand implements HttpMappingCommand {
     @Override
-    public HttpMapping createHttpMapping(MethodHandle method, String path, Object controller, Annotation annotation) {
+    public HttpMapping createHttpMapping(MethodHandle method,
+                                         String path,
+                                         Object controller,
+                                         Annotation annotation) {
         Post post = (Post) annotation;
         String value = post.value();
         return new HttpMapping(RequestMethod.POST.name(), path + value, method, controller);

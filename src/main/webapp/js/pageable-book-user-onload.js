@@ -5,20 +5,66 @@ const urlAcceptedOrders = `/library/order/user/get-order?statusCode=ACCEPT`;
 const createOrderPath = `/library/order/user`;
 const urlGetOrder = `/library/order/user/view`;
 
+function setUserPageBookListeners() {
+    const book_title = document.querySelector("#book_title");
+    const isbn = document.querySelector("#isbn");
+    const date_publication = document.querySelector("#date_publication");
+    const book_authors = document.querySelector("#book_authors");
+    const date_created = document.querySelector("#date_created");
+    const place = document.querySelector("#place");
+    const date_expire = document.querySelector("#date_expire");
+    const fine = document.querySelector("#fine");
+    date_created.onclick = function () {
+        sortBy = "date_created";
+        func(urlPath);
+    }
+    date_expire.onclick = function () {
+        sortBy = "date_expire";
+        func(urlPath);
+    }
+    place.onclick = function () {
+        sortBy = "code";
+        func(urlPath);
+    }
+    book_title.onclick = function () {
+        sortBy = "title";
+        func(urlPath);
+    };
+    isbn.onclick = function () {
+        sortBy = "isbn";
+        func(urlPath);
+    };
+    date_publication.onclick = function () {
+        sortBy = "date_publication";
+        func(urlPath);
+    };
+    book_authors.onclick = function () {
+        sortBy = "last_name";
+        func(urlPath);
+    };
+    fine.onclick = function () {
+        sortBy = "fine";
+        func(urlPath);
+    }
+    sortBy = "title";
+}
+
 window.onload = () => {
     urlPath = urlMakeOrders;
-    setBookListeners(urlPath);
+    setTableHeadersDefault();
+    setUserPageBookListeners();
     wizard(urlPath);
 }
 
 function setTableHeadersDefault() {
-    let isbn = document.querySelector(`#isbn`);
-    let date_publication = document.querySelector(`#date_publication`);
-    let authors = document.querySelector(`#book_authors`);
-
-    isbn.innerHTML = document.querySelector(`#label_ISBN`).innerHTML;
-    date_publication.innerHTML = document.querySelector(`#label_date_publication`).innerHTML;
-    authors.innerHTML = document.querySelector(`#label_authors`).innerHTML;
+    document.querySelector("#book_title").setAttribute('style', 'display');
+    document.querySelector("#isbn").setAttribute('style', 'display');
+    document.querySelector("#date_publication").setAttribute('style', 'display');
+    document.querySelector("#book_authors").setAttribute('style', 'display');
+    document.querySelector("#date_created").style.display = "none";
+    document.querySelector("#place").style.display = "none";
+    document.querySelector("#date_expire").style.display = "none";
+    document.querySelector("#fine").style.display = "none";
 }
 
 const listOrderToChoose = () => {
@@ -31,13 +77,14 @@ const listOrderToChoose = () => {
 }
 
 function setTableHeadersGetOrder() {
-    let isbn = document.querySelector(`#isbn`);
-    let date_publication = document.querySelector(`#date_publication`);
-    let authors = document.querySelector(`#book_authors`);
-
-    isbn.innerHTML = document.querySelector(`#label_date_created`).innerHTML;
-    date_publication.innerHTML = document.querySelector(`#label_place`).innerHTML;
-    authors.innerHTML = document.querySelector(`#label_fine`).innerHTML;
+    document.querySelector("#book_title").setAttribute('style', 'display');
+    document.querySelector("#isbn").setAttribute('style', 'display:none');
+    document.querySelector("#date_publication").setAttribute('style', 'display:none');
+    document.querySelector("#book_authors").setAttribute('style', 'display:none');
+    document.querySelector("#date_created").setAttribute('style', 'display');
+    document.querySelector("#place").setAttribute('style', 'display');
+    document.querySelector("#date_expire").setAttribute('style', 'display:none');
+    document.querySelector("#fine").setAttribute('style', 'display');
 }
 
 const listRegisteredOrders = () => {
@@ -50,13 +97,14 @@ const listRegisteredOrders = () => {
 }
 
 function setTableHeadersAcceptOrder() {
-    let isbn = document.querySelector(`#isbn`);
-    let date_publication = document.querySelector(`#date_publication`);
-    let authors = document.querySelector(`#book_authors`);
-
-    isbn.innerHTML = document.querySelector(`#label_date_expire`).innerHTML;
-    date_publication.innerHTML = document.querySelector(`#label_place`).innerHTML;
-    authors.innerHTML = document.querySelector(`#label_fine`).innerHTML;
+    document.querySelector("#book_title").setAttribute('style', 'display');
+    document.querySelector("#isbn").setAttribute('style', 'display:none');
+    document.querySelector("#date_publication").setAttribute('style', 'display:none');
+    document.querySelector("#book_authors").setAttribute('style', 'display:none');
+    document.querySelector("#date_created").setAttribute('style', 'display:none');
+    document.querySelector("#place").setAttribute('style', 'display');
+    document.querySelector("#date_expire").setAttribute('style', 'display');
+    document.querySelector("#fine").setAttribute('style', 'display');
 }
 
 const listAcceptedOrder = () => {

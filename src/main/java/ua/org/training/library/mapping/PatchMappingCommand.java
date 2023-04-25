@@ -14,7 +14,10 @@ import java.lang.invoke.MethodHandle;
 @ClassManagerType(values = {Patch.class})
 public class PatchMappingCommand implements HttpMappingCommand {
     @Override
-    public HttpMapping createHttpMapping(MethodHandle method, String path, Object controller, Annotation annotation) {
+    public HttpMapping createHttpMapping(MethodHandle method,
+                                         String path,
+                                         Object controller,
+                                         Annotation annotation) {
         Patch patch = (Patch) annotation;
         String value = patch.value();
         return new HttpMapping(RequestMethod.PATCH.name(), path + value, method, controller);

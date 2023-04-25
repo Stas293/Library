@@ -1,13 +1,8 @@
 package ua.org.training.library.utility.page.impl;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-
 import java.io.Serializable;
 import java.util.*;
 
-@EqualsAndHashCode
-@ToString
 public class Sort implements Serializable {
     private static final Sort UNSORTED = unsorted();
     public static final Direction DEFAULT_DIRECTION = Direction.ASC;
@@ -75,7 +70,13 @@ public class Sort implements Serializable {
         return !this.orders.isEmpty();
     }
 
-    @ToString
+    @Override
+    public String toString() {
+        return "Sort{" +
+                "orders=" + orders +
+                '}';
+    }
+
     public enum Direction {
         ASC,
         DESC;
@@ -108,8 +109,6 @@ public class Sort implements Serializable {
         }
     }
 
-    @EqualsAndHashCode
-    @ToString
     public static class Order implements Serializable {
         private final Direction direction;
         private final String property;
@@ -171,6 +170,15 @@ public class Sort implements Serializable {
 
         public Order ignoreCase() {
             return new Order(this.direction, this.property, true);
+        }
+
+        @Override
+        public String toString() {
+            return "Order{" +
+                    "direction=" + direction +
+                    ", property='" + property + '\'' +
+                    ", ignoreCase=" + ignoreCase +
+                    '}';
         }
     }
 }

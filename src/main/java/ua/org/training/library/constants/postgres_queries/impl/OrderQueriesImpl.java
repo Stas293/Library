@@ -15,9 +15,9 @@ import java.util.Map;
 
 @Component
 public class OrderQueriesImpl implements OrderQueries {
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "date_created");
     private final Map<String, String> queries;
     private final QueryBuilderImpl queryBuilderImpl;
-    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "date_created");
 
     @Autowired
     public OrderQueriesImpl(QueryBuilderImpl queryBuilderImpl) {
@@ -143,8 +143,9 @@ public class OrderQueriesImpl implements OrderQueries {
     public String getSelectAllByStatusAndUserIdQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getSelectAllByStatusAndUserIdQuery",
                 key -> selectFromOrders()
-                .join("books b", "b.id = o.book_id")
-                .join("users u", "u.id = o.user_id")
+                        .join("books b", "b.id = o.book_id")
+                        .join("users u", "u.id = o.user_id")
+                        .join("places p", "p.id = o.place_id")
                         .where("status_id = ?")
                         .and("user_id = ?")
                         .orderBy("%s")
@@ -157,60 +158,62 @@ public class OrderQueriesImpl implements OrderQueries {
     public String getSelectAllByStatusIdQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getSelectAllByStatusIdQuery",
                 key -> selectFromOrders()
-                .where("status_id = ?")
-                .orderBy("%s")
-                .limit("?")
-                .offset("?")
-                .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
+                        .join("books b", "b.id = o.book_id")
+                        .join("users u", "u.id = o.user_id")
+                        .where("status_id = ?")
+                        .orderBy("%s")
+                        .limit("?")
+                        .offset("?")
+                        .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
     }
 
     @Override
     public String getSelectAllByStatusAndUserIdAndSearchQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getSelectAllByStatusAndUserIdAndSearchQuery",
                 key -> selectFromOrders()
-                .join("books b", "o.book_id = b.id")
-                .where("o.status_id = ?")
-                .and("o.user_id = ?")
-                .and("b.title like ?")
-                .orderBy("%s")
-                .limit("?")
-                .offset("?")
-                .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
+                        .join("books b", "o.book_id = b.id")
+                        .where("o.status_id = ?")
+                        .and("o.user_id = ?")
+                        .and("b.title like ?")
+                        .orderBy("%s")
+                        .limit("?")
+                        .offset("?")
+                        .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
     }
 
     @Override
     public String getSelectAllByStatusAndSearchQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getSelectAllByStatusAndSearchQuery",
                 key -> selectFromOrders()
-                .join("books b", "o.book_id = b.id")
-                .where("o.status_id = ?")
-                .and("b.title like ?")
-                .orderBy("%s")
-                .limit("?")
-                .offset("?")
-                .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
+                        .join("books b", "o.book_id = b.id")
+                        .where("o.status_id = ?")
+                        .and("b.title like ?")
+                        .orderBy("%s")
+                        .limit("?")
+                        .offset("?")
+                        .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
     }
 
     @Override
     public String getSelectAllByStatusAndPlaceAndSearchQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getSelectAllByStatusAndPlaceAndSearchQuery",
                 key -> selectFromOrders()
-                .join("books b", "o.book_id = b.id")
-                .where("o.status_id = ?")
-                .and("o.place_id = ?")
-                .and("b.title like ?")
-                .orderBy("%s")
-                .limit("?")
-                .offset("?")
-                .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
+                        .join("books b", "o.book_id = b.id")
+                        .where("o.status_id = ?")
+                        .and("o.place_id = ?")
+                        .and("b.title like ?")
+                        .orderBy("%s")
+                        .limit("?")
+                        .offset("?")
+                        .build()), Utility.orderBy(page.getSort(), DEFAULT_SORT));
     }
 
     @Override
     public String getSelectAllByStatusAndPlaceQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getSelectAllByStatusAndPlaceQuery",
                 key -> selectFromOrders()
-                .join("books b", "o.book_id = b.id")
-                .join("users u", "o.user_id = u.id")
+                        .join("books b", "o.book_id = b.id")
+                        .join("users u", "o.user_id = u.id")
                         .where("status_id = ?")
                         .and("place_id = ?")
                         .orderBy("%s")

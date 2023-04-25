@@ -3,7 +3,6 @@ package ua.org.training.library.context;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.Servlet;
-import jakarta.servlet.annotation.WebServlet;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.Context;
@@ -39,7 +38,7 @@ public class TomcatServer implements Runnable {
                 new File(WEB_APP_DIRECTORY).getAbsolutePath());
 
         log.debug("Getting servlet");
-        Servlet servlet = applicationContext.getBeansWithAnnotation(WebServlet.class)
+        Servlet servlet = applicationContext.getBeansImplementingInterface(Servlet.class)
                 .values().stream()
                 .findFirst()
                 .map(Servlet.class::cast)
