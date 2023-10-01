@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.org.training.library.utility.page.impl.Sort;
 import ua.org.training.library.utility.query.QueryBuilderImpl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -282,7 +284,7 @@ class AuthorQueriesImplTest {
                 .thenReturn(queryBuilder);
         when(queryBuilder.from(anyString()))
                 .thenReturn(queryBuilder);
-        when(queryBuilder.orderBy(any(Sort.class)))
+        when(queryBuilder.orderBy(Mockito.any(String.class)))
                 .thenReturn(queryBuilder);
         when(queryBuilder.build())
                 .thenReturn("SELECT * FROM authors ORDER BY id ASC");
@@ -295,7 +297,7 @@ class AuthorQueriesImplTest {
         verify(queryBuilder).setUp();
         verify(queryBuilder).select("*");
         verify(queryBuilder).from("authors");
-        verify(queryBuilder).orderBy(sort);
+        verify(queryBuilder).orderBy(Mockito.any(String.class));
         verify(queryBuilder).build();
         assertEquals("SELECT * FROM authors ORDER BY id ASC", result);
     }
