@@ -15,19 +15,25 @@ import java.util.Properties;
 @Slf4j
 public class MailSender {
     @InjectProperty("mail.smtp.host")
-    private String MAIL_SMTP_HOST;
+    private String mailSmtpHost;
+
     @InjectProperty("mail.smtp.port")
-    private String MAIL_SMTP_PORT;
+    private String mailSmtpPort;
+
     @InjectProperty("mail.smtp.auth")
-    private String MAIL_SMTP_AUTH;
+    private String mailSmtpAuth;
+
     @InjectProperty("mail.smtp.starttls.enable")
-    private String MAIL_SMTP_STARTTLS_ENABLE;
+    private String mailSmtpStarttlsEnable;
+
     @InjectProperty("mail.smtp.ssl.trust")
-    private String MAIL_SMTP_SSL_TRUST;
+    private String mailSmtpSslTrust;
+
     @InjectProperty("mail.username")
-    private String MAIL_USERNAME;
+    private String mailUsername;
+
     @InjectProperty("mail.password")
-    private String MAIL_PASSWORD;
+    private String mailPassword;
 
     public void sendMail(String to, String subject, String text) {
         Properties properties = setProperties();
@@ -39,7 +45,7 @@ public class MailSender {
         return Session.getInstance(properties, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(MAIL_USERNAME, MAIL_PASSWORD);
+                return new PasswordAuthentication(mailUsername, mailPassword);
             }
         });
     }
@@ -47,7 +53,7 @@ public class MailSender {
     @SneakyThrows
     private void createAndSendMail(String to, String subject, String text, Session session) {
         Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(MAIL_USERNAME));
+        message.setFrom(new InternetAddress(mailUsername));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
         message.setSubject(subject);
         message.setText(text);
@@ -56,11 +62,11 @@ public class MailSender {
 
     private Properties setProperties() {
         Properties properties = new Properties();
-        properties.put("mail.smtp.host", MAIL_SMTP_HOST);
-        properties.put("mail.smtp.port", MAIL_SMTP_PORT);
-        properties.put("mail.smtp.auth", MAIL_SMTP_AUTH);
-        properties.put("mail.smtp.starttls.enable", MAIL_SMTP_STARTTLS_ENABLE);
-        properties.put("mail.smtp.ssl.trust", MAIL_SMTP_SSL_TRUST);
+        properties.put("mail.smtp.host", mailSmtpHost);
+        properties.put("mail.smtp.port", mailSmtpPort);
+        properties.put("mail.smtp.auth", mailSmtpAuth);
+        properties.put("mail.smtp.starttls.enable", mailSmtpStarttlsEnable);
+        properties.put("mail.smtp.ssl.trust", mailSmtpSslTrust);
         return properties;
     }
 }

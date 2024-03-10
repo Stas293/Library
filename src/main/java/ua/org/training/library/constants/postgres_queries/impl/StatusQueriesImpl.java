@@ -27,7 +27,7 @@ public class StatusQueriesImpl implements StatusQueries {
     @Override
     public String getCreateStatusQuery() {
         return queries.computeIfAbsent("getCreateStatusQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .insertInto("statuses")
                         .columns("code", "closed")
                         .values("?", "?")
@@ -37,7 +37,7 @@ public class StatusQueriesImpl implements StatusQueries {
     @Override
     public String getGetStatusByIdQuery() {
         return queries.computeIfAbsent("getGetStatusByIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("statuses")
                         .where("id = ?")
@@ -46,7 +46,7 @@ public class StatusQueriesImpl implements StatusQueries {
 
     @Override
     public String getGetStatusesByIdsQuery(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .select("*")
                 .from("statuses")
                 .where("id")
@@ -57,7 +57,7 @@ public class StatusQueriesImpl implements StatusQueries {
     @Override
     public String getGetAllStatusesQuery() {
         return queries.computeIfAbsent("getGetAllStatusesQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("statuses")
                         .build());
@@ -66,7 +66,7 @@ public class StatusQueriesImpl implements StatusQueries {
     @Override
     public String getGetAllStatusesQuery(Sort sort) {
         return String.format(queries.computeIfAbsent("getGetAllStatusesQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("statuses")
                         .orderBy("%s")
@@ -76,7 +76,7 @@ public class StatusQueriesImpl implements StatusQueries {
     @Override
     public String getGetPageStatusesQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getGetPageStatusesQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*, count(*) OVER() AS total")
                         .from("statuses")
                         .orderBy("%s")
@@ -88,7 +88,7 @@ public class StatusQueriesImpl implements StatusQueries {
     @Override
     public String getUpdateStatusQuery() {
         return queries.computeIfAbsent("getUpdateStatusQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .update("statuses")
                         .set("code", "closed")
                         .where("id = ?")
@@ -98,7 +98,7 @@ public class StatusQueriesImpl implements StatusQueries {
     @Override
     public String getDeleteStatusByIdQuery() {
         return queries.computeIfAbsent("getDeleteStatusByIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .deleteFrom("statuses")
                         .where("id = ?")
                         .build());
@@ -107,7 +107,7 @@ public class StatusQueriesImpl implements StatusQueries {
     @Override
     public String getGetCountStatusesQuery() {
         return queries.computeIfAbsent("getGetCountStatusesQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("count(*)")
                         .from("statuses")
                         .build());
@@ -116,14 +116,14 @@ public class StatusQueriesImpl implements StatusQueries {
     @Override
     public String getDeleteAllStatusesQuery() {
         return queries.computeIfAbsent("getDeleteAllStatusesQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .truncate("statuses")
                         .build());
     }
 
     @Override
     public String getDeleteStatusesByIdsQuery(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .deleteFrom("statuses")
                 .where("id")
                 .in(size)
@@ -133,7 +133,7 @@ public class StatusQueriesImpl implements StatusQueries {
     @Override
     public String getGetStatusByCodeQuery() {
         return queries.computeIfAbsent("getGetStatusByCodeQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("statuses")
                         .where("code = ?")
@@ -143,7 +143,7 @@ public class StatusQueriesImpl implements StatusQueries {
     @Override
     public String getGetStatusByOrderIdQuery() {
         return queries.computeIfAbsent("getGetStatusByOrderIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("s.*")
                         .from("statuses s")
                         .join("orders o", "s.id = o.status_id")
@@ -154,7 +154,7 @@ public class StatusQueriesImpl implements StatusQueries {
     @Override
     public String getGetStatusByHistoryOrderIdQuery() {
         return queries.computeIfAbsent("getGetStatusByHistoryOrderIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("s.*")
                         .from("statuses s")
                         .join("history_orders ho", "s.id = ho.status_id")
@@ -165,7 +165,7 @@ public class StatusQueriesImpl implements StatusQueries {
     @Override
     public String getGetNextStatusesForStatusByIdQuery() {
         return queries.computeIfAbsent("getNextStatusesForStatusById",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("ns2.*")
                         .from("statuses s")
                         .join("next_statuses ns", "s.id = ns.status")

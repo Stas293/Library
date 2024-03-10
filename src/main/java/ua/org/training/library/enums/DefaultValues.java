@@ -1,5 +1,10 @@
 package ua.org.training.library.enums;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Getter
 public enum DefaultValues {
     APP_DEFAULT_LOCALE("en"),
     BUNDLE_NAME("interface"),
@@ -18,15 +23,8 @@ public enum DefaultValues {
     CODE_ATTRIBUTE("code"),
     EMAIL_ATTRIBUTE("email"),
     APP_DEFAULT_LANGUAGE("en"),
-    REGISTERED("REGISTER"),;
-
-    DefaultValues(String value) {
-        this.value = value;
-    }
+    REGISTERED("REGISTER"),
+    SQL_CONNECTION_INIT("SELECT 1"),;
 
     private final String value;
-
-    public String getValue() {
-        return value;
-    }
 }

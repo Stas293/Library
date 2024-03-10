@@ -3,16 +3,20 @@ package ua.org.training.library.context;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.Servlet;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.coyote.ProtocolHandler;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
 import java.io.File;
+import java.util.concurrent.Executors;
 
 @Slf4j
+@RequiredArgsConstructor
 public class TomcatServer implements Runnable {
     private final AnnotationConfigApplicationContext applicationContext;
     private static final String CONTEXT_PATH = "";
@@ -21,10 +25,6 @@ public class TomcatServer implements Runnable {
     private static final int PORT = 8080;
     private static final String WEB_APP_DIRECTORY = "src/main/webapp";
     private static final String SERVLET_NAME = "dispatcherServlet";
-
-    public TomcatServer(AnnotationConfigApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
 
 
     @SneakyThrows
@@ -51,7 +51,12 @@ public class TomcatServer implements Runnable {
         log.debug("Adding filters");
         addFilters(ctx);
 
-        // Start the server
+        ProtocolHandler protocolHandler = tomcat.getConnector().getProtocolHandler();
+        protocolHandler.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
+
+        log.info("Starting tomcat server");
+        log.info("Listening on port: {}", PORT);
+
         tomcat.start();
         tomcat.getServer().await();
     }

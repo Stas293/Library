@@ -95,7 +95,9 @@ public class RequestParamsObjectMapper {
     public OrderUpdateDto getOrderUpdateDto(HttpServletRequest request) {
         return OrderUpdateDto.builder()
                 .id(Long.parseLong(request.getParameter("orderId")))
-                .dateExpire(request.getParameter("dateExpire") == null ? null : LocalDate.parse(request.getParameter("dateExpire")))
+                .dateExpire(request.getParameter("dateExpire") == null ?
+                        null
+                        : LocalDate.parse(request.getParameter("dateExpire")))
                 .status(request.getParameter("status"))
                 .build();
     }

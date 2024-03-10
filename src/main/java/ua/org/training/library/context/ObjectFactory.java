@@ -32,14 +32,14 @@ public class ObjectFactory {
         this.context = context;
         configurators = context.getConfig()
                 .getReflectionsSet()
-                .parallelStream()
+                .stream()
                 .filter(ObjectConfigurator.class::isAssignableFrom)
                 .map(ObjectFactory::getClassInstance)
                 .map(t -> (ObjectConfigurator) t)
                 .toList();
         proxyConfigurators = context.getConfig()
                 .getReflectionsSet()
-                .parallelStream()
+                .stream()
                 .filter(ProxyConfigurator.class::isAssignableFrom)
                 .map(ObjectFactory::getClassInstance)
                 .map(t -> (ProxyConfigurator) t)

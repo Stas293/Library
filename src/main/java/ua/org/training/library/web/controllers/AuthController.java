@@ -78,7 +78,7 @@ public class AuthController {
 
         RegistrationFormValidationError registrationFormValidationError = userService.save(user);
 
-        if (registrationFormValidationError.containsErrors()) {
+        if (registrationFormValidationError.isContainsErrors()) {
             request.setAttribute("user_reg", user);
             request.setAttribute("errors", registrationFormValidationError);
             return Links.REGISTRATION_PAGE.getLink();
@@ -145,7 +145,7 @@ public class AuthController {
 
         ResetValidationError resetValidationError = userService.updatePassword(userChangePasswordDto);
 
-        if (resetValidationError.containsErrors()) {
+        if (resetValidationError.isContainsErrors()) {
             request.setAttribute("resetValidationError", resetValidationError);
             return Links.ENTER_NEW_PASSWORD_PAGE.getLink();
         }

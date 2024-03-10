@@ -1,6 +1,7 @@
 package ua.org.training.library.context;
 
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -18,13 +19,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
+@RequiredArgsConstructor
 public class ControllerScanner {
 
     private final AnnotationConfigApplicationContext applicationContext;
-
-    public ControllerScanner(AnnotationConfigApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
 
     @SneakyThrows
     public void scanControllers() {

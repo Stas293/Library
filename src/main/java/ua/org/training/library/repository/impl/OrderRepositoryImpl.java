@@ -42,7 +42,10 @@ public class OrderRepositoryImpl implements OrderRepository {
     public Page<Order> getPageByStatusAndUser(Pageable page, Status status, User user, Locale locale) {
         log.info("Getting page of orders by status: {} and user: {}", status, user);
         Connection conn = transactionManager.getConnection();
-        Page<Order> orderPage = orderDao.getPageByStatusAndUserId(conn, page, status.getId(), user.getId());
+        Page<Order> orderPage = orderDao.getPageByStatusAndUserId(conn,
+                page,
+                status.getId(),
+                user.getId());
         orderPage.getContent().forEach(
                 order -> {
                     order.setBook(bookDao.getBookByOrderId(conn, order.getId()).orElse(null));
@@ -72,10 +75,15 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Page<Order> getPageByStatusAndUserAndSearch(Pageable page, Status statusOrder, User user, String search, Locale locale) {
+    public Page<Order> getPageByStatusAndUserAndSearch(Pageable page, Status statusOrder, User user,
+                                                       String search, Locale locale) {
         log.info("Getting page of orders by status: {} and user: {} and search: {}", statusOrder, user, search);
         Connection conn = transactionManager.getConnection();
-        Page<Order> orderPage = orderDao.getPageByStatusAndUserAndSearch(conn, page, statusOrder.getId(), user.getId(), search);
+        Page<Order> orderPage = orderDao.getPageByStatusAndUserAndSearch(conn,
+                page,
+                statusOrder.getId(),
+                user.getId(),
+                search);
         orderPage.getContent().forEach(
                 order -> {
                     order.setBook(bookDao.getBookByOrderId(conn, order.getId()).orElse(null));
@@ -174,10 +182,15 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Page<Order> getPageByStatusAndPlaceAndSearch(Pageable page, Status statusOrder, Place placeOrder, String search) {
+    public Page<Order> getPageByStatusAndPlaceAndSearch(Pageable page, Status statusOrder,
+                                                        Place placeOrder, String search) {
         log.info("Getting page of orders by status: {} and place: {} and search: {}", statusOrder, placeOrder, search);
         Connection conn = transactionManager.getConnection();
-        Page<Order> orderPage = orderDao.getPageByStatusAndPlaceAndSearch(conn, page, statusOrder.getId(), placeOrder.getId(), search);
+        Page<Order> orderPage = orderDao.getPageByStatusAndPlaceAndSearch(conn,
+                page,
+                statusOrder.getId(),
+                placeOrder.getId(),
+                search);
         orderPage.getContent().forEach(
                 order -> {
                     order.setBook(bookDao.getBookByOrderId(conn, order.getId()).orElse(null));
@@ -191,7 +204,10 @@ public class OrderRepositoryImpl implements OrderRepository {
     public Page<Order> getPageByStatusAndPlace(Pageable page, Status statusOrder, Place placeOrder) {
         log.info("Getting page of orders by status: {} and place: {}", statusOrder, placeOrder);
         Connection conn = transactionManager.getConnection();
-        Page<Order> orderPage = orderDao.getPageByStatusAndPlace(conn, page, statusOrder.getId(), placeOrder.getId());
+        Page<Order> orderPage = orderDao.getPageByStatusAndPlace(conn,
+                page,
+                statusOrder.getId(),
+                placeOrder.getId());
         orderPage.getContent().forEach(
                 order -> {
                     order.setBook(bookDao.getBookByOrderId(conn, order.getId()).orElse(null));

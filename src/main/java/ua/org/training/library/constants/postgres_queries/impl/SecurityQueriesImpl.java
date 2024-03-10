@@ -18,11 +18,12 @@ public class SecurityQueriesImpl implements SecurityQueries {
         this.queryBuilderImpl = queryBuilderImpl;
         this.passwordByLoginQuery = new WeakReference<>(null);
     }
+
     @Override
     public String getGetPasswordByLoginQuery() {
         String query = passwordByLoginQuery.get();
         if (query == null) {
-            query = queryBuilderImpl.setUp()
+            query = queryBuilderImpl
                     .select("password")
                     .from("users")
                     .where("login = ?")

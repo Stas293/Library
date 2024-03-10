@@ -27,7 +27,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
     @Override
     public String getCreateQuery() {
         return queries.computeIfAbsent("getCreateQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .insertInto("places")
                         .columns("code", "default_days", "choosable")
                         .values("?", "?", "?")
@@ -37,7 +37,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
     @Override
     public String getGetByIdQuery() {
         return queries.computeIfAbsent("getGetByIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("places")
                         .where("id = ?")
@@ -46,7 +46,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
 
     @Override
     public String getGetByIdsQuery(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .select("*")
                 .from("places")
                 .where("id")
@@ -57,7 +57,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
     @Override
     public String getGetAllQuery() {
         return queries.computeIfAbsent("getGetAllQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("places")
                         .build());
@@ -66,7 +66,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
     @Override
     public String getGetAllQuery(Sort sort) {
         return String.format(queries.computeIfAbsent("getGetAllQuerySort",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("places")
                         .orderBy("%s")
@@ -76,7 +76,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
     @Override
     public String getGetPageQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getGetPageQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("places")
                         .orderBy("%s")
@@ -88,7 +88,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
     @Override
     public String getUpdateQuery() {
         return queries.computeIfAbsent("getUpdateQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .update("places")
                         .set("code = ?")
                         .set("default_days = ?")
@@ -100,7 +100,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
     @Override
     public String getDeleteQuery() {
         return queries.computeIfAbsent("getDeleteQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .deleteFrom("places")
                         .where("id = ?")
                         .build());
@@ -109,7 +109,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
     @Override
     public String getCountQuery() {
         return queries.computeIfAbsent("getCountQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("count(*)")
                         .from("places")
                         .build());
@@ -118,14 +118,14 @@ public class PlaceQueriesImpl implements PlaceQueries {
     @Override
     public String getDeleteAllQuery() {
         return queries.computeIfAbsent("getDeleteAllQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .truncate("places")
                         .build());
     }
 
     @Override
     public String getDeleteAllQuery(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .deleteFrom("places")
                 .where("id")
                 .in(size)
@@ -135,7 +135,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
     @Override
     public String getGetByOrderIdQuery() {
         return queries.computeIfAbsent("getGetByOrderIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("p.*")
                         .from("places p")
                         .join("orders o", "p.id = o.place_id")
@@ -146,7 +146,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
     @Override
     public String getGetByCodeQuery() {
         return queries.computeIfAbsent("getGetByCodeQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("places")
                         .where("code = ?")

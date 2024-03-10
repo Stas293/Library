@@ -43,29 +43,31 @@ public class InjectPropertyAnnotationObjectConfigurator implements ObjectConfigu
     }
 
     @Override
-    @SneakyThrows
     public void configure(Object t, AnnotationConfigApplicationContext context) {
         log.info("Configuring properties");
-        Map<Class<?>, FieldSetter> beansImplementingInterface = context.getBeansImplementingInterface(FieldSetter.class);
+        Map<Class<?>, FieldSetter> beansImplementingInterface =
+                context.getBeansImplementingInterface(FieldSetter.class);
         beansImplementingInterface.forEach(this::fillMapWithFieldSetters);
-        Class<?> implClass = t.getClass();
-        for (Field field : implClass.getDeclaredFields()) {
-            if (field.isAnnotationPresent(InjectProperty.class)) {
-                log.info("Injecting property");
-                log.info("Field name: {}", field.getName());
-                log.info("Field type: {}", field.getType());
-                InjectProperty annotation = field.getAnnotation(InjectProperty.class);
-                String propertyName = annotation.value();
-                if (propertyName.isEmpty()) {
-                    propertyName = field.getName();
-                }
-                String propertyValue = propertiesMap.get(propertyName);
-                field.setAccessible(true);
-                Type type = field.getType();
-                setFieldDependingOnType(t, field, propertyValue, type);
-                field.setAccessible(false);
-            }
+        Arrays.stream(t.getClass().getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(InjectProperty.class))
+                .forEach(field -> injectProperty(t, field));
+    }
+
+    @SneakyThrows
+    private void injectProperty(Object t,Field field) {
+        log.info("Injecting property");
+        log.info("Field name: {}", field.getName());
+        log.info("Field type: {}", field.getType());
+        InjectProperty annotation = field.getAnnotation(InjectProperty.class);
+        String propertyName = annotation.value();
+        if (propertyName.isEmpty()) {
+            propertyName = field.getName();
         }
+        String propertyValue = propertiesMap.get(propertyName);
+        field.setAccessible(true);
+        Type type = field.getType();
+        setFieldDependingOnType(t, field, propertyValue, type);
+        field.setAccessible(false);
     }
 
     private void fillMapWithFieldSetters(Class<?> key, FieldSetter value) {
@@ -74,7 +76,8 @@ public class InjectPropertyAnnotationObjectConfigurator implements ObjectConfigu
             throw new RuntimeException("ClassManagerType annotation is not present");
         }
         Class<?>[] classesToCastTo = annotation.values();
-        Arrays.stream(classesToCastTo).forEach(classToCastTo -> fieldSetters.put(classToCastTo, value));
+        Arrays.stream(classesToCastTo)
+                .forEach(classToCastTo -> fieldSetters.put(classToCastTo, value));
     }
 
     private void setFieldDependingOnType(Object t, Field field, String propertyValue, Type type)

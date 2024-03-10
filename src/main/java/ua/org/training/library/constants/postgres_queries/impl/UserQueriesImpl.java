@@ -27,7 +27,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryById() {
         return queries.computeIfAbsent("getQueryById",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("users")
                         .where("id = ?")
@@ -36,7 +36,7 @@ public class UserQueriesImpl implements UserQueries {
 
     @Override
     public String getQueryByIds(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .select("*")
                 .from("users")
                 .where("id")
@@ -47,7 +47,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryAll() {
         return queries.computeIfAbsent("getQueryAll",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("users")
                         .build());
@@ -56,7 +56,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryAll(Sort sort) {
         return String.format(queries.computeIfAbsent("getQueryAllSort",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("users")
                         .orderBy("%s")
@@ -66,7 +66,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryPage(Pageable page) {
         return String.format(queries.computeIfAbsent("getQueryPage",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*, count(*) OVER() AS total")
                         .from("users")
                         .orderBy("%s")
@@ -78,7 +78,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryUpdate() {
         return queries.computeIfAbsent("getQueryUpdate",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .update("users")
                         .set("login", "first_name",
                                 "last_name", "email",
@@ -90,7 +90,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryDelete() {
         return queries.computeIfAbsent("getQueryDelete",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .deleteFrom("users")
                         .where("id = ?")
                         .build());
@@ -99,7 +99,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryCount() {
         return queries.computeIfAbsent("getQueryCount",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("count(*)")
                         .from("users")
                         .build());
@@ -108,14 +108,14 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryDeleteAll() {
         return queries.computeIfAbsent("getQueryDeleteAll",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .truncate("users")
                         .build());
     }
 
     @Override
     public String getQueryDeleteByIds(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .deleteFrom("users")
                 .where("id")
                 .in(size)
@@ -125,7 +125,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryCreate() {
         return queries.computeIfAbsent("getQueryCreate",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .insertInto("users")
                         .columns("login", "first_name", "last_name", "email", "phone", "enabled", "password")
                         .values("?", "?", "?", "?", "?", "?", "?")
@@ -135,7 +135,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryUpdatePassword() {
         return queries.computeIfAbsent("getQueryUpdatePassword",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .update("users")
                         .set("password")
                         .where("id = ?")
@@ -145,7 +145,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryGetByLogin() {
         return queries.computeIfAbsent("getQueryGetByLogin",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("users")
                         .where("login = ?")
@@ -155,7 +155,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryGetByEmail() {
         return queries.computeIfAbsent("getQueryGetByEmail",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("users")
                         .where("email = ?")
@@ -165,7 +165,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryGetByPhone() {
         return queries.computeIfAbsent("getQueryGetByPhone",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("users")
                         .where("phone = ?")
@@ -175,7 +175,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryGetByOrderId() {
         return queries.computeIfAbsent("getQueryGetByOrderId",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("users.*")
                         .from("users")
                         .join("orders", "users.id = orders.user_id")
@@ -186,7 +186,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryGetByHistoryOrderId() {
         return queries.computeIfAbsent("getQueryGetByHistoryOrderId",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("users.*")
                         .from("users")
                         .join("history_orders", "users.id = history_orders.user_id")
@@ -197,7 +197,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryDisable() {
         return queries.computeIfAbsent("getQueryDisable",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .update("users")
                         .set("enabled")
                         .where("id = ?")
@@ -207,7 +207,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryEnable() {
         return queries.computeIfAbsent("getQueryEnable",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .update("users")
                         .set("enabled")
                         .where("id = ?")
@@ -217,7 +217,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryDeleteRolesByUserId() {
         return queries.computeIfAbsent("getQueryDeleteRolesByUserId",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .deleteFrom("user_role")
                         .where("user_id = ?")
                         .build());
@@ -226,7 +226,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQueryInsertRolesByUserId() {
         return queries.computeIfAbsent("getQueryInsertRolesByUserId",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .insertInto("user_role")
                         .columns("user_id", "role_id")
                         .values("?", "?")
@@ -236,7 +236,7 @@ public class UserQueriesImpl implements UserQueries {
     @Override
     public String getQuerySearchUsers(Pageable pageable, String search) {
             return String.format(queries.computeIfAbsent("getQuerySearchUsers",
-                    key -> queryBuilderImpl.setUp()
+                    key -> queryBuilderImpl
                             .select("*, count(*) OVER() AS total")
                             .from("users")
                             .where("login LIKE ?")

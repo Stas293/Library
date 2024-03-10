@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
         validateEmail(userRegistrationDto.getEmail(), registrationFormValidationError);
         validateLogin(userRegistrationDto.getLogin(), registrationFormValidationError);
         validatePhone(userRegistrationDto.getPhone(), registrationFormValidationError);
-        if (registrationFormValidationError.containsErrors()) {
+        if (registrationFormValidationError.isContainsErrors()) {
             return registrationFormValidationError;
         }
         String bcryptPassword = BCrypt.hashpw(
@@ -159,7 +159,7 @@ public class UserServiceImpl implements UserService {
     public ResetValidationError updatePassword(UserChangePasswordDto userChangePasswordDto) {
         log.info("Updating password for user: {}", userChangePasswordDto);
         ResetValidationError resetValidationError = resetPasswordValidator.validate(userChangePasswordDto);
-        if (resetValidationError.containsErrors()) {
+        if (resetValidationError.isContainsErrors()) {
             return resetValidationError;
         }
         User user = userRepository.getByLogin(userChangePasswordDto.getLogin()).orElseThrow();
@@ -275,7 +275,7 @@ public class UserServiceImpl implements UserService {
         LoggedUserUpdatePasswordFormValidationError validationError = loggedUserEditPasswordValidator.validate(userFromRequest);
         User user = userRepository.getByLogin(authorityUser.getLogin()).orElseThrow();
         validateOldPassword(userFromRequest, validationError, user);
-        if (validationError.containsErrors()) {
+        if (validationError.isContainsErrors()) {
             log.info("Validation error: {}", validationError);
             return validationError;
         }

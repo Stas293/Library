@@ -28,7 +28,7 @@ public class OrderQueriesImpl implements OrderQueries {
     @Override
     public String getCreateQuery() {
         return queries.computeIfAbsent("getCreateQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .insertInto("orders")
                         .columns("date_created", "book_id", "status_id", "user_id", "place_id")
                         .values("?", "?", "?", "?", "?")
@@ -44,7 +44,7 @@ public class OrderQueriesImpl implements OrderQueries {
     }
 
     private QueryBuilder selectFromOrders() {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .select("o.*, COUNT(*) OVER()")
                 .from("orders o");
     }
@@ -85,7 +85,7 @@ public class OrderQueriesImpl implements OrderQueries {
     @Override
     public String getUpdateQuery() {
         return queries.computeIfAbsent("getUpdateQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .update("orders")
                         .set("date_created", "date_expire", "status_id",
                                 "user_id", "book_id")
@@ -96,7 +96,7 @@ public class OrderQueriesImpl implements OrderQueries {
     @Override
     public String getDeleteQuery() {
         return queries.computeIfAbsent("getDeleteQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .deleteFrom("orders")
                         .where("id = ?")
                         .build());
@@ -105,7 +105,7 @@ public class OrderQueriesImpl implements OrderQueries {
     @Override
     public String getCountQuery() {
         return queries.computeIfAbsent("getCountQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("count(*)")
                         .from("orders")
                         .build());
@@ -114,14 +114,14 @@ public class OrderQueriesImpl implements OrderQueries {
     @Override
     public String getDeleteAllQuery() {
         return queries.computeIfAbsent("getDeleteAllQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .truncate("orders")
                         .build());
     }
 
     @Override
     public String getDeleteByIdsQuery(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .deleteFrom("orders")
                 .where("id")
                 .in(size)
@@ -225,7 +225,7 @@ public class OrderQueriesImpl implements OrderQueries {
     @Override
     public String getSelectByUserIdAndBookIdQuery() {
         return queries.computeIfAbsent("getSelectByUserIdAndBookIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("orders")
                         .where("user_id = ?")
@@ -236,7 +236,7 @@ public class OrderQueriesImpl implements OrderQueries {
     @Override
     public String getSelectByBookIdQuery() {
         return queries.computeIfAbsent("getSelectByBookIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("orders")
                         .where("book_id = ?")

@@ -1,10 +1,8 @@
 package ua.org.training.library.form;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Data;
 
-@ToString
-@EqualsAndHashCode
+@Data
 public class PersonalEditFormValidationError {
     private String login;
     private String firstName;
@@ -13,17 +11,9 @@ public class PersonalEditFormValidationError {
     private String phone;
     private boolean containsErrors = false;
 
-    public String getLogin() {
-        return login;
-    }
-
     public void setLogin(String login) {
         this.login = login;
         this.containsErrors = true;
-    }
-
-    public String getFirstName() {
-        return firstName;
     }
 
     public void setFirstName(String firstName) {
@@ -31,17 +21,9 @@ public class PersonalEditFormValidationError {
         this.containsErrors = true;
     }
 
-    public String getLastName() {
-        return lastName;
-    }
-
     public void setLastName(String lastName) {
         this.lastName = lastName;
         this.containsErrors = true;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
     public void setEmail(String email) {
@@ -49,20 +31,8 @@ public class PersonalEditFormValidationError {
         this.containsErrors = true;
     }
 
-    public String getPhone() {
-        return phone;
-    }
-
     public void setPhone(String phone) {
         this.phone = phone;
         this.containsErrors = true;
-    }
-
-    public boolean isContainsErrors() {
-        return containsErrors;
-    }
-
-    public void setContainsErrors(boolean containsErrors) {
-        this.containsErrors = containsErrors;
     }
 }

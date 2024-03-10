@@ -27,7 +27,7 @@ public class RoleQueriesImpl implements RoleQueries {
     @Override
     public String getCreateQuery() {
         return queries.computeIfAbsent("getCreateQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .insertInto("roles")
                         .columns("code", "name")
                         .values("?", "?")
@@ -37,7 +37,7 @@ public class RoleQueriesImpl implements RoleQueries {
     @Override
     public String getGetByIdQuery() {
         return queries.computeIfAbsent("getGetByIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("roles")
                         .where("id = ?")
@@ -46,7 +46,7 @@ public class RoleQueriesImpl implements RoleQueries {
 
     @Override
     public String getGetByIdsQuery(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .select("*")
                 .from("roles")
                 .where("id")
@@ -57,7 +57,7 @@ public class RoleQueriesImpl implements RoleQueries {
     @Override
     public String getGetAllQuery() {
         return queries.computeIfAbsent("getGetAllQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("roles")
                         .build());
@@ -66,7 +66,7 @@ public class RoleQueriesImpl implements RoleQueries {
     @Override
     public String getGetAllQuery(Sort sort) {
         return String.format(queries.computeIfAbsent("getGetAllQuerySort",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("roles")
                         .orderBy("%s")
@@ -76,7 +76,7 @@ public class RoleQueriesImpl implements RoleQueries {
     @Override
     public String getGetPageQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getGetPageQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*, count(*) OVER() AS total")
                         .from("roles")
                         .orderBy("%s")
@@ -88,7 +88,7 @@ public class RoleQueriesImpl implements RoleQueries {
     @Override
     public String getUpdateQuery() {
         return queries.computeIfAbsent("getUpdateQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .update("roles")
                         .set("code", "name")
                         .where("id = ?")
@@ -98,7 +98,7 @@ public class RoleQueriesImpl implements RoleQueries {
     @Override
     public String getDeleteQuery() {
         return queries.computeIfAbsent("getDeleteQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .deleteFrom("roles")
                         .where("id = ?")
                         .build());
@@ -107,7 +107,7 @@ public class RoleQueriesImpl implements RoleQueries {
     @Override
     public String getGetCountQuery() {
         return queries.computeIfAbsent("getGetCountQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("count(*)")
                         .from("roles")
                         .build());
@@ -116,14 +116,14 @@ public class RoleQueriesImpl implements RoleQueries {
     @Override
     public String getDeleteAllQuery() {
         return queries.computeIfAbsent("getDeleteAllQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .truncate("roles")
                         .build());
     }
 
     @Override
     public String getDeleteAllQuery(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .deleteFrom("roles")
                 .where("id")
                 .in(size)
@@ -133,7 +133,7 @@ public class RoleQueriesImpl implements RoleQueries {
     @Override
     public String getGetByCodeQuery() {
         return queries.computeIfAbsent("getGetByCodeQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("roles")
                         .where("code = ?")
@@ -143,7 +143,7 @@ public class RoleQueriesImpl implements RoleQueries {
     @Override
     public String getGetByNameQuery() {
         return queries.computeIfAbsent("getGetByCodeQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("roles")
                         .where("name = ?")
@@ -153,7 +153,7 @@ public class RoleQueriesImpl implements RoleQueries {
     @Override
     public String getGetRolesByUserIdQuery() {
         return queries.computeIfAbsent("getGetRolesByUserIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("r.*")
                         .from("roles r")
                         .join("user_role ur", "r.id = ur.role_id")
@@ -163,7 +163,7 @@ public class RoleQueriesImpl implements RoleQueries {
 
     @Override
     public String getGetAllByCodesQuery(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .select("*")
                 .from("roles")
                 .where("code")

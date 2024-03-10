@@ -29,7 +29,7 @@ public class KeywordQueriesImpl implements KeywordQueries {
     @Override
     public String getInsertQuery() {
         return queries.computeIfAbsent("getInsertQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .insertInto("keywords")
                         .columns("keyword")
                         .values("?")
@@ -39,7 +39,7 @@ public class KeywordQueriesImpl implements KeywordQueries {
     @Override
     public String getSelectByIdQuery() {
         return queries.computeIfAbsent("getSelectByIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("keywords")
                         .where("id = ?")
@@ -48,7 +48,7 @@ public class KeywordQueriesImpl implements KeywordQueries {
 
     @Override
     public String getSelectByIdsQuery(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .select("*")
                 .from("keywords")
                 .where("id")
@@ -64,7 +64,7 @@ public class KeywordQueriesImpl implements KeywordQueries {
     }
 
     private QueryBuilder selectFromKeywords() {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .select("k.*, COUNT(*) OVER() AS full_count")
                 .from("keywords k");
     }
@@ -90,7 +90,7 @@ public class KeywordQueriesImpl implements KeywordQueries {
     @Override
     public String getUpdateQuery() {
         return queries.computeIfAbsent("getUpdateQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .update("keywords")
                         .set("keyword")
                         .where("id = ?")
@@ -100,7 +100,7 @@ public class KeywordQueriesImpl implements KeywordQueries {
     @Override
     public String getDeleteByIdQuery() {
         return queries.computeIfAbsent("getDeleteByIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .deleteFrom("keywords")
                         .where("id = ?")
                         .build());
@@ -109,7 +109,7 @@ public class KeywordQueriesImpl implements KeywordQueries {
     @Override
     public String getCountQuery() {
         return queries.computeIfAbsent("getCountQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("count(*)")
                         .from("keywords")
                         .build());
@@ -118,14 +118,14 @@ public class KeywordQueriesImpl implements KeywordQueries {
     @Override
     public String getDeleteAllQuery() {
         return queries.computeIfAbsent("getDeleteAllQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .truncate("keywords")
                         .build());
     }
 
     @Override
     public String getDeleteByIdsQuery(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .deleteFrom("keywords")
                 .where("id")
                 .in(size)
@@ -135,7 +135,7 @@ public class KeywordQueriesImpl implements KeywordQueries {
     @Override
     public String getSelectByBookIdQuery() {
         return queries.computeIfAbsent("getSelectByBookIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("k.*")
                         .from("keywords k")
                         .join("book_keywords bk", "bk.keyword_id = k.id")
@@ -146,7 +146,7 @@ public class KeywordQueriesImpl implements KeywordQueries {
     @Override
     public String getDeleteByBookIdQuery() {
         return queries.computeIfAbsent("getDeleteByBookIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .deleteFrom("book_keywords")
                         .where("book_id = ?")
                         .build());
@@ -155,7 +155,7 @@ public class KeywordQueriesImpl implements KeywordQueries {
     @Override
     public String getInserKeywordToBookQuery() {
         return queries.computeIfAbsent("getInserKeywordToBookQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .insertInto("book_keywords")
                         .columns("book_id", "keyword_id")
                         .values("?", "?")
@@ -165,7 +165,7 @@ public class KeywordQueriesImpl implements KeywordQueries {
     @Override
     public String getSelectByQueryQuery() {
         return queries.computeIfAbsent("getSelectByQueryQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("k.*")
                         .from("keywords k")
                         .where("k.keyword LIKE ?")
@@ -175,7 +175,7 @@ public class KeywordQueriesImpl implements KeywordQueries {
     @Override
     public String getSelectByDataQuery() {
         return queries.computeIfAbsent("getSelectByDataQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("k.*")
                         .from("keywords k")
                         .where("k.keyword = ?")

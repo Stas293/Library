@@ -29,7 +29,7 @@ public class CaptchaValidator {
             return false;
         }
         log.info(captchaResponse);
-        String url = requestUrl + "?secret=" + secretKey + "&response=" + captchaResponse;
+        String url = "%s?secret=%s&response=%s".formatted(requestUrl, secretKey, captchaResponse);
         String response = sendRequest(url, requestMethod);
         if (response == null || !response.contains("true")) {
             log.error("Captcha is not valid");

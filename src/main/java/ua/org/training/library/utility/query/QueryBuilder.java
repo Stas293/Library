@@ -42,8 +42,6 @@ public interface QueryBuilder {
 
     QueryBuilder groupBy(String condition);
 
-    QueryBuilder setUp();
-
     QueryBuilder as(String alias);
 
     QueryBuilder orderBy(String s);

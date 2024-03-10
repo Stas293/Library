@@ -107,23 +107,29 @@ public class AuthorDaoImplTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("firstName"));
         String search = "test";
         List<Author> expectedAuthors = List.of(Author.builder().firstName(search).lastName(search).build());
-
-        String query = "SELECT * FROM authors WHERE first_name ILIKE ? OR last_name ILIKE ? OR patronymic ILIKE ? ORDER BY first_name ASC LIMIT ? OFFSET ?";
+//queryBuilderImpl
+//                            .select("*, count(*) OVER()")
+//                            .from("authors")
+//                            .where("first_name LIKE ?")
+//                            .or("middle_name LIKE ?")
+//                            .or("last_name LIKE ?")
+//                            .limit("?")
+//                            .offset("?")
+//                            .build()
+        String query = "SELECT *, count(*) OVER() FROM authors " +
+                "WHERE first_name ILIKE ? OR middle_name LIKE ? OR last_name ILIKE ? " +
+                "ORDER BY first_name ASC LIMIT ? OFFSET ?";
         when(authorQueries.getSearchAuthors(pageable.getSort())).thenReturn(query);
-        when(connection.prepareStatement(query)).thenReturn(statement);
+        when(connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)).thenReturn(statement);
         when(statement.executeQuery()).thenReturn(resultSet);
         when(authorCollector.collectList(resultSet)).thenReturn(expectedAuthors);
-        String countQuery = "SELECT COUNT(*) FROM authors WHERE first_name ILIKE ? OR middle_name ILIKE ? OR last_name ILIKE ?";
-        PreparedStatement countStatement = mock(PreparedStatement.class);
-        when(authorQueries.getAuthorsCount()).thenReturn(countQuery);
-        when(connection.prepareStatement(countQuery)).thenReturn(countStatement);
-        when(countStatement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getLong(1)).thenReturn(1L);
+        when(resultSet.getLong(5)).thenReturn(1L);
 
         Page<Author> actualAuthors = authorDao.searchAuthors(connection, pageable, search);
 
-        verify(connection).prepareStatement(query);
+        verify(connection).prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY);
         verify(statement).setString(1, "%" + search + "%");
         verify(statement).setString(2, "%" + search + "%");
         verify(statement).setString(3, "%" + search + "%");
@@ -303,7 +309,6 @@ public class AuthorDaoImplTest {
     @Test
     @SneakyThrows
     void getPage() {
-
         Pageable pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.ASC, "id"));
         Page<Author> expectedPage = new PageImpl<>(
                 List.of(
@@ -320,23 +325,21 @@ public class AuthorDaoImplTest {
                                 .lastName("Doe")
                                 .build()),
                 pageable, 2);
-        when(authorQueries.getPageAuthors(pageable.getSort())).thenReturn("SELECT * FROM authors ORDER BY id ASC LIMIT ? OFFSET ?");
-        when(authorQueries.getCountAuthors()).thenReturn("SELECT COUNT(*) FROM authors");
-        when(connection.prepareStatement(anyString())).thenReturn(statement);
+        String selectAuthorQueries = "SELECT * FROM authors ORDER BY id ASC LIMIT ? OFFSET ?";
+        when(authorQueries.getPageAuthors(pageable.getSort())).thenReturn(selectAuthorQueries);
+        when(connection.prepareStatement(selectAuthorQueries,ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY )).thenReturn(statement);
         when(statement.executeQuery()).thenReturn(resultSet);
-        when(resultSet.next()).thenReturn(true);
-        when(resultSet.getLong(1)).thenReturn(2L);
         when(statement.executeQuery()).thenReturn(resultSet);
         when(authorCollector.collectList(resultSet)).thenReturn(expectedPage.getContent());
 
         Page<Author> actualPage = authorDao.getPage(connection, pageable);
 
-        verify(connection).prepareStatement(authorQueries.getPageAuthors(pageable.getSort()));
+        verify(connection).prepareStatement(authorQueries.getPageAuthors(pageable.getSort()), ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY);
         verify(statement).setInt(1, pageable.getPageSize());
         verify(statement).setLong(2, pageable.getOffset());
-        verify(connection).prepareStatement(authorQueries.getCountAuthors());
-        verify(resultSet).next();
-        verify(resultSet).getLong(1);
+        verify(resultSet).getLong(5);
         verify(authorCollector).collectList(resultSet);
         assertEquals(expectedPage, actualPage);
     }

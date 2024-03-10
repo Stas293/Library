@@ -83,7 +83,7 @@ public class UserController {
         AuthorityUser authorityUser = securityService.getAuthorityUser(request);
         UserLoggedUpdatePasswordDto userFromRequest = requestParamsObjectMapper.collectFromEditPasswordForm(request);
         LoggedUserUpdatePasswordFormValidationError validationError = userService.updatePassword(userFromRequest, authorityUser);
-        if (validationError.containsErrors()) {
+        if (validationError.isContainsErrors()) {
             request.setAttribute("errors", validationError);
             return "/WEB-INF/jsp/user/edit-password.jsp";
         }

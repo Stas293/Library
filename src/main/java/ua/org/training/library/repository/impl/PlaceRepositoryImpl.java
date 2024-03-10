@@ -41,7 +41,8 @@ public class PlaceRepositoryImpl implements PlaceRepository {
         places.forEach(
                 model -> model.setNames(
                         List.of(
-                                placeNameDao.getByPlaceId(transactionManager.getConnection(), model.getId(), locale).orElseThrow()
+                                placeNameDao.getByPlaceId(transactionManager.getConnection(),
+                                        model.getId(), locale).orElseThrow()
                         )
                 )
         );

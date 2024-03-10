@@ -30,7 +30,7 @@ public class BookQueriesImpl implements BookQueries {
     @Override
     public String getBooksByAuthorIdQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getBooksByAuthorIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("b.*, COUNT(*) OVER()")
                         .from("books b")
                         .join("book_authors ba", "b.id = ba.book_id")
@@ -44,7 +44,7 @@ public class BookQueriesImpl implements BookQueries {
     @Override
     public String getBooksByLanguageQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getBooksByLanguageQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*, COUNT(*) OVER()")
                         .from("books")
                         .where("language = ?")
@@ -57,7 +57,7 @@ public class BookQueriesImpl implements BookQueries {
     @Override
     public String getBookByOrderIdQuery() {
         return queries.computeIfAbsent("getBookByOrderIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("b.*")
                         .from("books b")
                         .join("orders o", "b.id = o.book_id")
@@ -68,7 +68,7 @@ public class BookQueriesImpl implements BookQueries {
     @Override
     public String getBooksWhichUserDidNotOrderQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getBooksWhichUserDidNotOrderQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("b.*, COUNT(*) OVER()")
                         .from("books b")
                         .join("book_authors ba", "b.id = ba.book_id")
@@ -94,7 +94,7 @@ public class BookQueriesImpl implements BookQueries {
     }
 
     private QueryBuilder selectBooks() {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .select("b.*, COUNT(*) OVER()")
                 .from("books b")
                 .join("book_authors ba", "b.id = ba.book_id")
@@ -105,7 +105,7 @@ public class BookQueriesImpl implements BookQueries {
     @Override
     public String getCreateBookQuery() {
         return queries.computeIfAbsent("getCreateBookQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .insertInto("books")
                         .columns("title",
                                 "description",
@@ -122,7 +122,7 @@ public class BookQueriesImpl implements BookQueries {
     @Override
     public String getGetBookByIdQuery() {
         return queries.computeIfAbsent("getGetBookByIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("b.*")
                         .from("books b")
                         .where("id = ?")
@@ -158,7 +158,7 @@ public class BookQueriesImpl implements BookQueries {
     @Override
     public String getUpdateBookQuery() {
         return queries.computeIfAbsent("getUpdateBookQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .update("books")
                         .set("title", "description", "isbn",
                                 "count", "date_publication",
@@ -170,7 +170,7 @@ public class BookQueriesImpl implements BookQueries {
     @Override
     public String getDeleteBookByIdQuery() {
         return queries.computeIfAbsent("getDeleteBookByIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .deleteFrom("books")
                         .where("id = ?")
                         .build());
@@ -179,7 +179,7 @@ public class BookQueriesImpl implements BookQueries {
     @Override
     public String getGetCountOfBooksQuery() {
         return queries.computeIfAbsent("getGetCountOfBooksQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("COUNT(*)")
                         .from("books")
                         .build());
@@ -188,7 +188,7 @@ public class BookQueriesImpl implements BookQueries {
     @Override
     public String getDeleteAllBooksQuery() {
         return queries.computeIfAbsent("getDeleteAllBooksQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .truncate("books")
                         .cascade()
                         .build());
@@ -196,7 +196,7 @@ public class BookQueriesImpl implements BookQueries {
 
     @Override
     public String getDeleteBooksByIdsQuery(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .deleteFrom("books")
                 .where("id")
                 .in(size)
@@ -214,7 +214,7 @@ public class BookQueriesImpl implements BookQueries {
     }
 
     private QueryBuilder selectBooksJoinRelationSearchByFieldsGroupById() {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .select("b.*, COUNT(*) OVER()")
                 .from("books b")
                 .join("book_keywords bk", "b.id = bk.book_id")
@@ -241,7 +241,7 @@ public class BookQueriesImpl implements BookQueries {
     }
 
     private QueryBuilder selectBooksExceptOrderedJoinRelationSearchByFieldsGroupById() {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .select("b.*, COUNT(*) OVER()")
                 .from("books b")
                 .join("book_keywords bk", "b.id = bk.book_id")
@@ -277,7 +277,7 @@ public class BookQueriesImpl implements BookQueries {
     @Override
     public String getBookCountQuery() {
         return queries.computeIfAbsent("getBookCountQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("b.count")
                         .from("books b")
                         .where("b.id = ?")
@@ -287,7 +287,7 @@ public class BookQueriesImpl implements BookQueries {
     @Override
     public String getBooksByAuthorIdQuery() {
         return queries.computeIfAbsent("getBooksByAuthorIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("b.*")
                         .from("books b")
                         .join("book_authors ba", "b.id = ba.book_id")
@@ -298,7 +298,7 @@ public class BookQueriesImpl implements BookQueries {
     @Override
     public String getExistsByIsbnQuery() {
         return queries.computeIfAbsent("getExistsByIsbnQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("b.id")
                         .from("books b")
                         .where("b.isbn = ?")

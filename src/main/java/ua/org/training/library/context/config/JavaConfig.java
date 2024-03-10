@@ -11,10 +11,9 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Getter
 @Slf4j
 public class JavaConfig implements Config {
-
-    @Getter
     private final Set<Class<?>> reflectionsSet;
 
     public JavaConfig(String packageToScan) {

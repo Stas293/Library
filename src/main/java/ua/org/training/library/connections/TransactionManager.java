@@ -82,19 +82,13 @@ public class TransactionManager {
     }
 
     public void closeConnection() {
-        log.info("Close connection");
-        Connection conn = connectionHolder.get();
-        if (conn != null) {
-            log.info("Connection is not null");
-            try {
-                conn.close();
-                connectionHolder.remove();
-            } catch (SQLException ex) {
-                log.error("Error while closing connection", ex);
-                throw new TransactionException("Error closing connection", ex);
-            }
+        try (Connection conn = connectionHolder.get()) {
+            log.info("Closing connection");
+            connectionHolder.remove();
+        } catch (SQLException ex) {
+            log.error("Error while closing connection", ex);
+            throw new TransactionException("Error closing connection", ex);
         }
     }
-
 }
 

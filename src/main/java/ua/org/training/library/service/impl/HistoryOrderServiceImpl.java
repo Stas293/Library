@@ -32,7 +32,8 @@ public class HistoryOrderServiceImpl implements HistoryOrderService {
         log.info("Getting history orders by authority: {}, {}, {}", page, authority, search);
         User user = userRepository.getByLogin(authority.getLogin()).orElseThrow();
         if (search != null && !search.isEmpty()) {
-            Page<HistoryOrder> historyOrderPage = historyOrderRepository.getPageByUserAndSearch(page, user, search, locale);
+            Page<HistoryOrder> historyOrderPage = historyOrderRepository.getPageByUserAndSearch(
+                    page, user, search, locale);
             return objectMapper.mapHistoryOrderPage(historyOrderPage);
         }
         Page<HistoryOrder> historyOrderPage = historyOrderRepository.getPageByUser(page, user, locale);

@@ -24,20 +24,23 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TransactionalHandlerProxyConfigurator implements ProxyConfigurator {
     @Override
-    public <T> T getProxyObjectWhenNeeded(T object, Class<?> implClass, AnnotationConfigApplicationContext context) {
+    public <T> T getProxyObjectWhenNeeded(T object, Class<?> implClass,
+                                          AnnotationConfigApplicationContext context) {
         if (!implClass.isAnnotationPresent(Service.class)) {
             return object;
         }
         Set<String> transactionalMethods = getTransactionalMethods(implClass);
         log.info("Creating proxy for class: {}", implClass.getName());
         if (implClass.getInterfaces().length > 0) {
-            return getRegularProxyIfClassImplementsInterfaces(object, implClass, transactionalMethods, context);
+            return getRegularProxyIfClassImplementsInterfaces(object, implClass,
+                                                              transactionalMethods, context);
         }
         return getProxyWithJavassist(object, transactionalMethods, context);
     }
 
     @SneakyThrows
-    private <T> T getProxyWithJavassist(T object, Set<String> transactionalMethods, AnnotationConfigApplicationContext context) {
+    private <T> T getProxyWithJavassist(T object, Set<String> transactionalMethods,
+                                        AnnotationConfigApplicationContext context) {
         ProxyFactory factory = new ProxyFactory();
         factory.setSuperclass(object.getClass());
         Constructor<?> constructorArgs = object.getClass().getConstructors()[0];
@@ -51,8 +54,7 @@ public class TransactionalHandlerProxyConfigurator implements ProxyConfigurator 
 
     private Object checkIfMethodIsTransactionalAndInvokeMethod(Object object, Set<String> transactionalMethods,
                                                                TransactionManager finalTransactionManager,
-                                                               Method thisMethod, Object[] args)
-            throws IllegalAccessException, InvocationTargetException {
+                                                               Method thisMethod, Object[] args) {
         assert finalTransactionManager != null;
         if (transactionalMethods.contains(thisMethod.getName())) {
             log.info("Creating transactional method invocation for method: {}", thisMethod.getName());
@@ -64,7 +66,8 @@ public class TransactionalHandlerProxyConfigurator implements ProxyConfigurator 
     }
 
     @SneakyThrows
-    private Object invokeMethodAndCloseConnection(Object object, TransactionManager finalTransactionManager, Method thisMethod, Object[] args) throws IllegalAccessException, InvocationTargetException {
+    private Object invokeMethodAndCloseConnection(Object object, TransactionManager finalTransactionManager,
+                                                  Method thisMethod, Object[] args) {
         if (methodFromObjectClass(thisMethod)) {
             return thisMethod.invoke(object, args);
         }
@@ -115,7 +118,8 @@ public class TransactionalHandlerProxyConfigurator implements ProxyConfigurator 
 
     @NotNull
     private <T> T getRegularProxyIfClassImplementsInterfaces(T object, Class<?> implClass,
-                                                             Set<String> transactionalMethods, AnnotationConfigApplicationContext context) {
+                                                             Set<String> transactionalMethods,
+                                                             AnnotationConfigApplicationContext context) {
         log.info("Creating regular proxy for class: {}", implClass.getName());
         TransactionManager finalTransactionManager = context.getObject(TransactionManager.class);
         return (T) Proxy.newProxyInstance(implClass.getClassLoader(),

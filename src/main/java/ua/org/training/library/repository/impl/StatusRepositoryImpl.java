@@ -43,7 +43,8 @@ public class StatusRepositoryImpl implements StatusRepository {
         List<Status> statuses = statusDao.getNextStatusesForStatusById(transactionManager.getConnection(), id);
         statuses.forEach(status -> status.setNames(
                         List.of(
-                                statusNameDao.getByStatusId(transactionManager.getConnection(), status.getId(), locale).orElseThrow()
+                                statusNameDao.getByStatusId(transactionManager.getConnection(),
+                                        status.getId(), locale).orElseThrow()
                         )
                 )
         );

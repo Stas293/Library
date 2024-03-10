@@ -26,8 +26,6 @@ class AuthorQueriesImplTest {
     @Test
     void getAuthorsByBookId() {
         // given
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
         when(queryBuilder.select(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.from(anyString()))
@@ -43,7 +41,6 @@ class AuthorQueriesImplTest {
         String result = authorQueries.getAuthorsByBookId();
 
         // then
-        verify(queryBuilder).setUp();
         verify(queryBuilder).select("*");
         verify(queryBuilder).from("authors a");
         verify(queryBuilder).join("book_authors ab", "a.id = ab.author_id");
@@ -55,8 +52,7 @@ class AuthorQueriesImplTest {
     @Test
     void getCreateAuthor() {
         // given
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.insertInto(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.columns(anyString(), anyString(), anyString()))
@@ -70,7 +66,7 @@ class AuthorQueriesImplTest {
         String result = authorQueries.getCreateAuthor();
 
         // then
-        verify(queryBuilder).setUp();
+        
         verify(queryBuilder).insertInto("authors");
         verify(queryBuilder).columns("first_name", "middle_name", "last_name");
         verify(queryBuilder).values("?", "?", "?");
@@ -81,8 +77,7 @@ class AuthorQueriesImplTest {
     @Test
     void getAuthorById() {
         // given
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.select(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.from(anyString()))
@@ -96,7 +91,7 @@ class AuthorQueriesImplTest {
         String result = authorQueries.getAuthorById();
 
         // then
-        verify(queryBuilder).setUp();
+        
         verify(queryBuilder).select("*");
         verify(queryBuilder).from("authors");
         verify(queryBuilder).where("id = ?");
@@ -107,8 +102,7 @@ class AuthorQueriesImplTest {
     @Test
     void getAllAuthors() {
         // given
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.select(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.from(anyString()))
@@ -120,7 +114,7 @@ class AuthorQueriesImplTest {
         String result = authorQueries.getAllAuthors();
 
         // then
-        verify(queryBuilder).setUp();
+        
         verify(queryBuilder).select("*");
         verify(queryBuilder).from("authors");
         verify(queryBuilder).build();
@@ -130,36 +124,36 @@ class AuthorQueriesImplTest {
     @Test
     void getPageAuthors() {
         // given
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.select(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.from(anyString()))
+                .thenReturn(queryBuilder);
+        when(queryBuilder.orderBy(Mockito.any(String.class)))
                 .thenReturn(queryBuilder);
         when(queryBuilder.limit(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.offset(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.build())
-                .thenReturn("SELECT * FROM authors LIMIT ? OFFSET ?");
+                .thenReturn("SELECT *, count(*) OVER() AS total FROM authors LIMIT ? OFFSET ?");
 
         // when
         String result = authorQueries.getPageAuthors(null);
 
         // then
-        verify(queryBuilder).setUp();
-        verify(queryBuilder).select("*");
+        
+        verify(queryBuilder).select("*, count(*) OVER() AS total");
         verify(queryBuilder).from("authors");
         verify(queryBuilder).limit("?");
         verify(queryBuilder).offset("?");
         verify(queryBuilder).build();
-        assertEquals("SELECT * FROM authors LIMIT ? OFFSET ?", result);
+        assertEquals("SELECT *, count(*) OVER() AS total FROM authors LIMIT ? OFFSET ?", result);
     }
 
     @Test
     void getUpdateAuthor() {
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.update(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.set(anyString(), anyString(), anyString()))
@@ -173,7 +167,7 @@ class AuthorQueriesImplTest {
         String result = authorQueries.getUpdateAuthor();
 
         // then
-        verify(queryBuilder).setUp();
+        
         verify(queryBuilder).update("authors");
         verify(queryBuilder).set("first_name", "middle_name", "last_name");
         verify(queryBuilder).where("id = ?");
@@ -184,8 +178,7 @@ class AuthorQueriesImplTest {
 
     @Test
     void getDeleteAuthor() {
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.deleteFrom(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.where(anyString()))
@@ -197,7 +190,7 @@ class AuthorQueriesImplTest {
         String result = authorQueries.getDeleteAuthor();
 
         // then
-        verify(queryBuilder).setUp();
+        
         verify(queryBuilder).deleteFrom("authors");
         verify(queryBuilder).where("id = ?");
         verify(queryBuilder).build();
@@ -206,8 +199,7 @@ class AuthorQueriesImplTest {
 
     @Test
     void getAuthorsByIds() {
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.select(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.from(anyString()))
@@ -223,7 +215,7 @@ class AuthorQueriesImplTest {
         String result = authorQueries.getAuthorsByIds(1);
 
         // then
-        verify(queryBuilder).setUp();
+        
         verify(queryBuilder).select("*");
         verify(queryBuilder).from("authors");
         verify(queryBuilder).where("id");
@@ -234,8 +226,7 @@ class AuthorQueriesImplTest {
 
     @Test
     void getCountAuthors() {
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.select(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.from(anyString()))
@@ -247,7 +238,7 @@ class AuthorQueriesImplTest {
         String result = authorQueries.getCountAuthors();
 
         // then
-        verify(queryBuilder).setUp();
+        
         verify(queryBuilder).select("count(*)");
         verify(queryBuilder).from("authors");
         verify(queryBuilder).build();
@@ -256,8 +247,7 @@ class AuthorQueriesImplTest {
 
     @Test
     void getDeleteAllAuthors() {
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.truncate(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.cascade())
@@ -269,7 +259,7 @@ class AuthorQueriesImplTest {
         String result = authorQueries.getDeleteAllAuthors();
 
         // then
-        verify(queryBuilder).setUp();
+        
         verify(queryBuilder).truncate("authors");
         verify(queryBuilder).cascade();
         verify(queryBuilder).build();
@@ -278,8 +268,7 @@ class AuthorQueriesImplTest {
 
     @Test
     void testGetAllAuthors() {
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.select(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.from(anyString()))
@@ -294,7 +283,7 @@ class AuthorQueriesImplTest {
         String result = authorQueries.getAllAuthors(sort);
 
         // then
-        verify(queryBuilder).setUp();
+        
         verify(queryBuilder).select("*");
         verify(queryBuilder).from("authors");
         verify(queryBuilder).orderBy(Mockito.any(String.class));
@@ -304,8 +293,7 @@ class AuthorQueriesImplTest {
 
     @Test
     void getDeleteAuthorsByIds() {
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.deleteFrom(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.where(anyString()))
@@ -319,7 +307,7 @@ class AuthorQueriesImplTest {
         String result = authorQueries.getDeleteAuthorsByIds(1);
 
         // then
-        verify(queryBuilder).setUp();
+        
         verify(queryBuilder).deleteFrom("authors");
         verify(queryBuilder).where("id");
         verify(queryBuilder).in(1);
@@ -329,8 +317,7 @@ class AuthorQueriesImplTest {
 
     @Test
     void getDeleteAuthorsByBookId() {
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.deleteFrom(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.where(anyString()))
@@ -342,7 +329,7 @@ class AuthorQueriesImplTest {
         String result = authorQueries.getDeleteAuthorsByBookId();
 
         // then
-        verify(queryBuilder).setUp();
+        
         verify(queryBuilder).deleteFrom("book_authors");
         verify(queryBuilder).where("book_id = ?");
         verify(queryBuilder).build();
@@ -352,8 +339,7 @@ class AuthorQueriesImplTest {
 
     @Test
     void getSaveAuthorsToBook() {
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.insertInto(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.columns(anyString(), anyString()))
@@ -367,7 +353,7 @@ class AuthorQueriesImplTest {
         String result = authorQueries.getSaveAuthorsToBook();
 
         // then
-        verify(queryBuilder).setUp();
+        
         verify(queryBuilder).insertInto("book_authors");
         verify(queryBuilder).columns("book_id", "author_id");
         verify(queryBuilder).values("?", "?");
@@ -378,8 +364,7 @@ class AuthorQueriesImplTest {
 
     @Test
     void getSearchAuthors() {
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.select(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.from(anyString()))
@@ -395,14 +380,16 @@ class AuthorQueriesImplTest {
         when(queryBuilder.offset(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.build())
-                .thenReturn("SELECT * FROM authors WHERE first_name LIKE ? OR middle_name LIKE ? OR last_name LIKE ? LIMIT ? OFFSET ?");
+                .thenReturn("SELECT *, count(*) OVER() FROM authors " +
+                        "WHERE first_name LIKE ? OR middle_name LIKE ? OR last_name LIKE ? " +
+                        "LIMIT ? OFFSET ?");
 
         // when
         String result = authorQueries.getSearchAuthors(null);
 
         // then
-        verify(queryBuilder).setUp();
-        verify(queryBuilder).select("*");
+        
+        verify(queryBuilder).select("*, count(*) OVER()");
         verify(queryBuilder).from("authors");
         verify(queryBuilder).where("first_name LIKE ?");
         verify(queryBuilder).or("middle_name LIKE ?");
@@ -410,13 +397,14 @@ class AuthorQueriesImplTest {
         verify(queryBuilder).limit("?");
         verify(queryBuilder).offset("?");
         verify(queryBuilder).build();
-assertEquals("SELECT * FROM authors WHERE first_name LIKE ? OR middle_name LIKE ? OR last_name LIKE ? LIMIT ? OFFSET ?", result);
+        assertEquals("SELECT *, count(*) OVER() FROM authors " +
+                "WHERE first_name LIKE ? OR middle_name LIKE ? OR last_name LIKE ? " +
+                "LIMIT ? OFFSET ?", result);
     }
 
     @Test
     void getAuthorsCount() {
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.select(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.from(anyString()))
@@ -434,7 +422,7 @@ assertEquals("SELECT * FROM authors WHERE first_name LIKE ? OR middle_name LIKE 
         String result = authorQueries.getAuthorsCount();
 
         // then
-        verify(queryBuilder).setUp();
+        
         verify(queryBuilder).select("count(*)");
         verify(queryBuilder).from("authors");
         verify(queryBuilder).where("first_name LIKE ?");
@@ -446,8 +434,7 @@ assertEquals("SELECT count(*) FROM authors WHERE first_name LIKE ? OR middle_nam
 
     @Test
     void getFindAllByNameContainingIgnoreCase() {
-        when(queryBuilder.setUp())
-                .thenReturn(queryBuilder);
+        
         when(queryBuilder.select(anyString()))
                 .thenReturn(queryBuilder);
         when(queryBuilder.from(anyString()))
@@ -465,7 +452,7 @@ assertEquals("SELECT count(*) FROM authors WHERE first_name LIKE ? OR middle_nam
         String result = authorQueries.getFindAllByNameContainingIgnoreCase();
 
         // then
-        verify(queryBuilder).setUp();
+        
         verify(queryBuilder).select("*");
         verify(queryBuilder).from("authors");
         verify(queryBuilder).where("first_name LIKE ?");

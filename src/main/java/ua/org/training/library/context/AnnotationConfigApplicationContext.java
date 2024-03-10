@@ -57,8 +57,8 @@ public class AnnotationConfigApplicationContext {
                                               String[] qualifiers) {
         if (qualifiers.length == 1 &&
                 (entry.getKey().isAnnotationPresent(Component.class) &&
-                        (entry.getKey().getAnnotation(Component.class).value()
-                                .equals(qualifiers[0])))) {
+                        (entry.getKey().getAnnotation(Component.class)
+                                .value().equals(qualifiers[0])))) {
             log.info("Qualifier {} found for {}", qualifiers[0], tClass);
             log.info("Assigning object {} to {}", entry.getValue(), tClass);
             return true;

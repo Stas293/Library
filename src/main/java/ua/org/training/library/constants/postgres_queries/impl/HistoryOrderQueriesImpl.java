@@ -29,7 +29,7 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
     @Override
     public String getCreateQuery() {
         return queries.computeIfAbsent("getCreateQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .insertInto("history_orders")
                         .columns("book_title", "date_created", "date_returned", "user_id", "status_id")
                         .values("?", "?", "?", "?", "?")
@@ -45,7 +45,7 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
     }
 
     private QueryBuilder selectFromHistoryOrders() {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .select("*, COUNT(*) OVER() AS full_count")
                 .from("history_orders");
     }
@@ -86,7 +86,7 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
     @Override
     public String getUpdateQuery() {
         return queries.computeIfAbsent("getUpdateQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .update("history_orders")
                         .set("book_title", "date_created",
                                 "date_returned", "user_id", "status_id")
@@ -97,7 +97,7 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
     @Override
     public String getDeleteQuery() {
         return queries.computeIfAbsent("getDeleteQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .deleteFrom("history_orders")
                         .where("id = ?")
                         .build());
@@ -106,7 +106,7 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
     @Override
     public String getCountQuery() {
         return queries.computeIfAbsent("getCountQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("count(*)")
                         .from("history_orders")
                         .build());
@@ -115,7 +115,7 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
     @Override
     public String getDeleteAllQuery() {
         return queries.computeIfAbsent("getDeleteAllQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .truncate("history_orders")
                         .cascade()
                         .build());
@@ -123,7 +123,7 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
 
     @Override
     public String getDeleteAllByIdsQuery(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .deleteFrom("history_orders")
                 .where("id")
                 .in(size)
@@ -141,7 +141,7 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
     }
 
     private QueryBuilder selectFromHistoryOrderWhereUserId() {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .select("*, COUNT(*) OVER() AS total")
                 .from("history_orders")
                 .where("user_id = ?");
@@ -150,7 +150,7 @@ public class HistoryOrderQueriesImpl implements HistoryOrderQueries {
     @Override
     public String getSelectAllByUserIdAndSearchQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getSelectAllByUserIdAndSearchQueryPage",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*, COUNT(*) OVER() AS total")
                         .from("history_orders")
                         .where("user_id = ?")

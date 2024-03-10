@@ -44,7 +44,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderDto> getPageByStatusAndUser(Pageable page, String status, User user, String search, Locale locale) {
+    public Page<OrderDto> getPageByStatusAndUser(Pageable page, String status, User user,
+                                                 String search, Locale locale) {
         log.info("Getting orders by status and user: {}, {}, {}", page, status, user);
         Status statusOrder = statusRepository.findByCode(status).orElseThrow();
         User userOrder = userRepository.getByLogin(user.getLogin()).orElseThrow();
@@ -76,7 +77,8 @@ public class OrderServiceImpl implements OrderService {
         Status statusOrder = statusRepository.findByCode(status).orElseThrow();
         Place placeOrder = placeRepository.getByCode(place).orElseThrow();
         if (search != null && !search.isEmpty()) {
-            Page<Order> orderPage = orderRepository.getPageByStatusAndPlaceAndSearch(page, statusOrder, placeOrder, search);
+            Page<Order> orderPage = orderRepository.getPageByStatusAndPlaceAndSearch(
+                    page, statusOrder, placeOrder, search);
             return objectMapper.mapOrderLibrarianToOrderDto(orderPage);
         }
         Page<Order> pageByStatusAndPlace = orderRepository.getPageByStatusAndPlace(page, statusOrder, placeOrder);
@@ -141,29 +143,30 @@ public class OrderServiceImpl implements OrderService {
         Status status = statusRepository.findByCode(orderUpdateDto.getStatus()).orElseThrow();
         log.info("New status: {}", status);
         order.setStatus(status);
+        order.setDateExpire(orderUpdateDto.getDateExpire());
         if (Boolean.TRUE.equals(status.getClosed())) {
-            log.info("Order is closed");
-            LocalDate dateExpiration = orderUpdateDto.getDateExpire();
-            order.setDateExpire(dateExpiration);
-            log.info("Date expiration: {}", dateExpiration);
-            orderRepository.delete(order);
-            log.info("Order deleted");
-            Book book = order.getBook();
-            book.setCount(book.getCount() + 1);
-            bookRepository.updateBookCount(book);
-            log.info("Book count updated");
-            HistoryOrder historyOrder = objectMapper.mapOrderToHistoryOrder(order);
-            log.info("History order: {}", historyOrder);
-            if (previousStatus.getCode().equals(DefaultValues.REGISTERED.getValue())) {
-                historyOrder.setDateReturned(null);
-            }
-            historyOrderRepository.save(historyOrder);
+            closeOrder(order, previousStatus);
         } else {
             log.info("Order is not closed");
-            order.setDateExpire(orderUpdateDto.getDateExpire());
             orderRepository.save(order);
         }
         return Optional.of(objectMapper.mapOrderSimpleToOrderDto(order));
+    }
+
+    private void closeOrder(Order order, Status previousStatus) {
+        log.info("Order is closed");
+        orderRepository.delete(order);
+        log.info("Order deleted");
+        Book book = order.getBook();
+        book.setCount(book.getCount() + 1);
+        bookRepository.updateBookCount(book);
+        log.info("Book count updated");
+        HistoryOrder historyOrder = objectMapper.mapOrderToHistoryOrder(order);
+        log.info("History order: {}", historyOrder);
+        if (previousStatus.getCode().equals(DefaultValues.REGISTERED.getValue())) {
+            historyOrder.setDateReturned(null);
+        }
+        historyOrderRepository.save(historyOrder);
     }
 
     @Override

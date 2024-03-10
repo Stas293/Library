@@ -27,7 +27,7 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
     @Override
     public String getCreateStatusNameQuery() {
         return queries.computeIfAbsent("getCreateStatusNameQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .insertInto("status_name")
                         .columns("name", "lang", "status_id")
                         .values("?", "?", "?")
@@ -37,7 +37,7 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
     @Override
     public String getGetStatusNameByIdQuery() {
         return queries.computeIfAbsent("getGetStatusNameByIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("status_name")
                         .where("id = ?")
@@ -46,7 +46,7 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
 
     @Override
     public String getGetStatusNameByIdsQuery(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .select("*")
                 .from("status_name")
                 .where("id")
@@ -57,7 +57,7 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
     @Override
     public String getGetAllStatusNamesQuery() {
         return queries.computeIfAbsent("getGetAllStatusNamesQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("status_name")
                         .build());
@@ -66,7 +66,7 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
     @Override
     public String getGetAllStatusNamesQuery(Sort sort) {
         return String.format(queries.computeIfAbsent("getGetAllStatusNamesQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("status_name")
                         .orderBy("%s")
@@ -76,7 +76,7 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
     @Override
     public String getGetPageStatusNamesQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getGetPageStatusNamesQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*, count(*) OVER() AS total")
                         .from("status_name")
                         .orderBy("%s")
@@ -88,7 +88,7 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
     @Override
     public String getUpdateStatusNameQuery() {
         return queries.computeIfAbsent("getUpdateStatusNameQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .update("status_name")
                         .set("name = ?", "lang = ?", "status_id = ?")
                         .where("id = ?")
@@ -98,7 +98,7 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
     @Override
     public String getDeleteStatusNameByIdQuery() {
         return queries.computeIfAbsent("getDeleteStatusNameByIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .deleteFrom("status_name")
                         .where("id = ?")
                         .build());
@@ -107,7 +107,7 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
     @Override
     public String getGetCountStatusNamesQuery() {
         return queries.computeIfAbsent("getGetCountStatusNamesQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("count(*)")
                         .from("status_name")
                         .build());
@@ -116,14 +116,14 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
     @Override
     public String getDeleteAllStatusNamesQuery() {
         return queries.computeIfAbsent("getDeleteAllStatusNamesQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .truncate("status_name")
                         .build());
     }
 
     @Override
     public String getDeleteStatusNamesByIdsQuery(int size) {
-        return queryBuilderImpl.setUp()
+        return queryBuilderImpl
                 .deleteFrom("status_name")
                 .where("id")
                 .in(size)
@@ -133,7 +133,7 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
     @Override
     public String getUpdateStatusNamesQuery() {
         return queries.computeIfAbsent("getUpdateStatusNamesQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .update("status_name")
                         .set("name = ?", "lang = ?", "status_id = ?")
                         .where("id = ?")
@@ -143,7 +143,7 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
     @Override
     public String getGetStatusNamesByStatusIdQuery() {
         return queries.computeIfAbsent("getGetStatusNamesByStatusIdQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("status_name")
                         .where("status_id = ?")
@@ -153,7 +153,7 @@ public class StatusNameQueriesImpl implements StatusNameQueries {
     @Override
     public String getGetStatusNameByStatusIdAndLocaleQuery() {
         return queries.computeIfAbsent("getGetStatusNameByStatusIdAndLocaleQuery",
-                key -> queryBuilderImpl.setUp()
+                key -> queryBuilderImpl
                         .select("*")
                         .from("status_name")
                         .where("status_id = ?")
