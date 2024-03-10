@@ -4,8 +4,10 @@
 
 ## Description
 
-My application context is used in this project. There is no Spring in this project. The following technologies are used:
-- Java 20 (+Virtual Threads)
+My application autowiring via context in this project (similar to Spring BeanFactory). ]
+But there is no Spring in this project. 
+The following technologies are used:
+- Java 21 (+Virtual Threads)
 - JDBC
 - PostgreSQL
 - JSP
@@ -15,6 +17,9 @@ My application context is used in this project. There is no Spring in this proje
 - Bootstrap 5
 - Maven
 - Tomcat 11
+- Docker
+- Docker Compose
+- JUnit 5
 
 The reader registers in the system and then can:
 - search (by author (s) / title / description / ISBN / keywords) and view books from the catalog;
@@ -46,15 +51,10 @@ And also:
 
 ## How to run
 
-Before you run the application please make sure to execute the SQL script from the `src/main/resources/schema.sql` file.
-The script will create the database and the necessary tables. 
-Then you have to execute the SQL script from the `src/main/resources/data.sql` file. 
-The script will insert some data into the database.
-
 1. Clone the repository
 2. Open the project in your IDE
-3. Run the project (it will bootstrap all the necessary classes and start the server on port 8080)
-4. Open the browser and go to http://localhost:8080
+3. Populate required environment variables in the docker-compose.yml file
+4. Run the application
 5. Enjoy!
 
 ## How to use

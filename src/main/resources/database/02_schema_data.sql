@@ -1,3 +1,5 @@
+\c library
+
 INSERT INTO roles (code, name)
 VALUES ('USER', 'User'),
        ('ADMIN', 'Admin'),
