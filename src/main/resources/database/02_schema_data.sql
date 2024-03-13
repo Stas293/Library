@@ -12,9 +12,9 @@ VALUES ('REGISTER', FALSE),
        ('CLOSE', TRUE);
 
 INSERT INTO next_statuses (next_status, status)
-VALUES  (1, 2),
-        (1, 3),
-        (2, 4);
+VALUES (1, 2),
+       (1, 3),
+       (2, 4);
 
 INSERT INTO status_name (name, lang, status_id)
 VALUES ('Registered', 'en', 1),

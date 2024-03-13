@@ -107,7 +107,8 @@
                     </c:if>
                 </div>
                 <div class="form-group" class="mb-3">
-                    <label hidden="hidden" id="recaptchaLabel"><fmt:message key="newUserRegistration.input.recaptcha"/></label>
+                    <label hidden="hidden" id="recaptchaLabel"><fmt:message
+                            key="newUserRegistration.input.recaptcha"/></label>
                     <div class="g-recaptcha" data-sitekey="6LeBIPUjAAAAABOzDNe4GDN4WdhheYH2Oax_bdJv"></div>
                     <c:set var="captchaErrors">${errors.captcha}</c:set>
                     <c:if test="${not empty captchaErrors}">

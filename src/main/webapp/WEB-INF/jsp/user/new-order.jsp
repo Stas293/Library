@@ -21,7 +21,8 @@
                     <li class="breadcrumb-item"><a href="/" class="text-white"><fmt:message key="home.pageTitle"/></a>
                     </li>
                     <li class="breadcrumb-item active">
-                        <a href="/library/order/user/page" class="text-white"><fmt:message key="orderList.pageTitle"/></a>
+                        <a href="/library/order/user/page" class="text-white"><fmt:message
+                                key="orderList.pageTitle"/></a>
                 </ol>
             </nav>
             <h1 class="my-4"><fmt:message key="orderBook.pageTitle"/></h1>

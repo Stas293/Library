@@ -18,14 +18,13 @@ import java.util.concurrent.Executors;
 @Slf4j
 @RequiredArgsConstructor
 public class TomcatServer implements Runnable {
-    private final AnnotationConfigApplicationContext applicationContext;
     private static final String CONTEXT_PATH = "";
     private static final String MAPPING_URL = "/library/*";
     private static final String FILTER_MAPPING_URL = "/*";
     private static final int PORT = 8080;
     private static final String WEB_APP_DIRECTORY = "src/main/webapp";
     private static final String SERVLET_NAME = "dispatcherServlet";
-
+    private final AnnotationConfigApplicationContext applicationContext;
 
     @SneakyThrows
     public void run() {

@@ -1,9 +1,9 @@
-package ua.org.training.library.constants.postgres_queries.impl;
+package ua.org.training.library.enums.constants.postgres_queries;
 
 
-import ua.org.training.library.constants.postgres_queries.BookQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.enums.constants.BookQueries;
 import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.WeakConcurrentHashMap;
 import ua.org.training.library.utility.page.Pageable;
@@ -15,9 +15,9 @@ import java.util.Map;
 
 @Component
 public class BookQueriesImpl implements BookQueries {
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "title");
     private final Map<String, String> queries;
     private final QueryBuilderImpl queryBuilderImpl;
-    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "title");
 
 
     @Autowired

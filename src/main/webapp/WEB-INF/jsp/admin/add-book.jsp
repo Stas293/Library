@@ -199,7 +199,8 @@
                     <c:if test="${not empty bookFine}">
                         <c:set var="bookFineNumber">${book.fine}</c:set>
                     </c:if>
-                    <input class="col-2 rounded border" id="bookFine" type="number" step="0.01" min="0" required name="fine"
+                    <input class="col-2 rounded border" id="bookFine" type="number" step="0.01" min="0" required
+                           name="fine"
                            value=${bookFineNumber}>
                     <c:set var="bookNameErrors">${bookValidationError.fine}</c:set>
                     <c:if test="${not empty bookNameErrors}">

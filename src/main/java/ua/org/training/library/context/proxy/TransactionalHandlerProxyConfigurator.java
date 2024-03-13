@@ -33,7 +33,7 @@ public class TransactionalHandlerProxyConfigurator implements ProxyConfigurator 
         log.info("Creating proxy for class: {}", implClass.getName());
         if (implClass.getInterfaces().length > 0) {
             return getRegularProxyIfClassImplementsInterfaces(object, implClass,
-                                                              transactionalMethods, context);
+                    transactionalMethods, context);
         }
         return getProxyWithJavassist(object, transactionalMethods, context);
     }
@@ -137,8 +137,8 @@ public class TransactionalHandlerProxyConfigurator implements ProxyConfigurator 
     }
 
     private Object createTransactionalMethodInvocation(Object object, Method method,
-                                                              TransactionManager transactionManager,
-                                                              Object... args) {
+                                                       TransactionManager transactionManager,
+                                                       Object... args) {
         try {
             transactionManager.beginTransaction();
             Object retVal = method.invoke(object, args);

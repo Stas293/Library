@@ -5,5 +5,5 @@ public enum RequestMethod {
     POST,
     PUT,
     PATCH,
-    DELETE;
+    DELETE
 }

@@ -4,12 +4,12 @@ package ua.org.training.library.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
-import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.context.annotations.Service;
 import ua.org.training.library.context.annotations.Transactional;
 import ua.org.training.library.dto.*;
+import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.enums.Validation;
 import ua.org.training.library.form.LoggedUserUpdatePasswordFormValidationError;
 import ua.org.training.library.form.PersonalEditFormValidationError;
@@ -38,6 +38,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserServiceImpl implements UserService {
+    private static final int APP_BCRYPT_SALT = 10;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ObjectMapper objectMapper;
@@ -45,7 +46,6 @@ public class UserServiceImpl implements UserService {
     private final UserRegistrationValidator userRegistrationValidator;
     private final ResetPasswordValidator resetPasswordValidator;
     private final LoggedUserEditPasswordValidator loggedUserEditPasswordValidator;
-    private static final int APP_BCRYPT_SALT = 10;
 
     @Override
     @Transactional

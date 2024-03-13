@@ -23,11 +23,11 @@ public class PageImpl<T> extends Chunk<T> implements Page<T> {
     }
 
     public PageImpl(List<T> content) {
-        this(content, Pageable.unpaged(), null == content ? 0L : (long)content.size());
+        this(content, Pageable.unpaged(), null == content ? 0L : (long) content.size());
     }
 
     public int getTotalPages() {
-        return this.getSize() == 0 ? 1 : (int)Math.ceil((double)this.total / (double)this.getSize());
+        return this.getSize() == 0 ? 1 : (int) Math.ceil((double) this.total / (double) this.getSize());
     }
 
     public long getTotalElements() {
@@ -37,6 +37,7 @@ public class PageImpl<T> extends Chunk<T> implements Page<T> {
     public boolean hasNext() {
         return this.getNumber() + 1 < this.getTotalPages();
     }
+
     public boolean isLast() {
         return !this.hasNext();
     }

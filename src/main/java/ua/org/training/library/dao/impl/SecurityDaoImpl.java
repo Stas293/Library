@@ -2,10 +2,10 @@ package ua.org.training.library.dao.impl;
 
 
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.constants.postgres_queries.SecurityQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.dao.SecurityDao;
+import ua.org.training.library.enums.constants.SecurityQueries;
 import ua.org.training.library.exceptions.DaoException;
 
 import java.sql.Connection;

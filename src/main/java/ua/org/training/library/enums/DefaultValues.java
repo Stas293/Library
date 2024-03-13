@@ -24,7 +24,8 @@ public enum DefaultValues {
     EMAIL_ATTRIBUTE("email"),
     APP_DEFAULT_LANGUAGE("en"),
     REGISTERED("REGISTER"),
-    SQL_CONNECTION_INIT("SELECT 1"),;
+    SQL_CONNECTION_INIT("SELECT 1"),
+    ;
 
     private final String value;
 }

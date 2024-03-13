@@ -5,31 +5,31 @@ let urlAcceptedOrders = `/library/order/librarian?statusCode=ACCEPT`;
 
 
 window.onload = () => {
-    document.getElementById('date_expire').setAttribute('style','display:none');
+    document.getElementById('date_expire').setAttribute('style', 'display:none');
     urlPath = registeresOrders;
     setOrderListeners(urlPath);
     wizard(urlPath, null);
 }
 
 function showUsersOrders() {
-    document.getElementById('date_expire').setAttribute('style','display:none');
-    document.getElementById('date_created').setAttribute('style','display');
+    document.getElementById('date_expire').setAttribute('style', 'display:none');
+    document.getElementById('date_created').setAttribute('style', 'display');
     urlPath = registeresOrders;
     setOrderListeners(urlPath);
     wizard(urlPath, null);
 }
 
 function showAcceptedOrdersOnSubscription() {
-    document.getElementById('date_expire').setAttribute('style','display');
-    document.getElementById('date_created').setAttribute('style','display:none');
+    document.getElementById('date_expire').setAttribute('style', 'display');
+    document.getElementById('date_created').setAttribute('style', 'display:none');
     urlPath = urlAcceptedOrders + '&placeName=SUBSCRIPTION';
     setOrderListeners(urlPath);
     wizard(urlPath, null);
 }
 
 function showAcceptedOrdersReadingRoom() {
-    document.getElementById('date_expire').setAttribute('style','display');
-    document.getElementById('date_created').setAttribute('style','display:none');
+    document.getElementById('date_expire').setAttribute('style', 'display');
+    document.getElementById('date_created').setAttribute('style', 'display:none');
     urlPath = urlAcceptedOrders + '&placeName=READING_ROOM';
     setOrderListeners(urlPath);
     wizard(urlPath, null);

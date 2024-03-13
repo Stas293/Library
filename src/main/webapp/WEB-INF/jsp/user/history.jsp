@@ -39,10 +39,10 @@
             <table class="table table-bordered table-active table-hover table-striped">
                 <thead class="table-header table-dark ">
                 <tr>
-                    <th id = "book_name" scope="col"><fmt:message key="orderList.table.name"/></th>
-                    <th id = "date_created" scope="col"><fmt:message key="orderList.table.date_created"/></th>
-                    <th id = "date_returned" scope="col"><fmt:message key="orderList.table.date_returned"/></th>
-                    <th id = "status" scope="col"><fmt:message key="orderList.table.status"/></th>
+                    <th id="book_name" scope="col"><fmt:message key="orderList.table.name"/></th>
+                    <th id="date_created" scope="col"><fmt:message key="orderList.table.date_created"/></th>
+                    <th id="date_returned" scope="col"><fmt:message key="orderList.table.date_returned"/></th>
+                    <th id="status" scope="col"><fmt:message key="orderList.table.status"/></th>
                 </tr>
                 </thead>
                 <tbody id="pageable-list">

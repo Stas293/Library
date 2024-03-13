@@ -15,8 +15,8 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MethodOverrideFilter implements Filter {
-    private final HttpServletRequestMethodMapper mapper;
     private static final String POST_METHOD = "POST";
+    private final HttpServletRequestMethodMapper mapper;
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {

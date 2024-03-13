@@ -4,8 +4,8 @@ package ua.org.training.library.security;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.exceptions.ServiceException;
 
 import java.util.HashSet;

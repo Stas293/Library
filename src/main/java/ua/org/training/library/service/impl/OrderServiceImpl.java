@@ -3,7 +3,6 @@ package ua.org.training.library.service.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.context.annotations.Service;
@@ -11,6 +10,7 @@ import ua.org.training.library.context.annotations.Transactional;
 import ua.org.training.library.dto.OrderCreationDto;
 import ua.org.training.library.dto.OrderDto;
 import ua.org.training.library.dto.OrderUpdateDto;
+import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.model.*;
 import ua.org.training.library.repository.*;
 import ua.org.training.library.security.AuthorityUser;
@@ -134,7 +134,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Optional<OrderDto>  updateModel(OrderUpdateDto orderUpdateDto, Locale locale) {
+    public Optional<OrderDto> updateModel(OrderUpdateDto orderUpdateDto, Locale locale) {
         log.info("Updating order: {}", orderUpdateDto);
         Order order = orderRepository.findById(orderUpdateDto.getId(), locale).orElseThrow();
         log.info("Order: {}", order);

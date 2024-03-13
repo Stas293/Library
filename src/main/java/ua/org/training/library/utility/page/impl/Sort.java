@@ -4,16 +4,10 @@ import java.io.Serializable;
 import java.util.*;
 
 public class Sort implements Serializable {
-    private static final Sort UNSORTED = unsorted();
     public static final Direction DEFAULT_DIRECTION = Direction.ASC;
-    private final List<Order> orders;
-
+    private final List<Order> orders;    private static final Sort UNSORTED = unsorted();
     protected Sort(List<Order> orders) {
         this.orders = orders;
-    }
-
-    public static Sort by(List<Order> orders) {
-        return orders.isEmpty() ? unsorted() : new Sort(orders);
     }
 
     private Sort(Direction direction, List<String> properties) {
@@ -22,6 +16,10 @@ public class Sort implements Serializable {
         } else {
             throw new IllegalArgumentException("You have to provide at least one property to sort by");
         }
+    }
+
+    public static Sort by(List<Order> orders) {
+        return orders.isEmpty() ? unsorted() : new Sort(orders);
     }
 
     public static Sort by(String... properties) {
@@ -55,6 +53,7 @@ public class Sort implements Serializable {
     public Iterator<Order> iterator() {
         return this.orders.iterator();
     }
+
     public Order getOrderFor(String property) {
 
         for (Order order : this.orders) {
@@ -84,14 +83,6 @@ public class Sort implements Serializable {
         Direction() {
         }
 
-        public boolean isAscending() {
-            return this.equals(ASC);
-        }
-
-        public boolean isDescending() {
-            return this.equals(DESC);
-        }
-
         public static Direction fromString(String value) {
             try {
                 return valueOf(value.toUpperCase(Locale.US));
@@ -107,6 +98,14 @@ public class Sort implements Serializable {
                 return Optional.empty();
             }
         }
+
+        public boolean isAscending() {
+            return this.equals(ASC);
+        }
+
+        public boolean isDescending() {
+            return this.equals(DESC);
+        }
     }
 
     public static class Order implements Serializable {
@@ -116,6 +115,12 @@ public class Sort implements Serializable {
 
         public Order(Direction direction, String property) {
             this(direction, property, false);
+        }
+
+        private Order(Direction direction, String property, boolean ignoreCase) {
+            this.direction = direction == null ? Sort.DEFAULT_DIRECTION : direction;
+            this.property = property;
+            this.ignoreCase = ignoreCase;
         }
 
         public static Order by(String property) {
@@ -128,12 +133,6 @@ public class Sort implements Serializable {
 
         public static Order desc(String property) {
             return new Order(Direction.DESC, property);
-        }
-
-        private Order(Direction direction, String property, boolean ignoreCase) {
-            this.direction = direction == null ? Sort.DEFAULT_DIRECTION : direction;
-            this.property = property;
-            this.ignoreCase = ignoreCase;
         }
 
         public Direction getDirection() {
@@ -181,4 +180,8 @@ public class Sort implements Serializable {
                     '}';
         }
     }
+
+
+
+
 }

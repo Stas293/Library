@@ -1,4 +1,4 @@
-package ua.org.training.library.constants.postgres_queries;
+package ua.org.training.library.enums.constants;
 
 
 import ua.org.training.library.utility.page.Pageable;
@@ -14,6 +14,7 @@ public interface HistoryOrderQueries {
     String getSelectAllQuery(Sort sort);
 
     String getSelectAllQuery(Pageable page);
+
     String getSelectAllQuery();
 
     String getUpdateQuery();

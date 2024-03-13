@@ -142,7 +142,7 @@
                     <c:if test="${not empty description}">
                         <c:set var="description">${book.description}</c:set>
                     </c:if>
-                    <textarea name="description"  id="description" class="form-control">${description}</textarea>
+                    <textarea name="description" id="description" class="form-control">${description}</textarea>
                     <c:set var="bookNameErrors">${bookValidationError.description}</c:set>
                     <c:if test="${not empty bookNameErrors}">
                         <div class="alert alert-danger"><fmt:message key="${bookValidationError.description}"/></div>
@@ -202,7 +202,8 @@
                     <c:if test="${not empty bookFine}">
                         <c:set var="bookFineNumber">${book.fine}</c:set>
                     </c:if>
-                    <input class="col-2 rounded border" id="bookFine" type="number" step="0.01" min="0" required name="fine"
+                    <input class="col-2 rounded border" id="bookFine" type="number" step="0.01" min="0" required
+                           name="fine"
                            value=${bookFineNumber}>
                     <c:set var="bookNameErrors">${bookValidationError.fine}</c:set>
                     <c:if test="${not empty bookNameErrors}">

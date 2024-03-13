@@ -19,7 +19,8 @@
     <jsp:body>
         <div class="container main-content">
             <ol class="breadcrumb list-group-item-dark rounded">
-                <li class="breadcrumb-item active"><a href="${pageContext.request.contextPath}/"><fmt:message key="home.pageTitle"/></a></li>
+                <li class="breadcrumb-item active"><a href="${pageContext.request.contextPath}/"><fmt:message
+                        key="home.pageTitle"/></a></li>
             </ol>
             <h1>
                 <fmt:message key="booksList.pageTitle"/>

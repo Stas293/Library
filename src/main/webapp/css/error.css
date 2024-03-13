@@ -1,4 +1,4 @@
-.error-body{
+.error-body {
     height: 100vh;
     background-image: url("https://images.unsplash.com/photo-1589652045525-4496b6099023");
     background-position: center;
@@ -6,7 +6,7 @@
     background-size: cover;
 }
 
-.access-denied{
+.access-denied {
     height: 100vh;
     background-image: url("https://images.unsplash.com/photo-1523672557977-2c106afb2278");
     background-position: center;
@@ -14,7 +14,7 @@
     background-size: cover;
 }
 
-.error-message{
+.error-message {
     display: flex;
     height: 75%;
     flex-direction: column;

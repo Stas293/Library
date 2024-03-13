@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.org.training.library.constants.postgres_queries.AuthorQueries;
 import ua.org.training.library.dao.collectors.Collector;
+import ua.org.training.library.enums.constants.AuthorQueries;
 import ua.org.training.library.model.Author;
 import ua.org.training.library.utility.page.Page;
 import ua.org.training.library.utility.page.Pageable;
@@ -327,8 +327,8 @@ public class AuthorDaoImplTest {
                 pageable, 2);
         String selectAuthorQueries = "SELECT * FROM authors ORDER BY id ASC LIMIT ? OFFSET ?";
         when(authorQueries.getPageAuthors(pageable.getSort())).thenReturn(selectAuthorQueries);
-        when(connection.prepareStatement(selectAuthorQueries,ResultSet.TYPE_SCROLL_INSENSITIVE,
-                ResultSet.CONCUR_READ_ONLY )).thenReturn(statement);
+        when(connection.prepareStatement(selectAuthorQueries, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)).thenReturn(statement);
         when(statement.executeQuery()).thenReturn(resultSet);
         when(statement.executeQuery()).thenReturn(resultSet);
         when(authorCollector.collectList(resultSet)).thenReturn(expectedPage.getContent());

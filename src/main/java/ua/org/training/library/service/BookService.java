@@ -22,6 +22,7 @@ public interface BookService {
 
     Page<BookDto> searchBooksExceptUserOrders(Pageable page, User user,
                                               String search, Locale locale);
+
     Optional<Book> getBookByISBN(String isbn);
 
     Page<BookDto> searchBooks(Pageable page, Locale locale, String search);

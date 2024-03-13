@@ -17,10 +17,10 @@ import static ua.org.training.library.enums.DefaultValues.LIBRARY_PATH;
 @Component
 @Slf4j
 public class ControllerFactory implements Serializable {
-    @Setter
-    private Map<String, HttpMapping> httpMapping;
     private static final Pattern PATTERN_ID = Pattern.compile("\\d+");
     private static final Pattern PATTERN_PARAMS = Pattern.compile("\\?.*");
+    @Setter
+    private Map<String, HttpMapping> httpMapping;
 
     public HttpMapping getControllerCommand(String httpMethod, String httpPath) {
         httpPath = httpPath.replace(LIBRARY_PATH.getValue(), "");

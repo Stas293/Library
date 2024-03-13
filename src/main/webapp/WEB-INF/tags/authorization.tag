@@ -47,8 +47,9 @@
                     </authorization-role:authority>
                     <authorization-role:authority role="hasRole('ADMIN')">
                         <div class="navbar-nav dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
                                 <fmt:message key="app.pageTitle.admin"/>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">

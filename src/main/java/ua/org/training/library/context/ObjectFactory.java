@@ -116,7 +116,7 @@ public class ObjectFactory {
 
     @Nullable
     private Object getObjectForConstructorInvocation(Set<Object> qualifiedObjects,
-                                                            Set<Object> objects, Parameter parameter) {
+                                                     Set<Object> objects, Parameter parameter) {
         log.info("Parameter: {}", parameter);
         log.info("Parameter type: {}", parameter.getType());
         if (parameter.isAnnotationPresent(Qualifier.class)) {
@@ -183,12 +183,12 @@ public class ObjectFactory {
         Arrays.stream(methods)
                 .filter(method -> method.isAnnotationPresent(PreDestroy.class))
                 .forEach(method -> {
-            log.info("Running pre destroy for object {} method {}", o, method);
-            try {
-                method.invoke(o);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-        });
+                    log.info("Running pre destroy for object {} method {}", o, method);
+                    try {
+                        method.invoke(o);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 }

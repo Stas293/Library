@@ -273,7 +273,7 @@ public class BookRepositoryImpl implements BookRepository {
     public List<Book> findAllByAuthors(Author author) {
         log.info("Getting all books by author: {}", author);
         Connection conn = transactionManager.getConnection();
-        return (List<Book>) bookDao.getBooksByAuthorId(conn, author.getId());
+        return bookDao.getBooksByAuthorId(conn, author.getId());
     }
 
     @Override

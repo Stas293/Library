@@ -30,10 +30,10 @@
                 <li class="breadcrumb-item active"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
             </ol>
             <c:if test="${param.created == true}">
-                <div class="alert alert-success"><fmt:message key="order.create.message" /></div>
+                <div class="alert alert-success"><fmt:message key="order.create.message"/></div>
             </c:if>
             <c:if test="${param.created == false}">
-                <div class="alert alert-danger"><fmt:message key="order.create.error" /></div>
+                <div class="alert alert-danger"><fmt:message key="order.create.error"/></div>
             </c:if>
             <h1>
                 <fmt:message key="orderList.pageTitle"/>
@@ -58,8 +58,9 @@
                         <input id="search" class="col-4 rounded border" type="text"
                                placeholder="<fmt:message key="table.search" />">
                         <input id="size" class="col-2 rounded border" type="number" min="2" max="8" value="5">
-                        <input name="sorting" class="hidden" type="radio" id="asc" value="ASC" checked><label class="col-2"
-                                                                                                              for="asc"><fmt:message
+                        <input name="sorting" class="hidden" type="radio" id="asc" value="ASC" checked><label
+                            class="col-2"
+                            for="asc"><fmt:message
                             key="table.asc"/></label>
                         <input name="sorting" class="hidden" type="radio" id="desc" value="DESC"><label class="col-2"
                                                                                                         for="desc"><fmt:message

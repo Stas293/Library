@@ -59,9 +59,9 @@
                     <form action="${pageContext.request.contextPath}/library/books/admin/${book.id}" method="post">
                         <input type="hidden" name="_method" value="DELETE"/>
                         <div class="form-group">
-                        <button type="submit" id="form-submit" class="btn btn-danger">
-                            <span><fmt:message key="admin.delete"/></span>
-                        </button>
+                            <button type="submit" id="form-submit" class="btn btn-danger">
+                                <span><fmt:message key="admin.delete"/></span>
+                            </button>
                         </div>
                     </form>
                 </div>

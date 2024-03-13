@@ -1,9 +1,9 @@
-package ua.org.training.library.constants.postgres_queries.impl;
+package ua.org.training.library.enums.constants.postgres_queries;
 
 
-import ua.org.training.library.constants.postgres_queries.UserQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.enums.constants.UserQueries;
 import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.WeakConcurrentHashMap;
 import ua.org.training.library.utility.page.Pageable;
@@ -14,9 +14,9 @@ import java.util.Map;
 
 @Component
 public class UserQueriesImpl implements UserQueries {
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "login");
     private final Map<String, String> queries;
     private final QueryBuilderImpl queryBuilderImpl;
-    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "login");
 
     @Autowired
     public UserQueriesImpl(QueryBuilderImpl queryBuilderImpl) {
@@ -235,19 +235,19 @@ public class UserQueriesImpl implements UserQueries {
 
     @Override
     public String getQuerySearchUsers(Pageable pageable, String search) {
-            return String.format(queries.computeIfAbsent("getQuerySearchUsers",
-                    key -> queryBuilderImpl
-                            .select("*, count(*) OVER() AS total")
-                            .from("users")
-                            .where("login LIKE ?")
-                            .or("first_name LIKE ?")
-                            .or("last_name LIKE ?")
-                            .or("email LIKE ?")
-                            .or("phone LIKE ?")
-                            .orderBy("%s")
-                            .limit("?")
-                            .offset("?")
-                            .build()), Utility.orderBy(pageable.getSort(), DEFAULT_SORT));
+        return String.format(queries.computeIfAbsent("getQuerySearchUsers",
+                key -> queryBuilderImpl
+                        .select("*, count(*) OVER() AS total")
+                        .from("users")
+                        .where("login LIKE ?")
+                        .or("first_name LIKE ?")
+                        .or("last_name LIKE ?")
+                        .or("email LIKE ?")
+                        .or("phone LIKE ?")
+                        .orderBy("%s")
+                        .limit("?")
+                        .offset("?")
+                        .build()), Utility.orderBy(pageable.getSort(), DEFAULT_SORT));
     }
 
 }

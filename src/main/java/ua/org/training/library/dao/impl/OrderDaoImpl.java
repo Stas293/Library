@@ -2,12 +2,12 @@ package ua.org.training.library.dao.impl;
 
 
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.constants.postgres_queries.OrderQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.context.annotations.Qualifier;
 import ua.org.training.library.dao.OrderDao;
 import ua.org.training.library.dao.collectors.Collector;
+import ua.org.training.library.enums.constants.OrderQueries;
 import ua.org.training.library.exceptions.DaoException;
 import ua.org.training.library.model.Order;
 import ua.org.training.library.utility.page.Page;

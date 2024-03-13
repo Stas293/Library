@@ -1,9 +1,12 @@
-package ua.org.training.library.constants.postgres_queries;
+package ua.org.training.library.enums.constants;
+
 
 import ua.org.training.library.utility.page.Pageable;
 import ua.org.training.library.utility.page.impl.Sort;
 
-public interface RoleQueries {
+import java.util.List;
+
+public interface PlaceNameQueries {
     String getCreateQuery();
 
     String getGetByIdQuery();
@@ -20,17 +23,13 @@ public interface RoleQueries {
 
     String getDeleteQuery();
 
-    String getGetCountQuery();
+    String getCountQuery();
 
     String getDeleteAllQuery();
 
-    String getDeleteAllQuery(int size);
+    String getDeleteAllQuery(List<? extends Long> longs);
 
-    String getGetByCodeQuery();
+    String getGetAllByPlaceIdQuery();
 
-    String getGetByNameQuery();
-
-    String getGetRolesByUserIdQuery();
-
-    String getGetAllByCodesQuery(int size);
+    String getGetByPlaceIdAndLocaleQuery();
 }

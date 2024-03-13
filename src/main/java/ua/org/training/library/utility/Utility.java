@@ -2,18 +2,20 @@ package ua.org.training.library.utility;
 
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import ua.org.training.library.enums.DefaultValues;
+import ua.org.training.library.exceptions.ValidationException;
 import ua.org.training.library.model.Book;
 import ua.org.training.library.model.Order;
 import ua.org.training.library.utility.page.impl.Sort;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.time.LocalDate;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
@@ -22,6 +24,40 @@ import java.util.regex.Pattern;
 public class Utility {
     private static final Pattern numberPattern = Pattern.compile("\\d+");
 
+    public static Type[] getTypeParametersFromString(String typeParameters) {
+        String types = typeParameters.substring(typeParameters.indexOf("<") + 1, typeParameters.indexOf(">"));
+        return Arrays.stream(types.split(","))
+                .map(String::trim)
+                .map(Utility::getType)
+                .toArray(Type[]::new);
+    }
+
+    private static Type getType(String s) {
+        try {
+            return Class.forName(s);
+        } catch (ClassNotFoundException e) {
+            log.error(String.format("Class not found exception %s", s));
+        }
+        return null;
+    }
+
+    public String getEnvOrProperty(String s) {
+        if (s.startsWith("${") && s.endsWith("}")) {
+            String env = s.substring(2, s.length() - 1);
+            return Optional.ofNullable(System.getenv(env)).orElse(s);
+        }
+        return s;
+    }
+
+    public void throwExceptionWithoutMessage(Annotation annotation) {
+        throw new ValidationException("Validation failed for " + annotation.annotationType().getSimpleName());
+    }
+
+    @SneakyThrows
+    public void throwExceptionWithMessage(Method methodMessage, Annotation annotation) {
+        String message = (String) methodMessage.invoke(annotation);
+        throw new ValidationException(message);
+    }
 
     public static double tryParseDouble(String applicationProperty, int defaultValue) {
         try {

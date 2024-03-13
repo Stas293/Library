@@ -18,7 +18,8 @@
         <div class="container main-content">
             <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
-                <li class="breadcrumb-item"><a href="/library/admin/page"><fmt:message key="usersList.pageTitle"/></a></li>
+                <li class="breadcrumb-item"><a href="/library/admin/page"><fmt:message key="usersList.pageTitle"/></a>
+                </li>
                 <li class="breadcrumb-item active"><a href="${userUrl}">${account.login}</a></li>
             </ol>
             <h1><fmt:message key="editUser.pageTitle"/>: ${account.login} </h1>

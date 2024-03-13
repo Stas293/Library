@@ -1,4 +1,4 @@
-package ua.org.training.library.constants.postgres_queries;
+package ua.org.training.library.enums.constants;
 
 
 import ua.org.training.library.utility.page.Pageable;

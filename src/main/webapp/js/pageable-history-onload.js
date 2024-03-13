@@ -14,11 +14,11 @@ class HistoryOrder {
         this.status = status;
     }
 
-    static from (json) {
+    static from(json) {
         return new HistoryOrder(
             json.id,
             json.bookTitle,
-            new Date (json.dateCreated).toDateString(),
+            new Date(json.dateCreated).toDateString(),
             json.dateReturned ? new Date(json.dateReturned).toDateString() : 'Not accepted',
             json.status
         );

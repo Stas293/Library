@@ -12,12 +12,12 @@
     <jsp:attribute name="head">
         <title><fmt:message key="not.found.title"/></title>
     </jsp:attribute>
-  <jsp:body>
-    <div class="error-body">
-      <div class="error-message">
-        <h1><fmt:message key="not.found.title"/></h1>
-        <c:out value="${param.message}"/>
-      </div>
-    </div>
-  </jsp:body>
+    <jsp:body>
+        <div class="error-body">
+            <div class="error-message">
+                <h1><fmt:message key="not.found.title"/></h1>
+                <c:out value="${param.message}"/>
+            </div>
+        </div>
+    </jsp:body>
 </tag:authorization>

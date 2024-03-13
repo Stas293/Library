@@ -1,9 +1,9 @@
-package ua.org.training.library.constants.postgres_queries.impl;
+package ua.org.training.library.enums.constants.postgres_queries;
 
 
-import ua.org.training.library.constants.postgres_queries.AuthorQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.enums.constants.AuthorQueries;
 import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.WeakConcurrentHashMap;
 import ua.org.training.library.utility.page.impl.Sort;
@@ -14,9 +14,9 @@ import java.util.Map;
 
 @Component
 public class AuthorQueriesImpl implements AuthorQueries {
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "id");
     private final Map<String, String> queries;
     private final QueryBuilderImpl queryBuilderImpl;
-    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "id");
 
     @Autowired
     public AuthorQueriesImpl(QueryBuilderImpl queryBuilderImpl) {
@@ -163,16 +163,16 @@ public class AuthorQueriesImpl implements AuthorQueries {
 
     @Override
     public String getSearchAuthors(Sort sort) {
-            return String.format(queries.computeIfAbsent("getSearchAuthors",
-                    key -> queryBuilderImpl
-                            .select("*, count(*) OVER()")
-                            .from("authors")
-                            .where("first_name LIKE ?")
-                            .or("middle_name LIKE ?")
-                            .or("last_name LIKE ?")
-                            .limit("?")
-                            .offset("?")
-                            .build()), Utility.orderBy(sort, DEFAULT_SORT));
+        return String.format(queries.computeIfAbsent("getSearchAuthors",
+                key -> queryBuilderImpl
+                        .select("*, count(*) OVER()")
+                        .from("authors")
+                        .where("first_name LIKE ?")
+                        .or("middle_name LIKE ?")
+                        .or("last_name LIKE ?")
+                        .limit("?")
+                        .offset("?")
+                        .build()), Utility.orderBy(sort, DEFAULT_SORT));
     }
 
     @Override

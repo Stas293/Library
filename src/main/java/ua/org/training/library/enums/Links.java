@@ -9,7 +9,8 @@ public enum Links {
     FORGOT_PASSWORD_PAGE("/WEB-INF/reset-password.jsp"),
     RESET_PASSWORD_PAGE_REDIRECT("redirect:library/forgot-password"),
     RESET_PASSWORD_PAGE("/WEB-INF/reset-password.jsp"),
-    ENTER_NEW_PASSWORD_PAGE("/WEB-INF/enter-new-password.jsp"),;
+    ENTER_NEW_PASSWORD_PAGE("/WEB-INF/enter-new-password.jsp"),
+    ;
 
     private final String link;
 

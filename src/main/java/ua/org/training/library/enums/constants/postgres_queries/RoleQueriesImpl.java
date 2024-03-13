@@ -1,9 +1,9 @@
-package ua.org.training.library.constants.postgres_queries.impl;
+package ua.org.training.library.enums.constants.postgres_queries;
 
 
-import ua.org.training.library.constants.postgres_queries.PlaceQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.enums.constants.RoleQueries;
 import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.WeakConcurrentHashMap;
 import ua.org.training.library.utility.page.Pageable;
@@ -13,13 +13,13 @@ import ua.org.training.library.utility.query.QueryBuilderImpl;
 import java.util.Map;
 
 @Component
-public class PlaceQueriesImpl implements PlaceQueries {
+public class RoleQueriesImpl implements RoleQueries {
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "name");
     private final Map<String, String> queries;
     private final QueryBuilderImpl queryBuilderImpl;
-    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "code");
 
     @Autowired
-    public PlaceQueriesImpl(QueryBuilderImpl queryBuilderImpl) {
+    public RoleQueriesImpl(QueryBuilderImpl queryBuilderImpl) {
         this.queryBuilderImpl = queryBuilderImpl;
         this.queries = new WeakConcurrentHashMap<>();
     }
@@ -28,9 +28,9 @@ public class PlaceQueriesImpl implements PlaceQueries {
     public String getCreateQuery() {
         return queries.computeIfAbsent("getCreateQuery",
                 key -> queryBuilderImpl
-                        .insertInto("places")
-                        .columns("code", "default_days", "choosable")
-                        .values("?", "?", "?")
+                        .insertInto("roles")
+                        .columns("code", "name")
+                        .values("?", "?")
                         .build());
     }
 
@@ -39,7 +39,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
         return queries.computeIfAbsent("getGetByIdQuery",
                 key -> queryBuilderImpl
                         .select("*")
-                        .from("places")
+                        .from("roles")
                         .where("id = ?")
                         .build());
     }
@@ -48,7 +48,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
     public String getGetByIdsQuery(int size) {
         return queryBuilderImpl
                 .select("*")
-                .from("places")
+                .from("roles")
                 .where("id")
                 .in(size)
                 .build();
@@ -59,7 +59,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
         return queries.computeIfAbsent("getGetAllQuery",
                 key -> queryBuilderImpl
                         .select("*")
-                        .from("places")
+                        .from("roles")
                         .build());
     }
 
@@ -68,7 +68,7 @@ public class PlaceQueriesImpl implements PlaceQueries {
         return String.format(queries.computeIfAbsent("getGetAllQuerySort",
                 key -> queryBuilderImpl
                         .select("*")
-                        .from("places")
+                        .from("roles")
                         .orderBy("%s")
                         .build()), Utility.orderBy(sort, DEFAULT_SORT));
     }
@@ -77,8 +77,8 @@ public class PlaceQueriesImpl implements PlaceQueries {
     public String getGetPageQuery(Pageable page) {
         return String.format(queries.computeIfAbsent("getGetPageQuery",
                 key -> queryBuilderImpl
-                        .select("*")
-                        .from("places")
+                        .select("*, count(*) OVER() AS total")
+                        .from("roles")
                         .orderBy("%s")
                         .limit("?")
                         .offset("?")
@@ -89,10 +89,8 @@ public class PlaceQueriesImpl implements PlaceQueries {
     public String getUpdateQuery() {
         return queries.computeIfAbsent("getUpdateQuery",
                 key -> queryBuilderImpl
-                        .update("places")
-                        .set("code = ?")
-                        .set("default_days = ?")
-                        .set("choosable = ?")
+                        .update("roles")
+                        .set("code", "name")
                         .where("id = ?")
                         .build());
     }
@@ -101,17 +99,17 @@ public class PlaceQueriesImpl implements PlaceQueries {
     public String getDeleteQuery() {
         return queries.computeIfAbsent("getDeleteQuery",
                 key -> queryBuilderImpl
-                        .deleteFrom("places")
+                        .deleteFrom("roles")
                         .where("id = ?")
                         .build());
     }
 
     @Override
-    public String getCountQuery() {
-        return queries.computeIfAbsent("getCountQuery",
+    public String getGetCountQuery() {
+        return queries.computeIfAbsent("getGetCountQuery",
                 key -> queryBuilderImpl
                         .select("count(*)")
-                        .from("places")
+                        .from("roles")
                         .build());
     }
 
@@ -119,28 +117,17 @@ public class PlaceQueriesImpl implements PlaceQueries {
     public String getDeleteAllQuery() {
         return queries.computeIfAbsent("getDeleteAllQuery",
                 key -> queryBuilderImpl
-                        .truncate("places")
+                        .truncate("roles")
                         .build());
     }
 
     @Override
     public String getDeleteAllQuery(int size) {
         return queryBuilderImpl
-                .deleteFrom("places")
+                .deleteFrom("roles")
                 .where("id")
                 .in(size)
                 .build();
-    }
-
-    @Override
-    public String getGetByOrderIdQuery() {
-        return queries.computeIfAbsent("getGetByOrderIdQuery",
-                key -> queryBuilderImpl
-                        .select("p.*")
-                        .from("places p")
-                        .join("orders o", "p.id = o.place_id")
-                        .where("o.id = ?")
-                        .build());
     }
 
     @Override
@@ -148,8 +135,39 @@ public class PlaceQueriesImpl implements PlaceQueries {
         return queries.computeIfAbsent("getGetByCodeQuery",
                 key -> queryBuilderImpl
                         .select("*")
-                        .from("places")
+                        .from("roles")
                         .where("code = ?")
                         .build());
+    }
+
+    @Override
+    public String getGetByNameQuery() {
+        return queries.computeIfAbsent("getGetByCodeQuery",
+                key -> queryBuilderImpl
+                        .select("*")
+                        .from("roles")
+                        .where("name = ?")
+                        .build());
+    }
+
+    @Override
+    public String getGetRolesByUserIdQuery() {
+        return queries.computeIfAbsent("getGetRolesByUserIdQuery",
+                key -> queryBuilderImpl
+                        .select("r.*")
+                        .from("roles r")
+                        .join("user_role ur", "r.id = ur.role_id")
+                        .where("ur.user_id = ?")
+                        .build());
+    }
+
+    @Override
+    public String getGetAllByCodesQuery(int size) {
+        return queryBuilderImpl
+                .select("*")
+                .from("roles")
+                .where("code")
+                .in(size)
+                .build();
     }
 }

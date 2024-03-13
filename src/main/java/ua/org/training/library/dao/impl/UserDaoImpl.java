@@ -2,12 +2,12 @@ package ua.org.training.library.dao.impl;
 
 
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.constants.postgres_queries.UserQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.context.annotations.Qualifier;
 import ua.org.training.library.dao.UserDao;
 import ua.org.training.library.dao.collectors.Collector;
+import ua.org.training.library.enums.constants.UserQueries;
 import ua.org.training.library.exceptions.DaoException;
 import ua.org.training.library.model.Role;
 import ua.org.training.library.model.User;
@@ -17,7 +17,10 @@ import ua.org.training.library.utility.page.impl.PageImpl;
 import ua.org.training.library.utility.page.impl.Sort;
 
 import java.sql.*;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -406,11 +409,11 @@ public class UserDaoImpl implements UserDao {
                 ResultSet.CONCUR_READ_ONLY)) {
             statement.setFetchSize(pageable.getPageSize());
             statement.setFetchDirection(ResultSet.FETCH_FORWARD);
-            statement.setString(1, "%"+search+"%");
-            statement.setString(2, "%"+search+"%");
-            statement.setString(3, "%"+search+"%");
-            statement.setString(4, "%"+search+"%");
-            statement.setString(5, "%"+search+"%");
+            statement.setString(1, "%" + search + "%");
+            statement.setString(2, "%" + search + "%");
+            statement.setString(3, "%" + search + "%");
+            statement.setString(4, "%" + search + "%");
+            statement.setString(5, "%" + search + "%");
             statement.setLong(6, pageable.getPageSize());
             statement.setLong(7, pageable.getOffset());
             try (var resultSet = statement.executeQuery()) {

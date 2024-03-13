@@ -8,7 +8,8 @@ public enum Mail {
     MAIL_ORDER_EXPIRATION("mail.order.expiration"),
     MAIL_STATUS("mail.status"),
     MAIL_SUBJECT_RESET_PASSWORD("mail.subject.reset.password"),
-    MAIL_TEXT_RESET_PASSWORD("mail.text.reset.password"),;
+    MAIL_TEXT_RESET_PASSWORD("mail.text.reset.password"),
+    ;
 
 
     private final String value;

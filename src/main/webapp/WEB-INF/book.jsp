@@ -19,19 +19,19 @@
                 <div class="col-md-8">
                     <h2 class="mb-4">${book.authors}</h2>
                     <div class="mb-4">
-                            <fmt:message key="book.publicationDate"/>:
+                        <fmt:message key="book.publicationDate"/>:
                             ${book.publicationDate}
                     </div>
                     <div class="mb-4">
-                            <fmt:message key="book.description"/>:
+                        <fmt:message key="book.description"/>:
                             ${book.description}
                     </div>
                     <div class="mb-4">
-                            <fmt:message key="book.isbn"/>:
+                        <fmt:message key="book.isbn"/>:
                             ${book.isbn}
                     </div>
                     <div class="mb-4">
-                            <fmt:message key="book.language"/>:
+                        <fmt:message key="book.language"/>:
                             ${book.language}
                     </div>
                     <div class="mb-4">
@@ -43,7 +43,7 @@
                         </c:if>
                     </div>
                     <div class="mb-4">
-                            <fmt:message key="book.keywords"/>:
+                        <fmt:message key="book.keywords"/>:
                             ${book.keywords}
                     </div>
                 </div>

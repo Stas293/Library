@@ -1,17 +1,17 @@
-package ua.org.training.library.constants.postgres_queries.impl;
+package ua.org.training.library.enums.constants.postgres_queries;
 
 
-import ua.org.training.library.constants.postgres_queries.SecurityQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.enums.constants.SecurityQueries;
 import ua.org.training.library.utility.query.QueryBuilderImpl;
 
 import java.lang.ref.WeakReference;
 
 @Component
 public class SecurityQueriesImpl implements SecurityQueries {
-    private WeakReference<String> passwordByLoginQuery;
     private final QueryBuilderImpl queryBuilderImpl;
+    private WeakReference<String> passwordByLoginQuery;
 
     @Autowired
     public SecurityQueriesImpl(QueryBuilderImpl queryBuilderImpl) {

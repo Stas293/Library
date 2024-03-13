@@ -56,7 +56,7 @@ const makeRow = (rowData, index) => {
     count.innerHTML = document.getElementById("book_count").innerHTML + `${rowData.count}`;
     modalBody.appendChild(count);
     let fine = document.createElement('p');
-    fine.innerHTML = document.getElementById("book_fine").innerHTML +  `${rowData.fine}`;
+    fine.innerHTML = document.getElementById("book_fine").innerHTML + `${rowData.fine}`;
     modalBody.appendChild(fine);
     let language = document.createElement('p');
     language.innerHTML = document.getElementById("book_language").innerHTML + `${rowData.language}`;

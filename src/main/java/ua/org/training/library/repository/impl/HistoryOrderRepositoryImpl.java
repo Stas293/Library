@@ -74,7 +74,7 @@ public class HistoryOrderRepositoryImpl implements HistoryOrderRepository {
         Connection conn = transactionManager.getConnection();
         if (entity.getId() == null) {
             log.info("Creating history order: {}", entity);
-            entity  = historyOrderDao.create(conn, entity);
+            entity = historyOrderDao.create(conn, entity);
         } else {
             log.info("Updating history order: {}", entity);
             historyOrderDao.update(conn, entity);

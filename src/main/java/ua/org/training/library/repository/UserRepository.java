@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public interface UserRepository extends JRepository<User, Long> {
     User save(User user, String password);
+
     Optional<User> getByLogin(String username);
 
     Optional<User> getByEmail(String email);

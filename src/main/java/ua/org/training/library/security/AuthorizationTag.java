@@ -30,8 +30,8 @@ public class AuthorizationTag extends TagSupport {
     @Override
     public int doStartTag() {
         AuthorityUser authorityUser = Optional.ofNullable(
-                (AuthorityUser) pageContext.findAttribute(
-                        DefaultValues.USER_ATTRIBUTE.getValue()))
+                        (AuthorityUser) pageContext.findAttribute(
+                                DefaultValues.USER_ATTRIBUTE.getValue()))
                 .orElse(AuthorityUser.ANONYMOUS);
         log.info(role);
         log.info("AuthorityUser: {}", authorityUser);

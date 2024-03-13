@@ -8,8 +8,8 @@
 <fmt:setLocale value="${sessionScope.lang}"/>
 <fmt:setBundle basename="interface"/>
 
-<fmt:message var="dateCreated" key="librarian.user.order.date.created" />
-<fmt:message var="dateExpire" key="librarian.user.order.date.expire" />
+<fmt:message var="dateCreated" key="librarian.user.order.date.created"/>
+<fmt:message var="dateExpire" key="librarian.user.order.date.expire"/>
 
 <tag:authorization>
     <jsp:attribute name="head">
@@ -37,10 +37,11 @@
             <div class="grid-container">
                 <div class="grid-left-3">
                     <div class="list-group list-group-flush components">
-                        <label class="list-group-item list-group-item-action" onclick="showUsersOrders()" >
+                        <label class="list-group-item list-group-item-action" onclick="showUsersOrders()">
                             <fmt:message key="librarian.orders"/>
                         </label>
-                        <label class="list-group-item list-group-item-action" onclick="showAcceptedOrdersOnSubscription()">
+                        <label class="list-group-item list-group-item-action"
+                               onclick="showAcceptedOrdersOnSubscription()">
                             <fmt:message key="librarian.subscriptions"/>
                         </label>
                         <label class="list-group-item list-group-item-action" onclick="showAcceptedOrdersReadingRoom()">
@@ -53,8 +54,9 @@
                         <input id="search" class="col-4 rounded border" type="text"
                                placeholder="<fmt:message key="table.search" />">
                         <input id="size" class="col-2 rounded border" type="number" min="2" max="8" value="5">
-                        <input name="sorting" class="hidden" type="radio" id="asc" value="ASC" checked><label class="col-2"
-                                                                                                              for="asc"><fmt:message
+                        <input name="sorting" class="hidden" type="radio" id="asc" value="ASC" checked><label
+                            class="col-2"
+                            for="asc"><fmt:message
                             key="table.asc"/></label>
                         <input name="sorting" class="hidden" type="radio" id="desc" value="DESC"><label class="col-2"
                                                                                                         for="desc"><fmt:message

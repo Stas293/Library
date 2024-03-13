@@ -121,19 +121,19 @@ public class RequestParamsObjectMapper {
         String keywordsRequest = request.getParameter("keywords");
         List<KeywordManagementDto> keywords = keywordsRequest == null ? List.of() :
                 Arrays.stream(request.getParameter("keywords")
-                .split(","))
-                .map(id -> KeywordManagementDto.builder()
-                        .id(Long.parseLong(id))
-                        .build())
-                .toList();
+                                .split(","))
+                        .map(id -> KeywordManagementDto.builder()
+                                .id(Long.parseLong(id))
+                                .build())
+                        .toList();
         String authorsRequest = request.getParameter("authors");
-        List<AuthorManagementDto> authors = authorsRequest== null ? List.of() :
+        List<AuthorManagementDto> authors = authorsRequest == null ? List.of() :
                 Arrays.stream(request.getParameter("authors")
-                .split(","))
-                .map(id -> AuthorManagementDto.builder()
-                        .id(Long.parseLong(id))
-                        .build())
-                .toList();
+                                .split(","))
+                        .map(id -> AuthorManagementDto.builder()
+                                .id(Long.parseLong(id))
+                                .build())
+                        .toList();
         return BookChangeDto.builder()
                 .id(Utility.tryParseLong(request.getParameter("id")))
                 .title(request.getParameter("title"))

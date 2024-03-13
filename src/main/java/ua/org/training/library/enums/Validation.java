@@ -28,7 +28,8 @@ public enum Validation {
     AUTHORS_EMPTY("form.validation.authors.empty"),
     KEYWORDS_EMPTY("form.validation.keywords.empty"),
     PUBLICATION_DATE_EMPTY("form.validation.publication.date.empty"),
-    ISBN_EXISTS("form.validation.isbn.exists"),;
+    ISBN_EXISTS("form.validation.isbn.exists"),
+    ;
     private final String message;
 
     Validation(String message) {

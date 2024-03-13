@@ -16,7 +16,8 @@
         <div class="container main-content">
             <ol class="breadcrumb list-group-item-dark rounded">
                 <li class="breadcrumb-item"><a href="/"><fmt:message key="home.pageTitle"/></a></li>
-                <li class="breadcrumb-item active"><a href="/library/login"><fmt:message key="subhead.welcome"/></a></li>
+                <li class="breadcrumb-item active"><a href="/library/login"><fmt:message key="subhead.welcome"/></a>
+                </li>
             </ol>
             <h1 class="text-center mb-4"><fmt:message key="user.reset.password"/></h1>
             <form class="form-floating" method="post">

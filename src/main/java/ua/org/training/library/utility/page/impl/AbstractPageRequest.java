@@ -33,7 +33,7 @@ public abstract class AbstractPageRequest implements Pageable, Serializable {
     }
 
     public long getOffset() {
-        return (long)this.page * (long)this.size;
+        return (long) this.page * (long) this.size;
     }
 
     public boolean hasPrevious() {

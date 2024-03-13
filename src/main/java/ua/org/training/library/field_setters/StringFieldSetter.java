@@ -1,8 +1,8 @@
 package ua.org.training.library.field_setters;
 
+import ua.org.training.library.context.annotations.ClassManagerType;
 import ua.org.training.library.context.annotations.Component;
 import ua.org.training.library.context.annotations.ContextInitClass;
-import ua.org.training.library.context.annotations.ClassManagerType;
 
 import java.lang.reflect.Field;
 

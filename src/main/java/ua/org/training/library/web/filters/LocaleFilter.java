@@ -4,8 +4,8 @@ package ua.org.training.library.web.filters;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import ua.org.training.library.enums.DefaultValues;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.enums.DefaultValues;
 
 import java.io.IOException;
 

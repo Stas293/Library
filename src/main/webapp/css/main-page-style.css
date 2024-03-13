@@ -1,8 +1,8 @@
-.box-slider{
+.box-slider {
     height: 100%;
 }
 
-.box-slider .carousel-inner{
+.box-slider .carousel-inner {
     height: 100%;
 }
 
@@ -22,7 +22,7 @@
     top: 0;
     left: 0;
     display: block;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .first-section h2 {
@@ -36,7 +36,7 @@
     position: relative;
 }
 
-.first-section h2 strong{
+.first-section h2 strong {
     color: #c76700;
 }
 
@@ -49,25 +49,25 @@
     color: #ffffff;
 }
 
-.box-slider .first-section{
+.box-slider .first-section {
     display: table;
     position: relative;
     width: 100%;
 }
 
-.dtab{
+.dtab {
     display: table-cell;
     vertical-align: middle;
 }
 
-#carouselExampleControls{
+#carouselExampleControls {
     position: absolute;
-    top:0;
-    left:0;
+    top: 0;
+    left: 0;
     width: 100vw;
     height: 100vh;
 }
 
-.carousel-indicators{
+.carousel-indicators {
     margin-bottom: 60px;
 }

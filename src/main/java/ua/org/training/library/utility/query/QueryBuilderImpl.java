@@ -11,6 +11,16 @@ public class QueryBuilderImpl implements QueryBuilder {
         query = ThreadLocal.withInitial(StringBuilder::new);
     }
 
+    private static void addVariablesList(String[] values,
+                                         StringBuilder stringBuilder) {
+        for (int i = 0; i < values.length; i++) {
+            stringBuilder.append(values[i]);
+            if (i < values.length - 1) {
+                stringBuilder.append(", ");
+            }
+        }
+    }
+
     @Override
     public QueryBuilder as(String alias) {
         query.get()
@@ -84,16 +94,6 @@ public class QueryBuilderImpl implements QueryBuilder {
         addVariablesList(values, stringBuilder);
         stringBuilder.append(")");
         return this;
-    }
-
-    private static void addVariablesList(String[] values,
-                                         StringBuilder stringBuilder) {
-        for (int i = 0; i < values.length; i++) {
-            stringBuilder.append(values[i]);
-            if (i < values.length - 1) {
-                stringBuilder.append(", ");
-            }
-        }
     }
 
     public QueryBuilder update(String table) {

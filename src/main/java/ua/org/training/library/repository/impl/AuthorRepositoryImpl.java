@@ -31,7 +31,7 @@ public class AuthorRepositoryImpl implements AuthorRepository {
         Connection conn = transactionManager.getConnection();
         if (entity.getId() == null) {
             log.info("Creating author: {}", entity);
-            entity  = dao.create(conn, entity);
+            entity = dao.create(conn, entity);
         } else {
             log.info("Updating author: {}", entity);
             dao.update(conn, entity);

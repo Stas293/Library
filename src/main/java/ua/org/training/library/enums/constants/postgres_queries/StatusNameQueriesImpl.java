@@ -1,9 +1,9 @@
-package ua.org.training.library.constants.postgres_queries.impl;
+package ua.org.training.library.enums.constants.postgres_queries;
 
 
-import ua.org.training.library.constants.postgres_queries.StatusNameQueries;
 import ua.org.training.library.context.annotations.Autowired;
 import ua.org.training.library.context.annotations.Component;
+import ua.org.training.library.enums.constants.StatusNameQueries;
 import ua.org.training.library.utility.Utility;
 import ua.org.training.library.utility.WeakConcurrentHashMap;
 import ua.org.training.library.utility.page.Pageable;
@@ -14,9 +14,9 @@ import java.util.Map;
 
 @Component
 public class StatusNameQueriesImpl implements StatusNameQueries {
+    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "name");
     private final Map<String, String> queries;
     private final QueryBuilderImpl queryBuilderImpl;
-    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.ASC, "name");
 
     @Autowired
     public StatusNameQueriesImpl(QueryBuilderImpl queryBuilderImpl) {

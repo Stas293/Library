@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<%@ page contentType="text/html;charset=UTF-8" isELIgnored="false" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ page contentType="text/html;charset=UTF-8" isELIgnored="false" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="tag" tagdir="/WEB-INF/tags" %>
 
-<fmt:requestEncoding value="UTF-8" />
-<fmt:setLocale value="${sessionScope.lang}" />
+<fmt:requestEncoding value="UTF-8"/>
+<fmt:setLocale value="${sessionScope.lang}"/>
 <fmt:setBundle basename="interface"/>
 
 <tag:authorization>
@@ -15,9 +15,9 @@
     <jsp:body>
         <div class="error-body">
             <div class="error-message">
-                <h1><fmt:message key="error.title" /></h1>
+                <h1><fmt:message key="error.title"/></h1>
                 <c:out value="${param.message}"/>
-                <p><fmt:message key="error.contact.admin" /></p>
+                <p><fmt:message key="error.contact.admin"/></p>
             </div>
         </div>
     </jsp:body>
